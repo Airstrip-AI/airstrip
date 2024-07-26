@@ -4,8 +4,8 @@ import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import type { Metadata } from 'next';
-import { Open_Sans } from 'next/font/google';
-const font = Open_Sans({ subsets: ['latin'] });
+import { Poppins } from 'next/font/google';
+const font = Poppins({ weight: '400', subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Airstrip | Open-source Enterprise AI Management Platform',
