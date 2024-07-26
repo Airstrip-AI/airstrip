@@ -1,0 +1,8 @@
+@import '@mantine/core/styles.css';
+@import '@mantine/notifications/styles.css';
+@import 'mantine-react-table/styles.css';
+
+body {
+  margin: 0px;
+  background: rgb(248, 249, 250);
+}
