@@ -8,10 +8,10 @@ export default function Cta() {
     <Container mt={rem(100)}>
       <Card style={{ backgroundColor: '#131111' }} p="xl">
         <Stack gap="lg">
-          <Text ta="center" fw="400" size="36px" c="#ffffff">
+          <Text ta="center" fw="400" size={rem(36)} c="#ffffff">
             Ready to take flight with Airstrip?
           </Text>
-          <Text size="18px" pt={rem(20)} ta="center" c="#ffffff">
+          <Text size={rem(18)} pt={rem(20)} ta="center" c="#ffffff">
             Start managing your AI integrations, control access, and build
             internal AI apps with ease.
           </Text>

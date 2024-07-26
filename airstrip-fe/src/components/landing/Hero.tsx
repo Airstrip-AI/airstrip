@@ -12,10 +12,10 @@ export default function Hero() {
           <AbstractDotsAnimation size={500} loop={true} />
         </Flex>
         <div style={{ position: 'absolute', top: '0%' }}>
-          <Text fw="400" size="48px" pt={rem(150)} ta="center">
+          <Text fw="400" size={rem(48)} pt={rem(150)} ta="center">
             Open-source Enterprise AI Management Platform
           </Text>
-          <Text size="18px" pt={rem(20)} ta="center" c="dimmed">
+          <Text size={rem(18)} pt={rem(20)} ta="center" c="dimmed">
             Manage your AI integrations, control access, and build internal AI
             apps with ease.
           </Text>
