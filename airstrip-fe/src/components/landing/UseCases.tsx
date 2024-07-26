@@ -1,5 +1,6 @@
 'use client';
 
 export default function UseCases() {
-  return <div>UseCases</div>;
+  // to be implemented when we get use case examples from users
+  return null;
 }

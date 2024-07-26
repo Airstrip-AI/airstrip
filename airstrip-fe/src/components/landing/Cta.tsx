@@ -1,5 +1,25 @@
 'use client';
 
+import { Card, Container, Flex, rem, Stack, Text } from '@mantine/core';
+import GetStartedButton from './GetStartedButton';
+
 export default function Cta() {
-  return <div>Cta</div>;
+  return (
+    <Container mt={rem(100)}>
+      <Card style={{ backgroundColor: '#131111' }} p="xl">
+        <Stack gap="lg">
+          <Text ta="center" fw="400" size="36px" c="#ffffff">
+            Ready to take flight with Airstrip?
+          </Text>
+          <Text size="18px" pt={rem(20)} ta="center" c="#ffffff">
+            Start managing your AI integrations, control access, and build
+            internal AI apps with ease.
+          </Text>
+          <Flex justify="center">
+            <GetStartedButton variant="white" />
+          </Flex>
+        </Stack>
+      </Card>
+    </Container>
+  );
 }
