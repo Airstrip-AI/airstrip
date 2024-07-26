@@ -12,7 +12,10 @@ export function middleware(request: NextRequest) {
         request.url,
       ),
     );
-  } else if (currentUserJwt && request.nextUrl.pathname.startsWith(Links.login())) {
+  } else if (
+    currentUserJwt &&
+    request.nextUrl.pathname.startsWith(Links.login())
+  ) {
     return Response.redirect(new URL(Links.appHome(), request.url));
   }
 }

@@ -1,14 +1,15 @@
 import '@/app/styles.css';
+import { PRODUCT_NAME } from '@/constants';
 import theme from '@/theme';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
-const font = Poppins({ weight: '400', subsets: ['latin'] });
+import { Inter } from 'next/font/google';
+const font = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Airstrip | Open-source Enterprise AI Management Platform',
+  title: `${PRODUCT_NAME} | Open-source Enterprise AI Management Platform`,
   openGraph: {
     images: ['/logo.png'],
   },
