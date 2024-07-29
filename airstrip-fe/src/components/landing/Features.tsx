@@ -1,41 +1,57 @@
 'use client';
 
 import { Card, Container, rem, SimpleGrid, Stack, Text } from '@mantine/core';
+import { ReactNode } from 'react';
 
-const features: { title: string; description: string }[] = [
+const features: { title: string; benefits: ReactNode }[] = [
   {
-    title: 'AI integrations made easy',
-    description:
-      'Bring your own API keys and connect to OpenAI, Anthropic, Gemini, and more (even self-hosted ones).',
+    title: 'Multiple AI integrations made easy',
+    benefits: (
+      <>
+        <Text>
+          Bring your own API keys and connect to OpenAI, Anthropic, Gemini,
+          self-hosted LLMs, and more.
+        </Text>
+        <Text>
+          Switch between AI integrations with a single click. Test different AI
+          models and see which one works best for your use case.
+        </Text>
+      </>
+    ),
   },
   {
     title: 'Manage teams and control access',
-    description:
-      'Manage teams and control access to different AI integrations, API keys, and internal AI apps.',
+    benefits: (
+      <Text>
+        Manage teams and control access to different AI integrations, API keys,
+        and internal AI apps.
+      </Text>
+    ),
   },
   {
-    title: 'Build internal AI apps/APIs',
-    description:
-      'Build chatbots or internal tools to extract structured data. Use the apps via a UI or call them with REST API endpoints.',
+    title: 'Build internal AI apps and tools effortlessly',
+    benefits: (
+      <>
+        <Text>
+          <b>Both engineering and business teams</b> can build internal AI apps
+          easily.
+        </Text>
+        <Text>
+          Build chatbots or internal tools to extract structured data. Use the
+          apps via a UI or call them with REST API endpoints.
+        </Text>
+      </>
+    ),
   },
   {
-    title: 'Switch between AI integrations effortlessly',
-    description:
-      'Switch between AI integrations with a single click. Test different AI models and see which one works best for your use case.',
-  },
-  {
-    title: 'View AI responses and refine prompts',
-    description: 'View all responses and refine prompts easily in the webapp.',
-  },
-  {
-    title: 'For everyone, not just engineering',
-    description:
-      'Both engineering and business teams can use Airstrip to build internal AI apps easily.',
-  },
-  {
-    title: 'Monitor usage',
-    description:
-      'Monitor usage, metrics, and costs of your AI integrations and internal AI apps all in one place.',
+    title: 'All-in-one AI management',
+    benefits: (
+      <Text>
+        Monitor usage, metrics, and costs of your AI integrations and internal
+        AI apps all in one place. No more pulling usage data from multiple
+        places.
+      </Text>
+    ),
   },
 ];
 
@@ -55,7 +71,7 @@ export default function Features() {
               <Text fw="400" size={rem(24)}>
                 {feature.title}
               </Text>
-              <Text>{feature.description}</Text>
+              {feature.benefits}
             </Stack>
           </Card>
         ))}
