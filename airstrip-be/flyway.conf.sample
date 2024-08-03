@@ -1,0 +1,10 @@
+# These values should not be modified.
+flyway.baselineOnMigrate=false
+flyway.outOfOrder=false
+flyway.failOnMissingLocations=true
+flyway.locations=filesystem:migrations
+
+# Modify these values.
+flyway.url=jdbc:postgresql://localhost:5432/airstrip
+flyway.user=airstrip
+flyway.password=airstrip

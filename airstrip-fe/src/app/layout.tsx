@@ -1,4 +1,5 @@
 import '@/app/styles.css';
+import ReactQueryClientProvider from '@/components/react-query-client-provider';
 import { PRODUCT_NAME } from '@/constants';
 import theme from '@/theme';
 import { MantineProvider } from '@mantine/core';
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body className={font.className} style={{ backgroundColor: '#ffffff' }}>
         <MantineProvider theme={theme}>
           <Notifications />
-          <ModalsProvider>{children}</ModalsProvider>
+          <ReactQueryClientProvider>
+            <ModalsProvider>{children}</ModalsProvider>
+          </ReactQueryClientProvider>
         </MantineProvider>
       </body>
     </html>

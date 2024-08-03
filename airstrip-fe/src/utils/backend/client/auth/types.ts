@@ -1,7 +1,14 @@
+import { UserRole } from '@/utils/backend/client/common/types';
+
 export class UserProfileResp {
   id: string;
   email: string;
   firstName: string;
+  orgs: {
+    id: string;
+    name: string;
+    role: UserRole;
+  }[];
 }
 
 export class LoginResp extends UserProfileResp {
@@ -10,6 +17,7 @@ export class LoginResp extends UserProfileResp {
 
 export class RegisterUserReq {
   email: string;
+  firstName: string;
   password: string;
 }
 

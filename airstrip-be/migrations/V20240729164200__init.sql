@@ -1,0 +1,73 @@
+CREATE TABLE users (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  email TEXT NOT NULL,
+  password_hash TEXT NOT NULL,
+  first_name TEXT NOT NULL,
+  verified BOOLEAN NOT NULL DEFAULT 'f',
+  verified_at TIMESTAMPTZ,
+  verify_token TEXT UNIQUE,
+  verify_token_expires_at TIMESTAMPTZ,
+  reset_password_token TEXT UNIQUE,
+  reset_password_token_expires_at TIMESTAMPTZ
+);
+
+CREATE UNIQUE INDEX ON users(lower(email));
+
+CREATE TABLE organizations (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE org_users (
+  user_id uuid NOT NULL,
+  org_id uuid NOT NULL,
+  role TEXT NOT NULL,
+  joined_org_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY(user_id, org_id),
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY(org_id) REFERENCES organizations(id) ON DELETE CASCADE
+);
+
+CREATE TABLE org_teams (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  org_id uuid NOT NULL,
+  name TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  FOREIGN KEY(org_id) REFERENCES organizations(id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX ON org_teams(org_id, lower(name));
+
+CREATE TABLE org_team_users (
+  org_team_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  org_id uuid NOT NULL,
+  role TEXT NOT NULL,
+  joined_team_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY(org_team_id, user_id),
+  FOREIGN KEY(org_team_id) REFERENCES org_teams(id) ON DELETE CASCADE,
+  FOREIGN KEY(user_id, org_id) REFERENCES org_users(user_id, org_id) ON DELETE CASCADE
+);
+
+CREATE TABLE org_invites (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  org_id uuid NOT NULL,
+  inviter_id uuid NOT NULL,
+  email TEXT NOT NULL,
+  role TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  accepted_at TIMESTAMPTZ,
+  token TEXT UNIQUE NOT NULL,
+  FOREIGN KEY(org_id) REFERENCES organizations(id) ON DELETE CASCADE,
+  FOREIGN KEY(inviter_id) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE (org_id, email)
+);

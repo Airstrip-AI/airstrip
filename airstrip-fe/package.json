@@ -21,6 +21,7 @@
     "clsx": "^2.1.1",
     "cookies-next": "^4.2.1",
     "dayjs": "^1.11.12",
+    "invariant": "^2.2.4",
     "jwt-decode": "^4.0.0",
     "mantine-react-table": "^2.0.0-beta.6",
     "next": "14.2.5",
@@ -31,6 +32,7 @@
     "react-redux": "^9.1.2"
   },
   "devDependencies": {
+    "@types/invariant": "^2.2.37",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -1,11 +1,13 @@
-import { UserProfileResp } from '@/utils/backend/types/auth';
+import { UserProfileResp } from '@/utils/backend/client/auth/types';
 import { Links } from '@/utils/misc/links';
+import { useLocalStorage } from '@mantine/hooks';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from 'react-query';
 
 export const currentUserJwtKey = 'currentUserJwt';
+export const activeOrgIdKey = 'active-org-id';
 
 export function getUserAuthToken() {
   return getCookie(currentUserJwtKey) as string | undefined;
@@ -19,6 +21,9 @@ export function verifyAuthToken(authToken: string) {
 
 export function useLogin() {
   const router = useRouter();
+  const [activeOrgId, setActiveOrgId] = useLocalStorage({
+    key: activeOrgIdKey,
+  });
 
   function login(
     _currentUser: UserProfileResp,
@@ -28,6 +33,13 @@ export function useLogin() {
     setCookie(currentUserJwtKey, authToken, {
       sameSite: true,
     });
+    if (
+      !activeOrgId ||
+      !_currentUser.orgs.find((org) => org.id === activeOrgId)
+    ) {
+      setActiveOrgId(_currentUser.orgs[0]?.id || '');
+    }
+
     router.push(redirectTo || Links.appHome());
   }
 

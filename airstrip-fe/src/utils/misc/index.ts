@@ -1,0 +1,76 @@
+import { UserProfileResp } from '@/utils/backend/client/auth/types';
+import { UserRole } from '@/utils/backend/client/common/types';
+import { notifications } from '@mantine/notifications';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
+
+/**
+ * This uses the Mantine notifications library to show a notification, hence must be called
+ * in a component within MantineProvider, and Notifications component should be rendered in the app.
+ */
+export function showErrorNotification(message: string) {
+  notifications.show({
+    title: 'Error',
+    color: 'red',
+    autoClose: 7000,
+    withBorder: true,
+    withCloseButton: true,
+    message,
+  });
+}
+
+/**
+ * This uses the Mantine notifications library to show a notification, hence must be called
+ * in a component within MantineProvider, and Notifications component should be rendered in the app.
+ */
+export function showSuccessNotification(message: string) {
+  notifications.show({
+    title: 'Success',
+    color: 'green',
+    autoClose: 7000,
+    withBorder: true,
+    withCloseButton: true,
+    message,
+  });
+}
+
+/**
+ * This uses the Mantine notifications library to show a notification, hence must be called
+ * in a component within MantineProvider, and Notifications component should be rendered in the app.
+ */
+export function showLoadingNotification(message: string) {
+  return notifications.show({
+    loading: true,
+    withBorder: true,
+    withCloseButton: true,
+    message,
+  });
+}
+
+export function minutesAgo(date: Date): number {
+  return Math.floor((Date.now() - date.getTime()) / 60000);
+}
+
+export function fromNow(date: string): string {
+  return dayjs(date).fromNow();
+}
+
+export function passwordValidator(password: string): string | null {
+  return password.length < 8
+    ? 'Password should include at least 8 characters'
+    : null;
+}
+
+export function isAdminOrAboveInOrg(
+  orgId: string,
+  userProfile?: UserProfileResp,
+): boolean {
+  const orgRole = userProfile?.orgs.find((org) => org.id === orgId)?.role;
+  return !!(orgRole && isAdminOrAbove(orgRole));
+}
+
+export function isAdminOrAbove(role: UserRole): boolean {
+  return role === UserRole.ADMIN || role === UserRole.OWNER;
+}
