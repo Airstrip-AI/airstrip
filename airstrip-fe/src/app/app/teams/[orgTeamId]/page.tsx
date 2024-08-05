@@ -5,6 +5,7 @@ import ActionDropdownButton, {
   ActionMenuItemProps,
 } from '@/components/action-dropdown-button/ActionDropdownButton';
 import AddTeamUserSelect from '@/components/add-team-user-select/AddTeamUserSelect';
+import Breadcrumbs from '@/components/breadcrumbs/Breadcrumbs';
 import { roleColors } from '@/constants';
 import {
   useChangeOrgTeamUserRole,
@@ -22,6 +23,7 @@ import {
   showErrorNotification,
   showSuccessNotification,
 } from '@/utils/misc';
+import { Links } from '@/utils/misc/links';
 import {
   Alert,
   Avatar,
@@ -88,6 +90,8 @@ export default function TeamDetailsPage() {
     () => [
       {
         header: 'Member',
+        sortingFn: (a, b) =>
+          a.original.userFirstName.localeCompare(b.original.userFirstName),
         accessorFn: (data) => (
           <>
             {data.userFirstName} ({data.userEmail})
@@ -96,12 +100,16 @@ export default function TeamDetailsPage() {
       },
       {
         header: 'Role',
+        sortingFn: (a, b) => a.original.role.localeCompare(b.original.role),
         accessorFn: (data) => (
           <Badge color={roleColors[data.role]}>{data.role}</Badge>
         ),
       },
       {
         header: 'Joined',
+        sortingFn: (a, b) =>
+          new Date(a.original.joinedTeamAt).getTime() -
+          new Date(b.original.joinedTeamAt).getTime(),
         accessorFn: (data) => fromNow(data.joinedTeamAt),
       },
       ...(hasOrgAdminPrivileges || hasTeamAdminPrivileges
@@ -231,6 +239,9 @@ export default function TeamDetailsPage() {
 
   return (
     <Stack mb={rem(20)}>
+      <Breadcrumbs
+        items={[{ title: '< Teams', href: `${Links.users('teams')}` }]}
+      />
       <Group>
         <Avatar color="cyan">
           {orgTeam?.name

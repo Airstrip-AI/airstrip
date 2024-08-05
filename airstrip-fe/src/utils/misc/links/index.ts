@@ -7,7 +7,8 @@ export const Links = {
   requestResetPassword: () => '/request-reset-password',
   appHome: () => `${appPrefix}`,
 
-  users: () => `${appPrefix}/users`,
+  users: (tab?: 'members' | 'teams') =>
+    `${appPrefix}/users${tab ? `?tab=${tab}` : ''}`,
   aiIntegrations: () => `${appPrefix}/ai-integrations`,
   teams: () => `${appPrefix}/teams`,
   apps: () => `${appPrefix}/apps`,

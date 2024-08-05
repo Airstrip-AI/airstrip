@@ -43,7 +43,7 @@ CREATE TABLE org_teams (
   FOREIGN KEY(org_id) REFERENCES organizations(id) ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX ON org_teams(org_id, lower(name));
+CREATE INDEX ON org_teams(org_id);
 
 CREATE TABLE org_team_users (
   org_team_id uuid NOT NULL,
@@ -71,3 +71,20 @@ CREATE TABLE org_invites (
   FOREIGN KEY(inviter_id) REFERENCES users(id) ON DELETE CASCADE,
   UNIQUE (org_id, email)
 );
+
+CREATE TABLE ai_integrations (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  org_id uuid NOT NULL,
+  restricted_to_team_id uuid, -- null means unrestricted
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  ai_provider TEXT NOT NULL,
+  ai_provider_api_key TEXT UNIQUE NOT NULL,
+  ai_provider_api_url TEXT,
+  FOREIGN KEY(org_id) REFERENCES organizations(id) ON DELETE CASCADE,
+  FOREIGN KEY(restricted_to_team_id) REFERENCES org_teams(id) ON DELETE SET NULL
+);
+
+CREATE INDEX ON ai_integrations(org_id, ai_provider, restricted_to_team_id);

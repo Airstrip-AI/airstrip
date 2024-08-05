@@ -12,6 +12,7 @@ import { EnvVariables } from '../../utils/constants/env';
 import { OrgInvitesModule } from '../org-invites/org-invites.module';
 import { UserOrgInvitesModule } from '../user-org-invites/user-org-invites.module';
 import { OrgTeamsModule } from '../org-teams/org-teams.module';
+import { AiIntegrationsModule } from '../ai-integrations/ai-integrations.module';
 
 function getPostgresDbConfig(
   configService: ConfigService,
@@ -57,6 +58,7 @@ function getPostgresDbConfig(
     OrgInvitesModule,
     UserOrgInvitesModule,
     OrgTeamsModule,
+    AiIntegrationsModule,
   ],
   providers: [
     {

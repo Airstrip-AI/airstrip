@@ -19,9 +19,12 @@ export function OrgTeamsGuard({
    * Minimum role required to access the team. Both fields are joined by OR operator.
    * If anyone in the org can access, regardless of whether they are in the team, set
    * both fields to '*'.
+   *
+   * A null value in either field means that if user does not have a role that passes the minimum role for
+   * the OTHER field, they will not be able to access the resource.
    */
-  teamMinimumRole: AllowedMinimumRole;
-  orgMinimumRole: AllowedMinimumRole;
+  teamMinimumRole: AllowedMinimumRole | null;
+  orgMinimumRole: AllowedMinimumRole | null;
 }): CanActivate {
   @Injectable()
   class OrgTeamsGuardInner implements CanActivate {
@@ -58,8 +61,12 @@ export function OrgTeamsGuard({
       );
 
       return (
-        (!!userOrg && isUserRoleAllowed(userOrg.role, orgMinimumRole)) ||
-        (!!orgTeamUser && isUserRoleAllowed(orgTeamUser.role, teamMinimumRole))
+        (!!orgMinimumRole &&
+          !!userOrg &&
+          isUserRoleAllowed(userOrg.role, orgMinimumRole)) ||
+        (!!teamMinimumRole &&
+          !!orgTeamUser &&
+          isUserRoleAllowed(orgTeamUser.role, teamMinimumRole))
       );
     }
   }

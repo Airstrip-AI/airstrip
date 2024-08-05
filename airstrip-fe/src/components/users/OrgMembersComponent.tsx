@@ -59,6 +59,7 @@ export default function OrgMembersComponent({
       },
       {
         header: 'Role',
+        sortingFn: (a, b) => a.original.role.localeCompare(b.original.role),
         accessorFn: (data) => (
           <Badge color={roleColors[data.role]}>{data.role}</Badge>
         ),
@@ -66,6 +67,9 @@ export default function OrgMembersComponent({
       {
         header: 'Joined',
         accessorKey: 'joinedOrgAt',
+        sortingFn: (a, b) =>
+          new Date(a.original.joinedOrgAt).getTime() -
+          new Date(b.original.joinedOrgAt).getTime(),
         accessorFn: (data) => fromNow(data.joinedOrgAt),
       },
       ...(hasOrgAdminPrivileges

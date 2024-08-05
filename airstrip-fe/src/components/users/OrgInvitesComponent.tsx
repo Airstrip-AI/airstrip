@@ -184,6 +184,7 @@ export default function OrgInvitesComponent({
       },
       {
         header: 'Role',
+        sortingFn: (a, b) => a.original.role.localeCompare(b.original.role),
         accessorFn: (data) => (
           <Badge color={roleColors[data.role]}>{data.role}</Badge>
         ),
@@ -191,6 +192,9 @@ export default function OrgInvitesComponent({
       },
       {
         header: 'Sent',
+        sortingFn: (a, b) =>
+          new Date(a.original.sentAt).getTime() -
+          new Date(b.original.sentAt).getTime(),
         accessorFn: (data) => fromNow(data.sentAt),
         size: 50,
       },

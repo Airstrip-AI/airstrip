@@ -5,6 +5,7 @@ import { UserButton } from '@/components/user-button/UserButton';
 import { useCurrentUser } from '@/hooks/queries/user-auth';
 import { useGetPendingOrgInvitesForUser } from '@/hooks/queries/user-org-invites';
 import { activeOrgIdKey, useLogout } from '@/hooks/user';
+import { isAdminOrAboveInOrg } from '@/utils/misc';
 import { Links } from '@/utils/misc/links';
 import {
   AppShell,
@@ -31,11 +32,12 @@ import {
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 
 const sideNav: {
   href: string;
   label: React.ReactNode;
+  requiresOrgAdmin: boolean;
 }[] = [
   {
     href: Links.appHome(),
@@ -45,6 +47,7 @@ const sideNav: {
         Dashboard
       </Group>
     ),
+    requiresOrgAdmin: false,
   },
   {
     href: Links.users(),
@@ -54,6 +57,7 @@ const sideNav: {
         Members & Teams
       </Group>
     ),
+    requiresOrgAdmin: false,
   },
   {
     href: Links.aiIntegrations(),
@@ -63,6 +67,7 @@ const sideNav: {
         AI Integrations
       </Group>
     ),
+    requiresOrgAdmin: true,
   },
   {
     href: Links.apps(),
@@ -72,10 +77,11 @@ const sideNav: {
         Apps
       </Group>
     ),
+    requiresOrgAdmin: false,
   },
 ];
 
-function NavLinks() {
+function NavLinks({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
   const { data } = useGetPendingOrgInvitesForUser({});
 
@@ -114,27 +120,29 @@ function NavLinks() {
           borderRadius: 5,
         }}
       />
-      {sideNav.map((item, index) => {
-        const itemPathname = item.href.split('?')[0];
+      {sideNav
+        .map((item, index) => {
+          const itemPathname = item.href.split('?')[0];
 
-        return (
-          <NavLink
-            key={index}
-            component={Link}
-            href={item.href}
-            active={pathname === itemPathname}
-            label={item.label}
-            styles={{
-              label: {
-                fontWeight: 600,
-              },
-            }}
-            style={{
-              borderRadius: 5,
-            }}
-          />
-        );
-      })}
+          return !item.requiresOrgAdmin || isAdmin ? (
+            <NavLink
+              key={index}
+              component={Link}
+              href={item.href}
+              active={pathname === itemPathname}
+              label={item.label}
+              styles={{
+                label: {
+                  fontWeight: 600,
+                },
+              }}
+              style={{
+                borderRadius: 5,
+              }}
+            />
+          ) : null;
+        })
+        .filter(Boolean)}
     </>
   );
 }
@@ -148,8 +156,15 @@ export default function Layout({ children }: PropsWithChildren) {
     key: activeOrgIdKey,
   });
 
+  const [hasOrgAdminPrivileges, setHasOrgAdminPrivileges] =
+    useState<boolean>(false);
+
   const [opened, { toggle }] = useDisclosure();
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
+
+  useEffect(() => {
+    setHasOrgAdminPrivileges(isAdminOrAboveInOrg(activeOrgId, currentUser));
+  }, [activeOrgId, currentUser]);
 
   return (
     <AppShell
@@ -238,7 +253,7 @@ export default function Layout({ children }: PropsWithChildren) {
             </Menu.Dropdown>
           </Menu>
           <Divider />
-          <NavLinks />
+          <NavLinks isAdmin={hasOrgAdminPrivileges} />
           <Divider />
         </Stack>
       </AppShell.Navbar>

@@ -115,6 +115,7 @@ export default function OrgTeamsComponent({
       {
         header: 'Team',
         size: 300,
+        sortingFn: (a, b) => a.original.name.localeCompare(b.original.name),
         accessorFn: (data) => (
           <Group>
             <Avatar color="cyan">
@@ -140,6 +141,9 @@ export default function OrgTeamsComponent({
       },
       {
         header: 'Created',
+        sortingFn: (a, b) =>
+          new Date(a.original.createdAt).getTime() -
+          new Date(b.original.createdAt).getTime(),
         accessorFn: (data) => fromNow(data.createdAt),
       },
       {
