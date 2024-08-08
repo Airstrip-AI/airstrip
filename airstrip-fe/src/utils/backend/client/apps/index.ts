@@ -22,7 +22,7 @@ export async function createApp({
   body: CreateAppReq;
 }) {
   return await makePostRequest<CreateAppReq, AppResp>({
-    endpoint: `/api/v1/apps/orgs/${orgId}`,
+    endpoint: `/api/v1/orgs/${orgId}/apps`,
     authToken,
     body,
   });
@@ -38,7 +38,7 @@ export async function listAppsForUser({
   page: string;
 }) {
   return await makeGetRequest<ListAppsResp>({
-    endpoint: `/api/v1/apps/orgs/${orgId}?page=${page}`,
+    endpoint: `/api/v1/orgs/${orgId}/apps?page=${page}`,
     authToken,
   });
 }

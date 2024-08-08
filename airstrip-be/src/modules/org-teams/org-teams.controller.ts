@@ -34,12 +34,13 @@ import { ApiResponse } from '@nestjs/swagger';
 import { OrgTeamsGuard } from './org-teams.guard';
 import { MessageResp } from '../../utils/common';
 
-@Controller('org-teams')
+@Controller()
 export class OrgTeamsController {
   constructor(private readonly orgTeamsService: OrgTeamsService) {}
 
-  @Get('user/orgs/:orgId')
+  @Get('orgs/:orgId/org-teams/for-user')
   @UseGuards(OrgsGuard('*'))
+  @ApiResponse({ status: '2XX', type: GetUserOrgTeamsResp })
   async getOrgTeamsForUser(
     @Request() request: AuthedRequest,
     @Param('orgId', ParseUUIDPipe) orgId: string,
@@ -59,7 +60,7 @@ export class OrgTeamsController {
     };
   }
 
-  @Post('orgs/:orgId')
+  @Post('orgs/:orgId/org-teams')
   @UseGuards(OrgsGuard(UserRole.ADMIN))
   @ApiResponse({ status: '2XX', type: OrgTeamResp })
   async createTeam(
@@ -77,7 +78,7 @@ export class OrgTeamsController {
     return this.orgTeamEntityToResp(orgTeamEntity);
   }
 
-  @Get('orgs/:orgId')
+  @Get('orgs/:orgId/org-teams')
   @UseGuards(OrgsGuard('*'))
   @ApiResponse({ status: '2XX', type: GetOrgTeamsResp })
   async getOrgTeams(
@@ -97,7 +98,7 @@ export class OrgTeamsController {
     };
   }
 
-  @Get(':orgTeamId')
+  @Get('org-teams/:orgTeamId')
   @UseGuards(
     OrgTeamsGuard({
       teamMinimumRole: '*',
@@ -121,7 +122,7 @@ export class OrgTeamsController {
    * This gets all users in an org and details on whether they are in the team pointed by orgTeamId.
    * Useful for populating a list of users to add to a team.
    */
-  @Get(':orgTeamId/org-users')
+  @Get('org-teams/:orgTeamId/org-users')
   @UseGuards(
     OrgTeamsGuard({
       teamMinimumRole: '*',
@@ -153,7 +154,7 @@ export class OrgTeamsController {
     };
   }
 
-  @Get(':orgTeamId/users')
+  @Get('org-teams/:orgTeamId/users')
   @UseGuards(
     OrgTeamsGuard({
       teamMinimumRole: '*',
@@ -176,7 +177,7 @@ export class OrgTeamsController {
     };
   }
 
-  @Post(':orgTeamId/users')
+  @Post('org-teams/:orgTeamId/users')
   @UseGuards(
     OrgTeamsGuard({
       teamMinimumRole: UserRole.ADMIN,
@@ -198,7 +199,7 @@ export class OrgTeamsController {
     };
   }
 
-  @Put(':orgTeamId/users/change-role')
+  @Put('org-teams/:orgTeamId/users/change-role')
   @UseGuards(
     OrgTeamsGuard({
       teamMinimumRole: UserRole.ADMIN,

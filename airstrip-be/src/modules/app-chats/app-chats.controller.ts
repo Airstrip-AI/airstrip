@@ -15,11 +15,11 @@ import { AuthedRequest } from '../auth/types/service';
 import { Response } from 'express';
 import { Message } from 'ai';
 
-@Controller('app-chats')
+@Controller()
 export class AppChatsController {
   constructor(private readonly appChatsService: AppChatsService) {}
 
-  @Post('stream/apps/:appId')
+  @Post('apps/:appId/stream-chat')
   @UseGuards(
     AppsGuard({
       teamMinimumRole: '*',

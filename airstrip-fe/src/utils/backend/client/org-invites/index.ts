@@ -19,7 +19,7 @@ export async function getPendingOrgInvites({
   authToken: string;
 }) {
   return await makeGetRequest<GetPendingOrgInvitesResp>({
-    endpoint: `/api/v1/org-invites/orgs/${orgId}/pending?page=${page}`,
+    endpoint: `/api/v1/orgs/${orgId}/org-invites/pending?page=${page}`,
     authToken,
   });
 }
@@ -34,7 +34,7 @@ export async function sendOrgInvites({
   body: OrgInvitesReq;
 }) {
   return await makePostRequest<OrgInvitesReq, MessageResp>({
-    endpoint: `/api/v1/org-invites/orgs/${orgId}`,
+    endpoint: `/api/v1/orgs/${orgId}/org-invites`,
     authToken,
     body,
   });

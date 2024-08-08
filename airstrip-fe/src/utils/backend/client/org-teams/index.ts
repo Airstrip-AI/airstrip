@@ -25,7 +25,7 @@ export async function createTeam({
   body: CreateOrgTeamReq;
 }) {
   return await makePostRequest<CreateOrgTeamReq, OrgTeamResp>({
-    endpoint: `/api/v1/org-teams/orgs/${orgId}`,
+    endpoint: `/api/v1/orgs/${orgId}/org-teams`,
     authToken,
     body,
   });
@@ -41,7 +41,7 @@ export async function getOrgTeams({
   authToken: string;
 }) {
   return await makeGetRequest<GetOrgTeamsResp>({
-    endpoint: `/api/v1/org-teams/orgs/${orgId}?page=${page}`,
+    endpoint: `/api/v1/orgs/${orgId}/org-teams?page=${page}`,
     authToken,
   });
 }
@@ -131,7 +131,7 @@ export async function getUserOrgTeams({
   authToken: string;
 }) {
   return await makeGetRequest<GetUserOrgTeamsResp>({
-    endpoint: `/api/v1/org-teams/user/orgs/${orgId}`,
+    endpoint: `/api/v1/orgs/${orgId}/org-teams/for-user`,
     authToken,
   });
 }

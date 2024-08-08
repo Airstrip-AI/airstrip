@@ -28,11 +28,11 @@ import { AuthedRequest } from '../auth/types/service';
 import { AppEntityWithOrgTeamAiProviderJoined } from './types/service';
 import { OrgsGuard } from '../orgs/orgs.guard';
 
-@Controller('apps')
+@Controller()
 export class AppsController {
   constructor(private readonly appsService: AppsService) {}
 
-  @Post('orgs/:orgId')
+  @Post('orgs/:orgId/apps')
   @UseGuards(
     AppsCreationGuard({
       teamMinimumRole: UserRole.ADMIN,
@@ -49,7 +49,7 @@ export class AppsController {
     );
   }
 
-  @Get('orgs/:orgId')
+  @Get('orgs/:orgId/apps')
   @UseGuards(OrgsGuard('*'))
   @ApiResponse({ status: '2XX', type: ListAppsResp })
   async listAppsForUser(
@@ -68,7 +68,7 @@ export class AppsController {
     };
   }
 
-  @Put(':appId')
+  @Put('apps/:appId')
   @UseGuards(
     AppsGuard({
       teamMinimumRole: UserRole.ADMIN,
@@ -85,7 +85,7 @@ export class AppsController {
     );
   }
 
-  @Get(':appId')
+  @Get('apps/:appId')
   @UseGuards(
     AppsGuard({
       teamMinimumRole: '*',
@@ -100,7 +100,7 @@ export class AppsController {
   /**
    * This is accessible by all org members, hence the response does not return sensitive data like api key.
    */
-  @Get(':appId/allowed-ai-providers')
+  @Get('apps/:appId/allowed-ai-providers')
   @UseGuards(
     AppsGuard({
       teamMinimumRole: '*',
@@ -123,7 +123,7 @@ export class AppsController {
     };
   }
 
-  @Get(':appId/check-user-privileges')
+  @Get('apps/:appId/check-user-privileges')
   @UseGuards(
     AppsGuard({
       teamMinimumRole: '*',

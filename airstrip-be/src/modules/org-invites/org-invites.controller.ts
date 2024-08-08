@@ -21,11 +21,11 @@ import { OrgsGuard } from '../orgs/orgs.guard';
 import { UserRole } from '../../utils/constants';
 import { OrgInvitesGuard } from './org-invites.guard';
 
-@Controller('org-invites')
+@Controller()
 export class OrgInvitesController {
   constructor(private readonly orgInvitesService: OrgInvitesService) {}
 
-  @Post('orgs/:orgId')
+  @Post('orgs/:orgId/org-invites')
   @UseGuards(OrgsGuard(UserRole.ADMIN))
   @ApiResponse({ status: '2XX', type: MessageResp })
   async inviteUsersToOrg(
@@ -43,7 +43,7 @@ export class OrgInvitesController {
     };
   }
 
-  @Get('orgs/:orgId/pending')
+  @Get('orgs/:orgId/org-invites/pending')
   @UseGuards(OrgsGuard(UserRole.ADMIN))
   @ApiResponse({ status: '2XX', type: GetPendingOrgInvitesResp })
   async getPendingOrgInvites(
@@ -58,7 +58,7 @@ export class OrgInvitesController {
     };
   }
 
-  @Delete(':orgInviteId')
+  @Delete('org-invites/:orgInviteId')
   @UseGuards(OrgInvitesGuard(UserRole.ADMIN))
   @ApiResponse({ status: '2XX', type: MessageResp })
   async cancelOrgInvite(

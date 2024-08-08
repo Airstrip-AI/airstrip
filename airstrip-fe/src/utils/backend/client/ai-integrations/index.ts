@@ -23,7 +23,7 @@ export async function createAiIntegration({
   body: CreateAiIntegrationReq;
 }) {
   return await makePostRequest<CreateAiIntegrationReq, AiIntegrationKeyResp>({
-    endpoint: `/api/v1/ai-integrations/orgs/${orgId}`,
+    endpoint: `/api/v1/orgs/${orgId}/ai-integrations`,
     authToken,
     body,
   });
@@ -81,7 +81,7 @@ export async function listAiIntegrationsInOrg({
   authToken: string;
 }) {
   return await makeGetRequest<ListAiIntegrationsResp>({
-    endpoint: `/api/v1/ai-integrations/orgs/${orgId}?page=${page}`,
+    endpoint: `/api/v1/orgs/${orgId}/ai-integrations?page=${page}`,
     authToken,
   });
 }
@@ -94,7 +94,7 @@ export async function getAllAiIntegrationsAccessibleByTeam({
   authToken: string;
 }) {
   return await makeGetRequest<GetAllAiIntegrationsAccessibleByTeamResp>({
-    endpoint: `/api/v1/ai-integrations/org-teams/${orgTeamId}`,
+    endpoint: `/api/v1/org-teams/${orgTeamId}/ai-integrations`,
     authToken,
   });
 }

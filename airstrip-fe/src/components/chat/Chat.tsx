@@ -28,8 +28,7 @@ export default function Chat({ app }: { app: AppResp }) {
     isLoading,
     stop,
   } = useChat({
-    api: new URL(`/api/v1/app-chats/stream/apps/${app.id}`, getBackendUrl())
-      .href,
+    api: new URL(`/api/v1/apps/${app.id}/stream-chat`, getBackendUrl()).href,
     headers: {
       Authorization: `Bearer ${authToken}`,
     },
