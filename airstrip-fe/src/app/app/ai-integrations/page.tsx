@@ -10,7 +10,6 @@ import {
 import { useCurrentUser } from '@/hooks/queries/user-auth';
 import { activeOrgIdKey } from '@/hooks/user';
 import { AiIntegrationKeyResp } from '@/utils/backend/client/ai-integrations/types';
-import { AiProvider } from '@/utils/backend/client/common/types';
 import {
   fromNow,
   isAdminOrAboveInOrg,
@@ -22,10 +21,9 @@ import { Alert, Button, Flex, Modal, rem, Stack, Text } from '@mantine/core';
 import { readLocalStorageValue, useDisclosure } from '@mantine/hooks';
 import { MRT_ColumnDef } from 'mantine-react-table';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
-import { IconCode } from '@tabler/icons-react';
 import { showConfirmDeleteAiIntegrationModal } from '@/components/delete-ai-integration/helpers';
+import { loadImage } from '@/components/ai-providers-image/helpers';
 
 export default function AiIntegrationsPage() {
   const router = useRouter();
@@ -78,67 +76,14 @@ export default function AiIntegrationsPage() {
     </>
   );
 
-  const providerLogoSize = 20;
   const columns = useMemo<MRT_ColumnDef<AiIntegrationKeyResp>[]>(
     () => [
       {
         header: 'Provider',
         sortingFn: (a, b) =>
           a.original.aiProvider.localeCompare(b.original.aiProvider),
-        size: providerLogoSize,
-        accessorFn: (data) => {
-          switch (data.aiProvider) {
-            case AiProvider.OPENAI:
-              return (
-                <Image
-                  alt="OpenAI"
-                  src="/llm-provider-logos/openai.svg"
-                  width={providerLogoSize}
-                  height={providerLogoSize}
-                />
-              );
-            case AiProvider.OPENAI_COMPATIBLE:
-              return <IconCode size={providerLogoSize} />;
-            case AiProvider.MISTRAL:
-              return (
-                <Image
-                  alt="Mistral"
-                  src="/llm-provider-logos/mistral.svg"
-                  width={providerLogoSize}
-                  height={providerLogoSize}
-                />
-              );
-            case AiProvider.GOOGLE:
-              return (
-                <Image
-                  alt="Google"
-                  src="/llm-provider-logos/google.svg"
-                  width={providerLogoSize}
-                  height={providerLogoSize}
-                />
-              );
-            case AiProvider.COHERE:
-              return (
-                <Image
-                  alt="Cohere"
-                  src="/llm-provider-logos/cohere.png"
-                  width={providerLogoSize}
-                  height={providerLogoSize}
-                />
-              );
-            case AiProvider.ANTHROPIC:
-              return (
-                <Image
-                  alt="Anthropic"
-                  src="/llm-provider-logos/anthropic.svg"
-                  width={providerLogoSize}
-                  height={providerLogoSize}
-                />
-              );
-            default:
-              return <Text>{data.aiProvider}</Text>;
-          }
-        },
+        size: 20,
+        accessorFn: (data) => loadImage(data.aiProvider),
       },
       {
         header: 'Name',

@@ -16,3 +16,8 @@ export enum AiProvider {
   COHERE = 'COHERE',
   ANTHROPIC = 'ANTHROPIC',
 }
+
+export enum AppType {
+  CHAT = 'CHAT',
+  TOOL = 'TOOL',
+}

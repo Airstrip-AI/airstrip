@@ -24,6 +24,7 @@ import {
   GetOrgTeamsResp,
   GetOrgTeamUsersResp,
   GetOrgUserAndTeamMembershipResp,
+  GetUserOrgTeamsResp,
   OrgTeamResp,
   OrgTeamUserResp,
 } from './types/api';
@@ -36,6 +37,27 @@ import { MessageResp } from '../../utils/common';
 @Controller('org-teams')
 export class OrgTeamsController {
   constructor(private readonly orgTeamsService: OrgTeamsService) {}
+
+  @Get('user/orgs/:orgId')
+  @UseGuards(OrgsGuard('*'))
+  async getOrgTeamsForUser(
+    @Request() request: AuthedRequest,
+    @Param('orgId', ParseUUIDPipe) orgId: string,
+  ): Promise<GetUserOrgTeamsResp> {
+    const orgTeams = await this.orgTeamsService.getUserOrgTeams(
+      orgId,
+      request.user.id,
+    );
+    return {
+      data: orgTeams.map((orgTeam) => ({
+        teamId: orgTeam.orgTeamId,
+        orgId: orgTeam.orgId,
+        userId: orgTeam.userId,
+        role: orgTeam.role,
+        name: orgTeam.orgTeam.name,
+      })),
+    };
+  }
 
   @Post('orgs/:orgId')
   @UseGuards(OrgsGuard(UserRole.ADMIN))

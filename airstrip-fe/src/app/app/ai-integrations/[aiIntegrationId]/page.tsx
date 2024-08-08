@@ -104,7 +104,7 @@ function AiIntegrationDetailsForm({
           <Table withColumnBorders>
             <Table.Tbody>
               <Table.Tr>
-                <Table.Td>{formFieldLabel('Name')}</Table.Td>
+                <Table.Td width="20%">{formFieldLabel('Name')}</Table.Td>
                 <Table.Td>
                   <TextInput
                     {...form.getInputProps('name')}

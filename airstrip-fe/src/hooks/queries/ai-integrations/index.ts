@@ -3,7 +3,7 @@ import {
   createAiIntegration,
   deleteAiIntegration,
   getAiIntegration,
-  listAiIntegrationsAccessibleByTeam,
+  getAllAiIntegrationsAccessibleByTeam,
   listAiIntegrationsInOrg,
   updateAiIntegration,
 } from '@/utils/backend/client/ai-integrations';
@@ -157,7 +157,7 @@ export function useGetAiIntegrationsInOrg({
   });
 }
 
-export function useGetAiIntegrationsAccessibleByTeam({
+export function useGetAllAiIntegrationsAccessibleByTeam({
   orgTeamId,
   onSuccess,
   onError,
@@ -170,7 +170,7 @@ export function useGetAiIntegrationsAccessibleByTeam({
     queryKey: [QueryKeys.AI_INTEGRATIONS, 'org-teams', orgTeamId],
     queryFn: () => {
       const authToken = getValidToken();
-      return listAiIntegrationsAccessibleByTeam({
+      return getAllAiIntegrationsAccessibleByTeam({
         orgTeamId,
         authToken,
       });

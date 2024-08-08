@@ -1,6 +1,7 @@
 import {
   AiIntegrationKeyResp,
   CreateAiIntegrationReq,
+  GetAllAiIntegrationsAccessibleByTeamResp,
   ListAiIntegrationsResp,
   UpdateAiIntegrationReq,
 } from '@/utils/backend/client/ai-integrations/types';
@@ -85,14 +86,14 @@ export async function listAiIntegrationsInOrg({
   });
 }
 
-export async function listAiIntegrationsAccessibleByTeam({
+export async function getAllAiIntegrationsAccessibleByTeam({
   orgTeamId,
   authToken,
 }: {
   orgTeamId: string;
   authToken: string;
 }) {
-  return await makeGetRequest<ListAiIntegrationsResp>({
+  return await makeGetRequest<GetAllAiIntegrationsAccessibleByTeamResp>({
     endpoint: `/api/v1/ai-integrations/org-teams/${orgTeamId}`,
     authToken,
   });

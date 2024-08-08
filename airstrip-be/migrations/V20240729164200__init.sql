@@ -88,3 +88,25 @@ CREATE TABLE ai_integrations (
 );
 
 CREATE INDEX ON ai_integrations(org_id, ai_provider, restricted_to_team_id);
+
+CREATE TABLE apps (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  org_id uuid NOT NULL,
+  team_id uuid,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  type TEXT NOT NULL,
+  ai_provider_id uuid,
+  system_prompt TEXT,
+  introduction_message TEXT,
+  output_json_schema TEXT,
+  ai_model TEXT,
+  temperature FLOAT NOT NULL DEFAULT 1.0,
+  FOREIGN KEY(org_id) REFERENCES organizations(id) ON DELETE CASCADE,
+  FOREIGN KEY(team_id) REFERENCES org_teams(id) ON DELETE SET NULL,
+  FOREIGN KEY(ai_provider_id) REFERENCES ai_integrations(id) ON DELETE SET NULL
+);
+
+CREATE INDEX ON apps(org_id, team_id, ai_provider_id);

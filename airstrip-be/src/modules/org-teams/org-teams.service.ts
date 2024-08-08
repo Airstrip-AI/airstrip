@@ -11,6 +11,7 @@ import { OrgTeamUserEntity } from './org-team-user.entity';
 import {
   CreateOrgTeamReq,
   OrgTeamEntityWithAuthedUserRoleAndNumMembers,
+  OrgTeamUserWithOrgTeamJoined,
   OrgTeamUserWithUserJoined,
 } from './types/service';
 import { UserRole, UserRoleOrder } from '../../utils/constants';
@@ -250,6 +251,21 @@ export class OrgTeamsService {
         userId,
       },
     });
+  }
+
+  async getUserOrgTeams(
+    orgId: string,
+    userId: string,
+  ): Promise<OrgTeamUserWithOrgTeamJoined[]> {
+    return (await this.orgTeamUserRepository.find({
+      where: {
+        userId,
+        orgId,
+      },
+      relations: {
+        orgTeam: true,
+      },
+    })) as OrgTeamUserWithOrgTeamJoined[];
   }
 
   async changeOrgTeamUserRole(

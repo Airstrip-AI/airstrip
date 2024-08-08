@@ -13,6 +13,8 @@ import { OrgInvitesModule } from '../org-invites/org-invites.module';
 import { UserOrgInvitesModule } from '../user-org-invites/user-org-invites.module';
 import { OrgTeamsModule } from '../org-teams/org-teams.module';
 import { AiIntegrationsModule } from '../ai-integrations/ai-integrations.module';
+import { AppsModule } from '../apps/apps.module';
+import { AppChatsModule } from '../app-chats/app-chats.module';
 
 function getPostgresDbConfig(
   configService: ConfigService,
@@ -59,6 +61,8 @@ function getPostgresDbConfig(
     UserOrgInvitesModule,
     OrgTeamsModule,
     AiIntegrationsModule,
+    AppsModule,
+    AppChatsModule,
   ],
   providers: [
     {

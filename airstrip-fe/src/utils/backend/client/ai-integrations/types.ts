@@ -40,3 +40,7 @@ export class ListAiIntegrationsResp {
   data: AiIntegrationKeyResp[];
   nextPageCursor: string | null;
 }
+
+export class GetAllAiIntegrationsAccessibleByTeamResp {
+  data: AiIntegrationKeyResp[];
+}

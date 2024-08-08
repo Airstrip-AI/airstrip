@@ -19,3 +19,7 @@ export const IS_PUBLIC = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC, true);
 
 export const PRODUCT_NAME = 'Airstrip';
+
+export function isAdminOrAbove(role: UserRole): boolean {
+  return UserRoleOrder[role] <= UserRoleOrder[UserRole.ADMIN];
+}

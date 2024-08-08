@@ -104,3 +104,8 @@ export class ListAiIntegrationsResp {
 
   nextPageCursor: string | null;
 }
+
+export class GetAllAiIntegrationsAccessibleByTeamResp {
+  @ApiProperty({ type: [AiIntegrationKeyResp] })
+  data: AiIntegrationKeyResp[];
+}

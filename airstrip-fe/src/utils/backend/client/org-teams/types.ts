@@ -48,11 +48,23 @@ export class OrgUserAndTeamMembershipResp {
   id: string;
   email: string;
   firstName: string;
-  joinedOrgAt: Date;
+  joinedOrgAt: string;
   teamRole: UserRole | null;
 }
 
 export class GetOrgUserAndTeamMembershipResp {
   data: OrgUserAndTeamMembershipResp[];
   nextPageCursor: string | null;
+}
+
+export class UserOrgTeamResp {
+  teamId: string;
+  orgId: string;
+  userId: string;
+  role: UserRole;
+  name: string;
+}
+
+export class GetUserOrgTeamsResp {
+  data: UserOrgTeamResp[];
 }

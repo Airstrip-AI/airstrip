@@ -15,6 +15,7 @@ import { AiIntegrationsService } from './ai-integrations.service';
 import {
   AiIntegrationKeyResp,
   CreateAiIntegrationReq,
+  GetAllAiIntegrationsAccessibleByTeamResp,
   ListAiIntegrationsResp,
   UpdateAiIntegrationReq,
 } from './types/api';
@@ -24,7 +25,7 @@ import { UserRole } from '../../utils/constants';
 import { AiIntegrationsGuard } from './ai-integrations.guard';
 import { MessageResp } from '../../utils/common';
 import { OrgTeamsGuard } from '../org-teams/org-teams.guard';
-import { AiIntegrationEntityWithOrgTeamJoined } from './types/service';
+import { aiIntegrationEntityWithOrgTeamToResp } from './types/common';
 
 @Controller('ai-integrations')
 export class AiIntegrationsController {
@@ -47,7 +48,7 @@ export class AiIntegrationsController {
         aiProviderApiUrl: body.aiProviderApiUrl,
       });
 
-    return this.aiIntegrationEntityWithOrgTeamToResp(aiIntegrationEntity);
+    return aiIntegrationEntityWithOrgTeamToResp(aiIntegrationEntity);
   }
 
   @Put(':aiIntegrationId')
@@ -67,7 +68,7 @@ export class AiIntegrationsController {
         aiProviderApiUrl: body.aiProviderApiUrl,
       });
 
-    return this.aiIntegrationEntityWithOrgTeamToResp(aiIntegrationEntity);
+    return aiIntegrationEntityWithOrgTeamToResp(aiIntegrationEntity);
   }
 
   @Delete(':aiIntegrationId')
@@ -91,7 +92,7 @@ export class AiIntegrationsController {
     const aiIntegrationEntity =
       await this.aiIntegrationsService.getAiIntegration(aiIntegrationId);
 
-    return this.aiIntegrationEntityWithOrgTeamToResp(aiIntegrationEntity);
+    return aiIntegrationEntityWithOrgTeamToResp(aiIntegrationEntity);
   }
 
   @Get('orgs/:orgId')
@@ -106,7 +107,7 @@ export class AiIntegrationsController {
 
     return {
       data: aiIntegrationEntitiesPage.data.map(
-        this.aiIntegrationEntityWithOrgTeamToResp,
+        aiIntegrationEntityWithOrgTeamToResp,
       ),
       nextPageCursor: aiIntegrationEntitiesPage.nextPageCursor,
     };
@@ -119,42 +120,22 @@ export class AiIntegrationsController {
       orgMinimumRole: UserRole.ADMIN,
     }),
   )
-  @ApiResponse({ status: '2XX', type: ListAiIntegrationsResp })
-  async listAiIntegrationsAccessibleByTeam(
+  @ApiResponse({
+    status: '2XX',
+    type: GetAllAiIntegrationsAccessibleByTeamResp,
+  })
+  async getAllAiIntegrationsAccessibleByTeam(
     @Param('orgTeamId', ParseUUIDPipe) orgTeamId: string,
-  ): Promise<ListAiIntegrationsResp> {
+  ): Promise<GetAllAiIntegrationsAccessibleByTeamResp> {
     const aiIntegrationEntitiesPage =
-      await this.aiIntegrationsService.listAiIntegrationsAccessibleByTeam(
+      await this.aiIntegrationsService.getAllAiIntegrationsAccessibleByTeam(
         orgTeamId,
       );
 
     return {
       data: aiIntegrationEntitiesPage.data.map(
-        this.aiIntegrationEntityWithOrgTeamToResp,
+        aiIntegrationEntityWithOrgTeamToResp,
       ),
-      nextPageCursor: null,
-    };
-  }
-
-  private aiIntegrationEntityWithOrgTeamToResp(
-    aiIntegrationEntity: AiIntegrationEntityWithOrgTeamJoined,
-  ): AiIntegrationKeyResp {
-    return {
-      id: aiIntegrationEntity.id,
-      createdAt: aiIntegrationEntity.createdAt,
-      updatedAt: aiIntegrationEntity.updatedAt,
-      orgId: aiIntegrationEntity.orgId,
-      restrictedToTeam: aiIntegrationEntity.restrictedToTeam
-        ? {
-            id: aiIntegrationEntity.restrictedToTeam.id,
-            name: aiIntegrationEntity.restrictedToTeam.name,
-          }
-        : null,
-      name: aiIntegrationEntity.name,
-      description: aiIntegrationEntity.description,
-      aiProvider: aiIntegrationEntity.aiProvider,
-      aiProviderApiUrl: aiIntegrationEntity.aiProviderApiUrl,
-      aiProviderApiKey: aiIntegrationEntity.aiProviderApiKey,
     };
   }
 }

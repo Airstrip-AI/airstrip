@@ -119,3 +119,25 @@ export class GetOrgUserAndTeamMembershipResp {
   @ApiProperty()
   nextPageCursor: string | null;
 }
+
+export class UserOrgTeamResp {
+  @ApiProperty()
+  teamId: string;
+
+  @ApiProperty()
+  orgId: string;
+
+  @ApiProperty()
+  userId: string;
+
+  @ApiProperty()
+  role: UserRole;
+
+  @ApiProperty()
+  name: string;
+}
+
+export class GetUserOrgTeamsResp {
+  @ApiProperty({ type: [UserOrgTeamResp] })
+  data: UserOrgTeamResp[];
+}

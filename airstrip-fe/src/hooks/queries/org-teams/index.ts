@@ -8,6 +8,7 @@ import {
   getOrgTeams,
   getOrgTeamUsers,
   getOrgUsersAndTeamMembershipDetails,
+  getUserOrgTeams,
 } from '@/utils/backend/client/org-teams';
 import {
   AddOrgTeamUsersReq,
@@ -16,6 +17,7 @@ import {
   GetOrgTeamsResp,
   GetOrgTeamUsersResp,
   GetOrgUserAndTeamMembershipResp,
+  GetUserOrgTeamsResp,
   OrgTeamResp,
 } from '@/utils/backend/client/org-teams/types';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -221,6 +223,30 @@ export function useChangeOrgTeamUserRole({
       queryClient.invalidateQueries([QueryKeys.ORG_TEAM_ORG_USERS]);
       onSuccess(resp);
     },
+    onError,
+  });
+}
+
+export function useGetUserOrgTeams({
+  orgId,
+  onSuccess,
+  onError,
+}: {
+  orgId: string;
+  onSuccess?: (results: GetUserOrgTeamsResp) => void;
+  onError?: (error: Error) => void;
+}) {
+  return useQuery({
+    queryKey: [QueryKeys.USER_ORG_TEAMS, orgId],
+    queryFn: () => {
+      const authToken = getValidToken();
+      return getUserOrgTeams({
+        orgId,
+        authToken,
+      });
+    },
+    keepPreviousData: true,
+    onSuccess,
     onError,
   });
 }

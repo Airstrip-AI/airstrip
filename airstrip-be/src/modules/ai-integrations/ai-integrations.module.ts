@@ -14,5 +14,6 @@ import { OrgsModule } from '../orgs/orgs.module';
   ],
   controllers: [AiIntegrationsController],
   providers: [AiIntegrationsService],
+  exports: [AiIntegrationsService],
 })
 export class AiIntegrationsModule {}

@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { UserRole } from '../../utils/constants';
 import { UserEntity } from '../users/user.entity';
+import { OrgTeamEntity } from './org-team.entity';
 
 @Entity({
   name: 'org_team_users',
@@ -49,4 +50,11 @@ export class OrgTeamUserEntity {
     nullable: false,
   })
   user?: UserEntity;
+
+  @JoinColumn({ name: 'org_team_id' })
+  @ManyToOne(() => OrgTeamEntity, {
+    eager: false,
+    nullable: false,
+  })
+  orgTeam?: OrgTeamEntity;
 }

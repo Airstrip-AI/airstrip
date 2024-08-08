@@ -13,6 +13,13 @@ export type OrgTeamUserWithUserJoined = Omit<OrgTeamUserEntity, 'user'> & {
   user: UserEntity;
 };
 
+export type OrgTeamUserWithOrgTeamJoined = Omit<
+  OrgTeamUserEntity,
+  'orgTeam'
+> & {
+  orgTeam: OrgTeamEntity;
+};
+
 export type OrgTeamEntityWithAuthedUserRoleAndNumMembers = OrgTeamEntity & {
   // The authed user's role in this team. null means not a member.
   authedUserRole: UserRole | null;

@@ -6,6 +6,7 @@ import {
   GetOrgTeamsResp,
   GetOrgTeamUsersResp,
   GetOrgUserAndTeamMembershipResp,
+  GetUserOrgTeamsResp,
   OrgTeamResp,
 } from '@/utils/backend/client/org-teams/types';
 import {
@@ -119,5 +120,18 @@ export async function changeOrgTeamUserRole({
     endpoint: `/api/v1/org-teams/${orgTeamId}/users/change-role`,
     authToken,
     body,
+  });
+}
+
+export async function getUserOrgTeams({
+  orgId,
+  authToken,
+}: {
+  orgId: string;
+  authToken: string;
+}) {
+  return await makeGetRequest<GetUserOrgTeamsResp>({
+    endpoint: `/api/v1/org-teams/user/orgs/${orgId}`,
+    authToken,
   });
 }

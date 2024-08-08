@@ -159,7 +159,25 @@ export class AiIntegrationsService {
     };
   }
 
-  async listAiIntegrationsAccessibleByTeam(orgTeamId: string): Promise<{
+  async getAllOrgWideAiIntegrations(orgId: string): Promise<{
+    data: AiIntegrationEntityWithOrgTeamJoined[];
+  }> {
+    return {
+      data: (await this.aiIntegrationRepository.find({
+        where: [
+          {
+            orgId,
+            restrictedToTeamId: IsNull(),
+          },
+        ],
+        relations: {
+          restrictedToTeam: true,
+        },
+      })) as AiIntegrationEntityWithOrgTeamJoined[],
+    };
+  }
+
+  async getAllAiIntegrationsAccessibleByTeam(orgTeamId: string): Promise<{
     data: AiIntegrationEntityWithOrgTeamJoined[];
   }> {
     const orgTeam = await this.orgTeamsService.getOrgTeamById(orgTeamId);

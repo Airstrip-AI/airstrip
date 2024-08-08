@@ -11,7 +11,8 @@ export const Links = {
     `${appPrefix}/users${tab ? `?tab=${tab}` : ''}`,
   aiIntegrations: () => `${appPrefix}/ai-integrations`,
   teams: () => `${appPrefix}/teams`,
-  apps: () => `${appPrefix}/apps`,
+  apps: (appId?: string) => `${appPrefix}/apps${appId ? `/${appId}` : ''}`,
+  appUserMode: (appId: string) => `${appPrefix}/apps/usermode/${appId}`,
 
   invites: () => `${appPrefix}/invites`,
   publicInvites: () => `/invites`,
