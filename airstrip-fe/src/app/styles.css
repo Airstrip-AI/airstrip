@@ -2,6 +2,7 @@
 @import '@mantine/notifications/styles.css';
 @import 'mantine-react-table/styles.css';
 @import '@mantine/code-highlight/styles.css';
+@import '@mantine/charts/styles.css';
 
 body {
   margin: 0px;

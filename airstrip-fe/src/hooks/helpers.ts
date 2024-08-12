@@ -26,4 +26,5 @@ export enum QueryKeys {
   AI_INTEGRATIONS = 'AI_INTEGRATIONS',
   APPS = 'APPS',
   CHATS = 'CHATS',
+  APPS_USAGE_DATA = 'APPS_USAGE_DATA',
 }
