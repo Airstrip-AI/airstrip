@@ -38,13 +38,18 @@ export default function AppIndexPage() {
                   barSize: 20,
                 }}
                 withLegend
-                data={[
-                  {
-                    totalMessages: 'Total messages',
-                    User: appUsageData.totalUserMessages,
-                    Assistant: appUsageData.totalAssistantMessages,
-                  },
-                ]}
+                data={
+                  appUsageData.totalUserMessages ||
+                  appUsageData.totalAssistantMessages
+                    ? [
+                        {
+                          totalMessages: 'Total messages',
+                          User: appUsageData.totalUserMessages,
+                          Assistant: appUsageData.totalAssistantMessages,
+                        },
+                      ]
+                    : []
+                }
                 dataKey="totalMessages"
                 series={[
                   { name: 'User', color: 'violet.6' },
