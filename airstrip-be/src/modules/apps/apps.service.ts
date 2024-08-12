@@ -51,7 +51,10 @@ export class AppsService {
   async listAppsForUser(
     authedUser: AuthedUser,
     orgId: string,
-    page: number,
+    pagination: {
+      page?: number;
+      fetchAll?: boolean;
+    },
   ): Promise<{
     data: AppEntityWithOrgTeamAiProviderJoined[];
     nextPageCursor: string | null;
@@ -60,6 +63,10 @@ export class AppsService {
     const orgRole = authedUser.orgs.find((o) => o.id === orgId)?.role;
     if (!orgRole) {
       throw new UnauthorizedException('User does not have access to org');
+    }
+
+    if (!pagination.fetchAll && pagination.page === undefined) {
+      throw new BadRequestException('Page number is required');
     }
 
     let where: FindOptionsWhere<AppEntity>[];
@@ -91,10 +98,17 @@ export class AppsService {
       ];
     }
 
+    // pagination.page should not be undefined here if fetchAll is false because of the check above, but just in case fallback to 0
+    const page = pagination.page || 0;
+
     const apps = await this.appRepository.find({
       where,
-      take: pageSize + 1,
-      skip: pageSize * page,
+      ...(pagination.fetchAll
+        ? {}
+        : {
+            take: pageSize + 1,
+            skip: pageSize * page,
+          }),
       relations: {
         org: true,
         orgTeam: true,
@@ -104,7 +118,11 @@ export class AppsService {
 
     return {
       data: apps.slice(0, pageSize) as AppEntityWithOrgTeamAiProviderJoined[],
-      nextPageCursor: apps.length > pageSize ? String(page + 1) : null,
+      nextPageCursor: pagination.fetchAll
+        ? null
+        : apps.length > pageSize
+          ? String(page + 1)
+          : null,
     };
   }
 

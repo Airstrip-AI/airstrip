@@ -12,5 +12,6 @@ import { ChatMessagesModule } from '../chat-messages/chat-messages.module';
   ],
   controllers: [MessageTokenUsageDataController],
   providers: [MessageTokenUsageDataService],
+  exports: [MessageTokenUsageDataService],
 })
 export class MessageTokenUsageDataModule {}

@@ -1,9 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MessageTokenUsageDataEntity } from './message-token-usage-data.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ChatMessagesService } from '../chat-messages/chat-messages.service';
 import { AuthedUser } from '../auth/types/service';
+import { AiProvider } from '../ai-integrations/types/common';
 
 @Injectable()
 export class MessageTokenUsageDataService {
@@ -41,5 +42,72 @@ export class MessageTokenUsageDataService {
       appId: chatMessage.chat.appId,
       usage: dto,
     });
+  }
+
+  async countAppTokensUsageGroupByAiProviderAndModel(appIds: string[]): Promise<
+    Map<
+      string,
+      {
+        appId: string;
+        aiProvider: AiProvider;
+        aiModel: string;
+        totalPromptTokens: number;
+        totalCompletionTokens: number;
+      }[]
+    >
+  > {
+    if (!appIds.length) {
+      return new Map();
+    }
+
+    const messageTokenUsageData =
+      await this.messageTokenUsageDataEntityRepo.find({
+        where: {
+          appId: In(appIds),
+        },
+      });
+
+    // this is grouped by appId+aiProvider+aiModel
+    const usageDataMap = messageTokenUsageData.reduce(
+      (acc, usageData) => {
+        const key = `${usageData.appId}-${usageData.aiProvider}-${usageData.aiModel}`;
+        let tokenUsageData = acc.get(key);
+        if (!tokenUsageData) {
+          tokenUsageData = {
+            appId: usageData.appId!, // because we are querying by appId, hence it will always be present
+            aiProvider: usageData.aiProvider,
+            aiModel: usageData.aiModel,
+            totalPromptTokens: 0,
+            totalCompletionTokens: 0,
+          };
+          acc.set(key, tokenUsageData);
+        }
+
+        tokenUsageData.totalPromptTokens += usageData.usage.usage.promptTokens;
+        tokenUsageData.totalCompletionTokens +=
+          usageData.usage.usage.completionTokens;
+        return acc;
+      },
+      new Map<
+        string,
+        {
+          appId: string;
+          aiProvider: AiProvider;
+          aiModel: string;
+          totalPromptTokens: number;
+          totalCompletionTokens: number;
+        }
+      >(),
+    );
+
+    return Array.from(usageDataMap.values()).reduce((acc, tokenUsageData) => {
+      let appTokenUsageDataArray = acc.get(tokenUsageData.appId);
+      if (!appTokenUsageDataArray) {
+        appTokenUsageDataArray = [];
+        acc.set(tokenUsageData.appId, appTokenUsageDataArray);
+      }
+      appTokenUsageDataArray.push(tokenUsageData);
+      return acc;
+    }, new Map());
   }
 }

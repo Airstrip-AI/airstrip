@@ -55,11 +55,9 @@ export class AppsController {
     @Param('orgId', ParseUUIDPipe) orgId: string,
     @Query('page', ParseIntPipe) page: number,
   ): Promise<ListAppsResp> {
-    const appsPage = await this.appsService.listAppsForUser(
-      req.user,
-      orgId,
+    const appsPage = await this.appsService.listAppsForUser(req.user, orgId, {
       page,
-    );
+    });
     return {
       data: appsPage.data.map(this.appEntityToAppResp),
       nextPageCursor: appsPage.nextPageCursor,

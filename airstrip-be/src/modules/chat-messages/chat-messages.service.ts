@@ -115,4 +115,59 @@ export class ChatMessagesService {
 
     return chatMessage as ChatMessageEntityWithChatAndAppJoined;
   }
+
+  async countAppMessagesByRole(appIds: string[]): Promise<
+    Map<
+      string,
+      {
+        appId: string;
+        totalUserMessages: number;
+        totalAssistantMessages: number;
+      }
+    >
+  > {
+    const appMessageCounts: {
+      app_id: string;
+      role: string;
+      count: string;
+    }[] = appIds.length
+      ? await this.chatMessageRepository.query(
+          `SELECT c.app_id, cm.role, count(*) FROM chat_messages cm JOIN chats c ON cm.chat_id=c.id WHERE c.app_id = ANY($1) GROUP BY c.app_id, cm.role`,
+          [appIds],
+        )
+      : [];
+
+    return appMessageCounts.reduce(
+      (acc, row) => {
+        const rowCount = parseInt(row.count);
+        const isUserMessage = row.role === 'user';
+
+        let appMessageCountsForApp = acc.get(row.app_id);
+        if (!appMessageCountsForApp) {
+          appMessageCountsForApp = {
+            appId: row.app_id,
+            totalUserMessages: 0,
+            totalAssistantMessages: 0,
+          };
+          acc.set(row.app_id, appMessageCountsForApp);
+        }
+
+        if (isUserMessage) {
+          appMessageCountsForApp.totalUserMessages += rowCount;
+        } else {
+          appMessageCountsForApp.totalAssistantMessages += rowCount;
+        }
+
+        return acc;
+      },
+      new Map<
+        string,
+        {
+          appId: string;
+          totalUserMessages: number;
+          totalAssistantMessages: number;
+        }
+      >(),
+    );
+  }
 }

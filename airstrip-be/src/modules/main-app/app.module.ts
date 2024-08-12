@@ -17,6 +17,7 @@ import { AppsModule } from '../apps/apps.module';
 import { AppChatsModule } from '../app-chats/app-chats.module';
 import { ChatMessagesModule } from '../chat-messages/chat-messages.module';
 import { MessageTokenUsageDataModule } from '../message-token-usage-data/message-token-usage-data.module';
+import { DashboardAnalyticsModule } from '../dashboard-analytics/dashboard-analytics.module';
 
 function getPostgresDbConfig(
   configService: ConfigService,
@@ -67,6 +68,7 @@ function getPostgresDbConfig(
     AppChatsModule,
     ChatMessagesModule,
     MessageTokenUsageDataModule,
+    DashboardAnalyticsModule,
   ],
   providers: [
     {
