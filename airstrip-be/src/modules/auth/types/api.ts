@@ -56,3 +56,27 @@ export class RegisterUserReq {
   @ApiProperty()
   password: string;
 }
+
+export class RequestResetPasswordReq {
+  @IsEmail()
+  @MaxLength(300)
+  @ApiProperty()
+  email: string;
+}
+
+export class ResetPasswordReq {
+  @IsEmail()
+  @MaxLength(300)
+  @ApiProperty()
+  email: string;
+
+  @IsString()
+  @ApiProperty()
+  token: string;
+
+  @IsString()
+  @Length(8, 20)
+  @IsNotEmpty()
+  @ApiProperty()
+  password: string;
+}

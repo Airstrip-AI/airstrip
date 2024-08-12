@@ -1,10 +1,18 @@
 import { getValidToken, QueryKeys } from '@/hooks/helpers';
 import { activeOrgIdKey, useLogout } from '@/hooks/user';
-import { register, login, getCurrentUser } from '@/utils/backend/client/auth';
+import {
+  register,
+  login,
+  getCurrentUser,
+  requestResetPassword,
+  resetPassword,
+} from '@/utils/backend/client/auth';
 import {
   RegisterUserReq,
   LoginResp,
   LoginReq,
+  RequestResetPasswordReq,
+  ResetPasswordReq,
 } from '@/utils/backend/client/auth/types';
 import { MessageResp } from '@/utils/backend/client/common/types';
 import { readLocalStorageValue, useLocalStorage } from '@mantine/hooks';
@@ -75,4 +83,36 @@ export function useCurrentUser() {
     currentUser: data,
     loadingCurrentUser: isLoading,
   };
+}
+
+export function useRequestResetPassword({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (results: MessageResp) => void;
+  onError: (error: Error) => void;
+}) {
+  return useMutation({
+    mutationFn: (body: RequestResetPasswordReq) => {
+      return requestResetPassword(body);
+    },
+    onSuccess,
+    onError,
+  });
+}
+
+export function useResetPassword({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (results: MessageResp) => void;
+  onError: (error: Error) => void;
+}) {
+  return useMutation({
+    mutationFn: (body: ResetPasswordReq) => {
+      return resetPassword(body);
+    },
+    onSuccess,
+    onError,
+  });
 }

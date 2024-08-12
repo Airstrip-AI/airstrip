@@ -10,7 +10,8 @@ CREATE TABLE users (
   verify_token TEXT UNIQUE,
   verify_token_expires_at TIMESTAMPTZ,
   reset_password_token TEXT UNIQUE,
-  reset_password_token_expires_at TIMESTAMPTZ
+  reset_password_token_expires_at TIMESTAMPTZ,
+  reset_password_token_created_at TIMESTAMPTZ
 );
 
 CREATE UNIQUE INDEX ON users(lower(email));

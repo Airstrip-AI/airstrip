@@ -11,7 +11,13 @@ import { Public } from '../../utils/constants';
 import { JwtService } from './jwt.service';
 import { AuthService } from './auth.service';
 import { AuthedRequest } from './types/service';
-import { LoginResp, RegisterUserReq, UserProfileResp } from './types/api';
+import {
+  LoginResp,
+  RegisterUserReq,
+  RequestResetPasswordReq,
+  ResetPasswordReq,
+  UserProfileResp,
+} from './types/api';
 import { ApiResponse } from '@nestjs/swagger';
 import { MessageResp } from '../../utils/common';
 
@@ -61,5 +67,31 @@ export class AuthController {
     await this.authService.register(registerUserReq);
 
     return { message: 'Registration successful.' };
+  }
+
+  @Public()
+  @Post('request-reset-password')
+  @ApiResponse({ status: '2XX', type: MessageResp })
+  async requestResetPassword(
+    @Body() reqBody: RequestResetPasswordReq,
+  ): Promise<MessageResp> {
+    await this.authService.requestResetPassword(reqBody);
+
+    return {
+      message:
+        'The request to reset password has been sent. If an account with the email exists, a reset link will be sent to the email.',
+    };
+  }
+
+  @Public()
+  @Post('reset-password')
+  @ApiResponse({ status: '2XX', type: MessageResp })
+  async resetPassword(@Body() reqBody: ResetPasswordReq): Promise<MessageResp> {
+    await this.authService.resetPassword(reqBody);
+
+    return {
+      message:
+        'Password reset successful. Please login with your new password.',
+    };
   }
 }

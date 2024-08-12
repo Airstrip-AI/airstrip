@@ -172,7 +172,6 @@ export default function AuthenticationForm({
               style={{ textDecoration: 'none' }}
             >
               <Text c="dimmed" size="xs">
-                {/* TODO: reset password flow */}
                 Forgot your password? Reset it here.
               </Text>
             </Link>

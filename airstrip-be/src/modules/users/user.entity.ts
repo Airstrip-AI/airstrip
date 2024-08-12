@@ -80,6 +80,13 @@ export class UserEntity {
   })
   resetPasswordTokenExpiresAt: Date | null;
 
+  @Column({
+    name: 'reset_password_token_created_at',
+    type: 'timestamptz',
+    nullable: true,
+  })
+  resetPasswordTokenCreatedAt: Date | null;
+
   @OneToMany(() => OrgUserEntity, (orgUser) => orgUser.user, {
     eager: false,
   })

@@ -6,6 +6,7 @@ import { UserEntity } from './user.entity';
 import { UserWithOrgs } from './types/service';
 import { PasswordHashService } from '../password-hash/password-hash.service';
 import { OrgsService } from '../orgs/orgs.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UsersService {
@@ -90,5 +91,77 @@ export class UsersService {
         manager,
       );
     });
+  }
+
+  async requestResetPassword(req: { email: string }): Promise<{
+    token: string;
+    expireHours: number;
+    expireTime: Date;
+  } | null> {
+    const { email } = req;
+    const user = await this.findOneByEmail(email);
+    if (!user) {
+      return null;
+    }
+    const expireHours = 24;
+
+    const now = new Date();
+
+    // set a new token if it doesn't exist or if the existing one is expiring in less than 1 hour
+    if (
+      !user.resetPasswordToken ||
+      !user.resetPasswordTokenExpiresAt ||
+      user.resetPasswordTokenExpiresAt.getTime() - now.getTime() <
+        1 * 60 * 60 * 1000
+    ) {
+      user.resetPasswordToken = uuidv4();
+      user.resetPasswordTokenCreatedAt = now;
+      user.resetPasswordTokenExpiresAt = new Date(
+        Date.now() + expireHours * 60 * 60 * 1000,
+      );
+      await this.usersRepository.save(user);
+    }
+
+    return {
+      token: user.resetPasswordToken,
+      expireHours,
+      expireTime: user.resetPasswordTokenExpiresAt,
+    };
+  }
+
+  async resetPassword(req: {
+    email: string;
+    token: string;
+    password: string;
+  }): Promise<void> {
+    const { email, token, password } = req;
+    const user = await this.findOneByEmail(email);
+    if (!user) {
+      throw new BadRequestException('No such user.');
+    }
+
+    if (
+      !user.resetPasswordToken ||
+      !user.resetPasswordTokenExpiresAt ||
+      user.resetPasswordToken !== token ||
+      user.resetPasswordTokenExpiresAt.getTime() < Date.now()
+    ) {
+      throw new BadRequestException('Invalid or expired token.');
+    }
+
+    user.passwordHash = await this.passwordHashService.hashPassword(password);
+    // don't reset resetPasswordTokenCreatedAt so that we know when a reset password was last requested
+    user.resetPasswordToken = null;
+    user.resetPasswordTokenExpiresAt = null;
+    await this.usersRepository.save(user);
+  }
+
+  private async findOneByEmail(email: string): Promise<UserEntity | null> {
+    return await this.usersRepository
+      .createQueryBuilder('users')
+      .where('lower(users.email) = :email', {
+        email: email.trim().toLowerCase(),
+      })
+      .getOne();
   }
 }

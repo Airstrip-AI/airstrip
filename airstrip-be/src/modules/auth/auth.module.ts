@@ -14,13 +14,18 @@ import {
   JwtServiceConfig,
 } from './jwt.service';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import {
+  AUTH_SERVICE_CONFIG,
+  AuthService,
+  AuthServiceConfig,
+} from './auth.service';
 import { PasswordHashModule } from '../password-hash/password-hash.module';
 import { UsersModule } from '../users/users.module';
 import { EnvVariables } from '../../utils/constants/env';
+import { EmailModule } from '../email/email.module';
 
 @Module({
-  imports: [PasswordHashModule, UsersModule],
+  imports: [PasswordHashModule, UsersModule, EmailModule],
   providers: [
     {
       provide: BEARER_STRATEGY_CONFIG,
@@ -68,6 +73,15 @@ import { EnvVariables } from '../../utils/constants/env';
         };
       },
       inject: [ConfigService],
+    },
+    {
+      provide: AUTH_SERVICE_CONFIG,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService): AuthServiceConfig => ({
+        frontendUrl: configService.getOrThrow<string>(
+          EnvVariables.AIRSTRIP_FRONTEND_URL,
+        ),
+      }),
     },
     LocalStrategy,
     BearerStrategy,
