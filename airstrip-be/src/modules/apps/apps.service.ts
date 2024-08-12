@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppEntity } from './app.entity';
-import { In, IsNull, Repository } from 'typeorm';
+import { FindOptionsWhere, In, IsNull, Repository } from 'typeorm';
 import {
   AppEntityWithOrgTeamAiProviderJoined,
   CreateAppServiceDto,
@@ -57,11 +57,25 @@ export class AppsService {
     nextPageCursor: string | null;
   }> {
     const pageSize = 20;
-    const authedUserTeamIds = (
-      await this.orgTeamsService.getUserOrgTeams(orgId, authedUser.id)
-    ).map((t) => t.orgTeamId);
-    const apps = await this.appRepository.find({
-      where: [
+    const orgRole = authedUser.orgs.find((o) => o.id === orgId)?.role;
+    if (!orgRole) {
+      throw new UnauthorizedException('User does not have access to org');
+    }
+
+    let where: FindOptionsWhere<AppEntity>[];
+    if (isAdminOrAbove(orgRole)) {
+      // admin or above, can see all apps
+      where = [
+        {
+          orgId,
+        },
+      ];
+    } else {
+      // not admin, can only see apps they have access to
+      const authedUserTeamIds = (
+        await this.orgTeamsService.getUserOrgTeams(orgId, authedUser.id)
+      ).map((t) => t.orgTeamId);
+      where = [
         {
           orgId,
           teamId: IsNull(),
@@ -74,7 +88,11 @@ export class AppsService {
               },
             ]
           : []),
-      ],
+      ];
+    }
+
+    const apps = await this.appRepository.find({
+      where,
       take: pageSize + 1,
       skip: pageSize * page,
       relations: {
