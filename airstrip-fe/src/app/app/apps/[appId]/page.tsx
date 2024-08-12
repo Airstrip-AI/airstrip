@@ -1,5 +1,6 @@
 'use client';
 
+import { loadImage } from '@/components/ai-providers-image/helpers';
 import Breadcrumbs from '@/components/breadcrumbs/Breadcrumbs';
 import {
   useCheckUserPrivilegesForApp,
@@ -8,7 +9,7 @@ import {
   useUpdateApp,
 } from '@/hooks/queries/apps';
 import { AppResp, UpdateAppReq } from '@/utils/backend/client/apps/types';
-import { AppType } from '@/utils/backend/client/common/types';
+import { AiProvider, AppType } from '@/utils/backend/client/common/types';
 import {
   isAdminOrAbove,
   showErrorNotification,
@@ -93,6 +94,19 @@ function AppDetailsForm({ app }: { app: AppResp }) {
   const canUpdateApp = userAppPrivileges?.accessLevel
     ? isAdminOrAbove(userAppPrivileges?.accessLevel)
     : false;
+
+  const aiProviderBoxData = [
+    {
+      label: '(unset)',
+      value: '',
+      provider: null,
+    },
+    ...(allowedAiProvidersForApp?.data.map((provider) => ({
+      label: provider.name,
+      value: provider.id,
+      provider,
+    })) || []),
+  ];
 
   return canUpdateApp ? (
     <form
@@ -183,16 +197,45 @@ function AppDetailsForm({ app }: { app: AppResp }) {
               <Table.Td>
                 <Select
                   {...form.getInputProps('aiProviderId')}
-                  data={[
-                    {
-                      label: '',
-                      value: '',
-                    },
-                    ...(allowedAiProvidersForApp?.data.map((provider) => ({
-                      label: `${provider.name} (${provider.aiProvider}): ${provider.description.substring(0, 25)}...`,
-                      value: provider.id,
-                    })) || []),
-                  ]}
+                  data={aiProviderBoxData}
+                  renderOption={({ option, checked }) => {
+                    const provider = (option as any).provider as {
+                      id: string;
+                      name: string;
+                      description: string;
+                      aiProvider: AiProvider;
+                    } | null;
+                    const label = provider ? (
+                      <Group>
+                        <Text size="sm" fw="bold">
+                          {provider.name}
+                        </Text>{' '}
+                        <Text size="sm" c="dimmed">
+                          {provider.description.substring(0, 100) + '...'}
+                        </Text>
+                      </Group>
+                    ) : (
+                      <Text size="sm">{option.label}</Text>
+                    );
+
+                    return (
+                      <Group flex="1" gap="xs">
+                        {provider ? loadImage(provider.aiProvider) : null}
+                        {label}
+                        {checked && (
+                          <IconCheck
+                            style={{ marginInlineStart: 'auto' }}
+                            {...{
+                              stroke: 1.5,
+                              color: 'currentColor',
+                              opacity: 0.6,
+                              size: 18,
+                            }}
+                          />
+                        )}
+                      </Group>
+                    );
+                  }}
                 />
               </Table.Td>
             </Table.Tr>
