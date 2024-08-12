@@ -17,16 +17,15 @@ import { orgInviteEntityToOrgInvite } from './utils';
 import { AuthedRequest } from '../auth/types/service';
 import { ApiResponse } from '@nestjs/swagger';
 import { MessageResp } from '../../utils/common';
-import { OrgsGuard } from '../orgs/orgs.guard';
-import { UserRole } from '../../utils/constants';
-import { OrgInvitesGuard } from './org-invites.guard';
+import { OrgsAdminGuard } from '../orgs/orgs.guard';
+import { OrgInvitesAdminGuard } from './org-invites.guard';
 
 @Controller()
 export class OrgInvitesController {
   constructor(private readonly orgInvitesService: OrgInvitesService) {}
 
   @Post('orgs/:orgId/org-invites')
-  @UseGuards(OrgsGuard(UserRole.ADMIN))
+  @UseGuards(OrgsAdminGuard)
   @ApiResponse({ status: '2XX', type: MessageResp })
   async inviteUsersToOrg(
     @Request() request: AuthedRequest,
@@ -44,7 +43,7 @@ export class OrgInvitesController {
   }
 
   @Get('orgs/:orgId/org-invites/pending')
-  @UseGuards(OrgsGuard(UserRole.ADMIN))
+  @UseGuards(OrgsAdminGuard)
   @ApiResponse({ status: '2XX', type: GetPendingOrgInvitesResp })
   async getPendingOrgInvites(
     @Param('orgId', ParseUUIDPipe) orgId: string,
@@ -59,7 +58,7 @@ export class OrgInvitesController {
   }
 
   @Delete('org-invites/:orgInviteId')
-  @UseGuards(OrgInvitesGuard(UserRole.ADMIN))
+  @UseGuards(OrgInvitesAdminGuard)
   @ApiResponse({ status: '2XX', type: MessageResp })
   async cancelOrgInvite(
     @Param('orgInviteId', ParseUUIDPipe) orgInviteId: string,

@@ -25,4 +25,5 @@ export enum QueryKeys {
   ORG_TEAM_ORG_USERS = 'ORG_TEAM_ORG_USERS',
   AI_INTEGRATIONS = 'AI_INTEGRATIONS',
   APPS = 'APPS',
+  CHATS = 'CHATS',
 }

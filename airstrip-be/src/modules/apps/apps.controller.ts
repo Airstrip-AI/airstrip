@@ -21,24 +21,22 @@ import {
   ListAppsResp,
   UpdateAppReq,
 } from './types/api';
-import { UserRole } from '../../utils/constants';
-import { AppsCreationGuard } from './apps-creation.guard';
-import { AppsGuard } from './apps.guard';
 import { AuthedRequest } from '../auth/types/service';
 import { AppEntityWithOrgTeamAiProviderJoined } from './types/service';
-import { OrgsGuard } from '../orgs/orgs.guard';
+import { OrgsMemberGuard } from '../orgs/orgs.guard';
+import {
+  AppsAdminCreationGuard,
+  AppsAdminGuard,
+  AppsMemberGuard,
+  AppsOrgMemberGuard,
+} from './apps.guard';
 
 @Controller()
 export class AppsController {
   constructor(private readonly appsService: AppsService) {}
 
   @Post('orgs/:orgId/apps')
-  @UseGuards(
-    AppsCreationGuard({
-      teamMinimumRole: UserRole.ADMIN,
-      orgMinimumRole: UserRole.ADMIN,
-    }),
-  )
+  @UseGuards(AppsAdminCreationGuard)
   @ApiResponse({ status: '2XX', type: AppResp })
   async createApp(
     @Param('orgId', ParseUUIDPipe) orgId: string,
@@ -50,7 +48,7 @@ export class AppsController {
   }
 
   @Get('orgs/:orgId/apps')
-  @UseGuards(OrgsGuard('*'))
+  @UseGuards(OrgsMemberGuard)
   @ApiResponse({ status: '2XX', type: ListAppsResp })
   async listAppsForUser(
     @Request() req: AuthedRequest,
@@ -69,12 +67,7 @@ export class AppsController {
   }
 
   @Put('apps/:appId')
-  @UseGuards(
-    AppsGuard({
-      teamMinimumRole: UserRole.ADMIN,
-      orgMinimumRole: UserRole.ADMIN,
-    }),
-  )
+  @UseGuards(AppsAdminGuard)
   @ApiResponse({ status: '2XX', type: AppResp })
   async updateApp(
     @Param('appId', ParseUUIDPipe) appId: string,
@@ -86,12 +79,7 @@ export class AppsController {
   }
 
   @Get('apps/:appId')
-  @UseGuards(
-    AppsGuard({
-      teamMinimumRole: '*',
-      orgMinimumRole: UserRole.ADMIN,
-    }),
-  )
+  @UseGuards(AppsMemberGuard)
   @ApiResponse({ status: '2XX', type: AppResp })
   async getApp(@Param('appId', ParseUUIDPipe) appId: string): Promise<AppResp> {
     return this.appEntityToAppResp(await this.appsService.getAppById(appId));
@@ -101,12 +89,7 @@ export class AppsController {
    * This is accessible by all org members, hence the response does not return sensitive data like api key.
    */
   @Get('apps/:appId/allowed-ai-providers')
-  @UseGuards(
-    AppsGuard({
-      teamMinimumRole: '*',
-      orgMinimumRole: UserRole.ADMIN,
-    }),
-  )
+  @UseGuards(AppsMemberGuard)
   @ApiResponse({ status: '2XX', type: GetAllowedAiProvidersForAppResp })
   async getAllowedAiProvidersForApp(
     @Param('appId', ParseUUIDPipe) appId: string,
@@ -124,12 +107,7 @@ export class AppsController {
   }
 
   @Get('apps/:appId/check-user-privileges')
-  @UseGuards(
-    AppsGuard({
-      teamMinimumRole: '*',
-      orgMinimumRole: '*',
-    }),
-  )
+  @UseGuards(AppsOrgMemberGuard)
   @ApiResponse({ status: '2XX', type: CheckUserPrivilegesForAppResp })
   async checkUserPrivilegesForApp(
     @Request() req: AuthedRequest,

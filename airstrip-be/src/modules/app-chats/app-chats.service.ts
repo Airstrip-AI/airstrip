@@ -56,9 +56,17 @@ export class AppChatsService {
       system: systemPrompt || undefined,
       temperature: app.temperature,
       messages: convertToCoreMessages(messages as any),
+      onFinish: (event) => {
+        resp.write(
+          `d: ${JSON.stringify({
+            finishReason: event.finishReason,
+            usage: event.usage,
+          })}\n`,
+        );
+      },
     });
 
-    streamTextResp.pipeAIStreamToResponse(resp);
+    return streamTextResp.pipeAIStreamToResponse(resp);
   }
 
   private getLanguageModel(
@@ -73,7 +81,11 @@ export class AppChatsService {
     switch (aiProvider) {
       case AiProvider.OPENAI:
       case AiProvider.OPENAI_COMPATIBLE:
-        languageModel = createOpenAI(genAiSettings)(model);
+        languageModel = createOpenAI({
+          ...genAiSettings,
+          compatibility:
+            aiProvider === AiProvider.OPENAI ? 'strict' : 'compatible',
+        })(model);
         break;
       case AiProvider.ANTHROPIC:
         languageModel = createAnthropic(genAiSettings)(model);

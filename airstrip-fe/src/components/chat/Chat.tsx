@@ -5,19 +5,40 @@ import { AppResp } from '@/utils/backend/client/apps/types';
 import { getBackendUrl } from '@/utils/backend/utils';
 import { Alert, Card, Stack, Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import { Message } from 'ai';
 import { useChat } from 'ai/react';
 import ChatList from '@/components/chat/ChatList';
 import { ChatScrollAnchor } from '@/components/chat/ChatScrollAnchor';
 import ChatPanel from '@/components/chat/ChatPanel';
 import { useMediaQuery } from '@mantine/hooks';
+import {
+  useCreateNewChatWithFirstMessage,
+  useSaveChatMessage,
+} from '@/hooks/queries/chat-messages';
+import { showErrorNotification } from '@/utils/misc';
+import { useSaveUsageDataByClientGeneratedId } from '@/hooks/queries/message-token-usage-data';
+import { UsageData } from '@/utils/backend/client/message-token-usage-data/types';
 
-export default function Chat({ app }: { app: AppResp }) {
+export default function Chat({
+  app,
+  id: initialChatId,
+}: {
+  app: AppResp;
+  id: string | null;
+}) {
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const [chatId, setChatId] = useState<string | null>(null);
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
+  const [usageData, setUsageData] = useState<Map<string, UsageData>>(new Map());
 
-  useEffect(() => {
-    setAuthToken(getValidToken());
-  }, []);
+  const { mutate: saveUsageDataMutation } = useSaveUsageDataByClientGeneratedId(
+    {
+      onSuccess: (resp) => {},
+      onError: (error) => {
+        console.error('Failed to save usage data', error);
+      },
+    },
+  );
 
   const {
     messages,
@@ -33,7 +54,90 @@ export default function Chat({ app }: { app: AppResp }) {
       Authorization: `Bearer ${authToken}`,
     },
     keepLastMessageOnError: true,
+    onFinish: (message, options) =>
+      setUsageData((prev) => {
+        const newUsageData = new Map(prev);
+        newUsageData.set(message.id, {
+          finishReason: options.finishReason,
+          usage: options.usage,
+        });
+        return newUsageData;
+      }),
   });
+
+  const { mutate: createNewChatMutation } = useCreateNewChatWithFirstMessage({
+    onSuccess: (newChat) => {
+      setChatId(newChat.chatId);
+    },
+    onError: (error) =>
+      showErrorNotification(`Failed to create chat. Error: ${error.message}`),
+  });
+  const { mutate: saveChatMessageMutation } = useSaveChatMessage({
+    onSuccess: (savedChatMessageResp) => {
+      const { clientGeneratedId } = savedChatMessageResp;
+      const messageUsageData = usageData.get(clientGeneratedId);
+      if (!messageUsageData) {
+        return;
+      }
+      saveUsageDataMutation({
+        clientGeneratedId,
+        body: {
+          usage: messageUsageData,
+        },
+      });
+      setUsageData((prev) => {
+        const newUsageData = new Map(prev);
+        newUsageData.delete(clientGeneratedId);
+        return newUsageData;
+      });
+    },
+    onError: (error) =>
+      showErrorNotification(`Failed to save message. Error: ${error.message}`),
+  });
+
+  const saveMessage = (message: Message) => {
+    const messagePayload = {
+      role: message.role,
+      clientGeneratedId: message.id,
+      content: message.content,
+      attachments: message.experimental_attachments || null,
+      createdAt: message.createdAt || new Date(),
+    };
+    if (chatId) {
+      saveChatMessageMutation({
+        chatId,
+        body: messagePayload,
+      });
+    } else {
+      createNewChatMutation({
+        appId: app.id,
+        body: {
+          firstMessage: messagePayload,
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    setAuthToken(getValidToken());
+  }, []);
+
+  useEffect(() => {
+    setChatId(initialChatId);
+  }, [initialChatId]);
+
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    if (!lastMessage) {
+      return;
+    }
+    if (messages.length > 1 && !chatId) {
+      console.warn('Chat ID is not set, but there are multiple messages.');
+    }
+    if (lastMessage.role === 'user' || !isLoading) {
+      saveMessage(lastMessage);
+    }
+  }, [messages, isLoading]);
 
   const hasMessages = !!messages.length;
 

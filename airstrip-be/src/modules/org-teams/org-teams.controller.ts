@@ -28,18 +28,21 @@ import {
   OrgTeamResp,
   OrgTeamUserResp,
 } from './types/api';
-import { OrgsGuard } from '../orgs/orgs.guard';
-import { UserRole } from '../../utils/constants';
 import { ApiResponse } from '@nestjs/swagger';
-import { OrgTeamsGuard } from './org-teams.guard';
+import {
+  OrgTeamsAdminGuard,
+  OrgTeamsMemberGuard,
+  OrgTeamsOrgMemberGuard,
+} from './org-teams.guard';
 import { MessageResp } from '../../utils/common';
+import { OrgsAdminGuard, OrgsMemberGuard } from '../orgs/orgs.guard';
 
 @Controller()
 export class OrgTeamsController {
   constructor(private readonly orgTeamsService: OrgTeamsService) {}
 
   @Get('orgs/:orgId/org-teams/for-user')
-  @UseGuards(OrgsGuard('*'))
+  @UseGuards(OrgsMemberGuard)
   @ApiResponse({ status: '2XX', type: GetUserOrgTeamsResp })
   async getOrgTeamsForUser(
     @Request() request: AuthedRequest,
@@ -61,7 +64,7 @@ export class OrgTeamsController {
   }
 
   @Post('orgs/:orgId/org-teams')
-  @UseGuards(OrgsGuard(UserRole.ADMIN))
+  @UseGuards(OrgsAdminGuard)
   @ApiResponse({ status: '2XX', type: OrgTeamResp })
   async createTeam(
     @Param('orgId', ParseUUIDPipe) orgId: string,
@@ -79,7 +82,7 @@ export class OrgTeamsController {
   }
 
   @Get('orgs/:orgId/org-teams')
-  @UseGuards(OrgsGuard('*'))
+  @UseGuards(OrgsMemberGuard)
   @ApiResponse({ status: '2XX', type: GetOrgTeamsResp })
   async getOrgTeams(
     @Request() request: AuthedRequest,
@@ -99,12 +102,7 @@ export class OrgTeamsController {
   }
 
   @Get('org-teams/:orgTeamId')
-  @UseGuards(
-    OrgTeamsGuard({
-      teamMinimumRole: '*',
-      orgMinimumRole: '*',
-    }),
-  )
+  @UseGuards(OrgTeamsOrgMemberGuard)
   @ApiResponse({ status: '2XX', type: OrgTeamResp })
   async getOrgTeam(
     @Request() request: AuthedRequest,
@@ -123,12 +121,7 @@ export class OrgTeamsController {
    * Useful for populating a list of users to add to a team.
    */
   @Get('org-teams/:orgTeamId/org-users')
-  @UseGuards(
-    OrgTeamsGuard({
-      teamMinimumRole: '*',
-      orgMinimumRole: UserRole.ADMIN,
-    }),
-  )
+  @UseGuards(OrgTeamsMemberGuard)
   @ApiResponse({ status: '2XX', type: GetOrgUserAndTeamMembershipResp })
   async getOrgUsersAndTeamMembershipDetails(
     @Param('orgTeamId', ParseUUIDPipe) orgTeamId: string,
@@ -155,12 +148,7 @@ export class OrgTeamsController {
   }
 
   @Get('org-teams/:orgTeamId/users')
-  @UseGuards(
-    OrgTeamsGuard({
-      teamMinimumRole: '*',
-      orgMinimumRole: UserRole.ADMIN,
-    }),
-  )
+  @UseGuards(OrgTeamsMemberGuard)
   @ApiResponse({ status: '2XX', type: GetOrgTeamUsersResp })
   async getOrgTeamUsers(
     @Param('orgTeamId', ParseUUIDPipe) orgTeamId: string,
@@ -178,12 +166,7 @@ export class OrgTeamsController {
   }
 
   @Post('org-teams/:orgTeamId/users')
-  @UseGuards(
-    OrgTeamsGuard({
-      teamMinimumRole: UserRole.ADMIN,
-      orgMinimumRole: UserRole.ADMIN,
-    }),
-  )
+  @UseGuards(OrgTeamsAdminGuard)
   @ApiResponse({ status: '2XX', type: MessageResp })
   async addOrgTeamUsers(
     @Param('orgTeamId', ParseUUIDPipe) orgTeamId: string,
@@ -200,12 +183,7 @@ export class OrgTeamsController {
   }
 
   @Put('org-teams/:orgTeamId/users/change-role')
-  @UseGuards(
-    OrgTeamsGuard({
-      teamMinimumRole: UserRole.ADMIN,
-      orgMinimumRole: UserRole.ADMIN,
-    }),
-  )
+  @UseGuards(OrgTeamsAdminGuard)
   @ApiResponse({ status: '2XX', type: MessageResp })
   async changeOrgTeamUserRole(
     @Request() request: AuthedRequest,

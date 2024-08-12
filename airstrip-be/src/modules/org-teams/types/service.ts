@@ -9,14 +9,11 @@ export type CreateOrgTeamReq = {
   creatorId: string;
 };
 
-export type OrgTeamUserWithUserJoined = Omit<OrgTeamUserEntity, 'user'> & {
+export type OrgTeamUserWithUserJoined = OrgTeamUserEntity & {
   user: UserEntity;
 };
 
-export type OrgTeamUserWithOrgTeamJoined = Omit<
-  OrgTeamUserEntity,
-  'orgTeam'
-> & {
+export type OrgTeamUserWithOrgTeamJoined = OrgTeamUserEntity & {
   orgTeam: OrgTeamEntity;
 };
 

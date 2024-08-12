@@ -20,19 +20,18 @@ import {
   UpdateAiIntegrationReq,
 } from './types/api';
 import { ApiResponse } from '@nestjs/swagger';
-import { OrgsGuard } from '../orgs/orgs.guard';
-import { UserRole } from '../../utils/constants';
-import { AiIntegrationsGuard } from './ai-integrations.guard';
+import { AiIntegrationsAdminGuard } from './ai-integrations.guard';
 import { MessageResp } from '../../utils/common';
-import { OrgTeamsGuard } from '../org-teams/org-teams.guard';
 import { aiIntegrationEntityWithOrgTeamToResp } from './types/common';
+import { OrgsAdminGuard } from '../orgs/orgs.guard';
+import { OrgTeamsAdminGuard } from '../org-teams/org-teams.guard';
 
 @Controller()
 export class AiIntegrationsController {
   constructor(private readonly aiIntegrationsService: AiIntegrationsService) {}
 
   @Post('orgs/:orgId/ai-integrations')
-  @UseGuards(OrgsGuard(UserRole.ADMIN))
+  @UseGuards(OrgsAdminGuard)
   @ApiResponse({ status: '2XX', type: AiIntegrationKeyResp })
   async createAiIntegration(
     @Param('orgId', ParseUUIDPipe) orgId: string,
@@ -52,7 +51,7 @@ export class AiIntegrationsController {
   }
 
   @Get('orgs/:orgId/ai-integrations')
-  @UseGuards(OrgsGuard(UserRole.ADMIN))
+  @UseGuards(OrgsAdminGuard)
   @ApiResponse({ status: '2XX', type: ListAiIntegrationsResp })
   async listAiIntegrationsInOrg(
     @Param('orgId', ParseUUIDPipe) orgId: string,
@@ -70,12 +69,7 @@ export class AiIntegrationsController {
   }
 
   @Get('org-teams/:orgTeamId/ai-integrations')
-  @UseGuards(
-    OrgTeamsGuard({
-      teamMinimumRole: UserRole.ADMIN,
-      orgMinimumRole: UserRole.ADMIN,
-    }),
-  )
+  @UseGuards(OrgTeamsAdminGuard)
   @ApiResponse({
     status: '2XX',
     type: GetAllAiIntegrationsAccessibleByTeamResp,
@@ -96,7 +90,7 @@ export class AiIntegrationsController {
   }
 
   @Put('ai-integrations/:aiIntegrationId')
-  @UseGuards(AiIntegrationsGuard(UserRole.ADMIN))
+  @UseGuards(AiIntegrationsAdminGuard)
   @ApiResponse({ status: '2XX', type: AiIntegrationKeyResp })
   async updateAiIntegration(
     @Param('aiIntegrationId', ParseUUIDPipe) aiIntegrationId: string,
@@ -116,7 +110,7 @@ export class AiIntegrationsController {
   }
 
   @Delete('ai-integrations/:aiIntegrationId')
-  @UseGuards(AiIntegrationsGuard(UserRole.ADMIN))
+  @UseGuards(AiIntegrationsAdminGuard)
   @ApiResponse({ status: '2XX', type: MessageResp })
   async deleteAiIntegration(
     @Param('aiIntegrationId', ParseUUIDPipe) aiIntegrationId: string,
@@ -128,7 +122,7 @@ export class AiIntegrationsController {
   }
 
   @Get('ai-integrations/:aiIntegrationId')
-  @UseGuards(AiIntegrationsGuard(UserRole.ADMIN))
+  @UseGuards(AiIntegrationsAdminGuard)
   @ApiResponse({ status: '2XX', type: AiIntegrationKeyResp })
   async getAiIntegration(
     @Param('aiIntegrationId', ParseUUIDPipe) aiIntegrationId: string,

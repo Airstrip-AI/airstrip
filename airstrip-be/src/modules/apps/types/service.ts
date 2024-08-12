@@ -23,10 +23,7 @@ export type UpdateAppServiceDto = {
   temperature: number;
 };
 
-export type AppEntityWithOrgTeamAiProviderJoined = Omit<
-  AppEntity,
-  'org' | 'orgTeam' | 'aiProvider'
-> & {
+export type AppEntityWithOrgTeamAiProviderJoined = AppEntity & {
   org: OrganizationEntity;
   orgTeam: OrgTeamEntity | null;
   aiProvider: AiIntegrationEntity | null;

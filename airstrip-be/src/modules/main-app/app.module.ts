@@ -15,6 +15,8 @@ import { OrgTeamsModule } from '../org-teams/org-teams.module';
 import { AiIntegrationsModule } from '../ai-integrations/ai-integrations.module';
 import { AppsModule } from '../apps/apps.module';
 import { AppChatsModule } from '../app-chats/app-chats.module';
+import { ChatMessagesModule } from '../chat-messages/chat-messages.module';
+import { MessageTokenUsageDataModule } from '../message-token-usage-data/message-token-usage-data.module';
 
 function getPostgresDbConfig(
   configService: ConfigService,
@@ -63,6 +65,8 @@ function getPostgresDbConfig(
     AiIntegrationsModule,
     AppsModule,
     AppChatsModule,
+    ChatMessagesModule,
+    MessageTokenUsageDataModule,
   ],
   providers: [
     {

@@ -26,7 +26,7 @@ export default function AppUserModePage() {
           </Text>
         </Group>
         <Card>
-          <Chat app={app} />
+          <Chat app={app} id={null} />
         </Card>
       </Stack>
     </Container>

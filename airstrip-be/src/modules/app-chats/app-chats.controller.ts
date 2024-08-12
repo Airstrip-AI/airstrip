@@ -9,23 +9,17 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AppChatsService } from './app-chats.service';
-import { AppsGuard } from '../apps/apps.guard';
-import { UserRole } from '../../utils/constants';
 import { AuthedRequest } from '../auth/types/service';
 import { Response } from 'express';
 import { Message } from 'ai';
+import { AppsMemberGuard } from '../apps/apps.guard';
 
 @Controller()
 export class AppChatsController {
   constructor(private readonly appChatsService: AppChatsService) {}
 
   @Post('apps/:appId/stream-chat')
-  @UseGuards(
-    AppsGuard({
-      teamMinimumRole: '*',
-      orgMinimumRole: UserRole.ADMIN,
-    }),
-  )
+  @UseGuards(AppsMemberGuard)
   async streamChatWithApp(
     @Request() req: AuthedRequest,
     @Param('appId', ParseUUIDPipe) appId: string,

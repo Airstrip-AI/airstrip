@@ -3,75 +3,189 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
-  mixin,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { validate as uuidValidate } from 'uuid';
-import { AllowedMinimumRole, isUserRoleAllowed } from '../../utils/guards';
 import { AuthedUser } from '../auth/types/service';
 import { AppsService } from './apps.service';
 import { OrgTeamsService } from '../org-teams/org-teams.service';
+import { isAdminOrAbove } from '../../utils/constants';
+import { CreateAppReq } from './types/api';
 
-export function AppsGuard({
-  teamMinimumRole,
-  orgMinimumRole,
-}: {
+@Injectable()
+export class AppsOrgMemberGuard implements CanActivate {
+  constructor(private readonly appsService: AppsService) {}
+
   /**
-   * Minimum role required to access the team. Both fields are joined by OR operator.
-   * If anyone in the org can access, regardless of whether they are in the team, set
-   * both fields to '*'.
-   *
-   * A null value in either field means that if user does not have a role that passes the minimum role for
-   * the OTHER field, they will not be able to access the resource.
+   * Not to be confused with {@link AppsMemberGuard}.
+   * Checks user is member of org that app belongs to.
    */
-  teamMinimumRole: AllowedMinimumRole | null;
-  orgMinimumRole: AllowedMinimumRole | null;
-}): CanActivate {
-  @Injectable()
-  class AppsGuardInner implements CanActivate {
-    constructor(
-      private readonly appsService: AppsService,
-      private readonly orgTeamsService: OrgTeamsService,
-    ) {}
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest() as Request;
+    const appId = request.params.appId;
 
-    /**
-     * Checks user has access to apps restricted by the minimum roles parameters.
-     * Must be used on URLs that have an appId path param.
-     */
-    async canActivate(context: ExecutionContext): Promise<boolean> {
-      const request = context.switchToHttp().getRequest() as Request;
-      const appId = request.params.appId;
+    if (!appId) {
+      throw new UnauthorizedException('Missing appId');
+    }
+    if (!uuidValidate(appId)) {
+      return false;
+    }
 
-      if (!appId) {
-        throw new UnauthorizedException('Missing appId');
-      }
-      if (!uuidValidate(appId)) {
-        return false;
-      }
+    const user = request.user as AuthedUser;
+    if (!user) {
+      throw new UnauthorizedException('Not authorized');
+    }
 
-      const user = request.user as AuthedUser;
-      if (!user) {
-        throw new UnauthorizedException('Not authorized');
-      }
+    const appEntity = await this.appsService.getAppById(appId);
 
-      const appEntity = await this.appsService.getAppById(appId);
+    return !!user.orgs.find((org) => org.id === appEntity.orgId);
+  }
+}
 
-      const userOrg = user.orgs.find((org) => org.id === appEntity.orgId);
+@Injectable()
+export class AppsMemberGuard implements CanActivate {
+  constructor(
+    private readonly appsService: AppsService,
+    private readonly orgTeamsService: OrgTeamsService,
+  ) {}
 
-      const orgTeamUser = appEntity.teamId
-        ? await this.orgTeamsService.getOrgTeamUser(appEntity.teamId, user.id)
-        : null;
+  /**
+   * Checks user has usage access to app by checking either he is a member of the app's team or if he is org admin.
+   * Must be used on URLs that have an appId path param.
+   */
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest() as Request;
+    const appId = request.params.appId;
 
-      return (
-        (!!orgMinimumRole &&
-          !!userOrg &&
-          isUserRoleAllowed(userOrg.role, orgMinimumRole)) ||
-        (!!teamMinimumRole &&
-          !!orgTeamUser &&
-          isUserRoleAllowed(orgTeamUser.role, teamMinimumRole))
+    if (!appId) {
+      throw new UnauthorizedException('Missing appId');
+    }
+    if (!uuidValidate(appId)) {
+      return false;
+    }
+
+    const user = request.user as AuthedUser;
+    if (!user) {
+      throw new UnauthorizedException('Not authorized');
+    }
+
+    const appEntity = await this.appsService.getAppById(appId);
+
+    const userOrg = user.orgs.find((org) => org.id === appEntity.orgId);
+
+    if (!appEntity.teamId) {
+      // org-wide app, check if user is in org
+      return !!userOrg;
+    } else {
+      // team app, check if user is in team OR if user is org admin
+      const orgTeamUser = await this.orgTeamsService.getOrgTeamUser(
+        appEntity.teamId,
+        user.id,
       );
+      return !!orgTeamUser || (!!userOrg && isAdminOrAbove(userOrg.role));
     }
   }
+}
 
-  return mixin(AppsGuardInner) as unknown as CanActivate;
+@Injectable()
+export class AppsAdminGuard implements CanActivate {
+  constructor(
+    private readonly appsService: AppsService,
+    private readonly orgTeamsService: OrgTeamsService,
+  ) {}
+
+  /**
+   * Checks user has admin rights on the app.
+   * Must be used on URLs that have an appId path param.
+   */
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest() as Request;
+    const appId = request.params.appId;
+
+    if (!appId) {
+      throw new UnauthorizedException('Missing appId');
+    }
+    if (!uuidValidate(appId)) {
+      return false;
+    }
+
+    const user = request.user as AuthedUser;
+    if (!user) {
+      throw new UnauthorizedException('Not authorized');
+    }
+
+    const appEntity = await this.appsService.getAppById(appId);
+
+    const userOrg = user.orgs.find((org) => org.id === appEntity.orgId);
+    const isOrgAdmin = !!userOrg && isAdminOrAbove(userOrg.role);
+
+    if (!appEntity.teamId) {
+      // org-wide app, check if user is org admin
+      return isOrgAdmin;
+    } else {
+      // team app, check if user is team admin or org admin
+      const orgTeamUser = await this.orgTeamsService.getOrgTeamUser(
+        appEntity.teamId,
+        user.id,
+      );
+      const isTeamAdmin = !!orgTeamUser && isAdminOrAbove(orgTeamUser.role);
+      return isTeamAdmin || isOrgAdmin;
+    }
+  }
+}
+
+@Injectable()
+export class AppsAdminCreationGuard implements CanActivate {
+  constructor(private readonly orgTeamsService: OrgTeamsService) {}
+
+  /**
+   * Checks user is allowed to create the app in his request. This checks either user has
+   * org admin role in the org or team admin role (in the team specified in the request body).
+   */
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest() as Request;
+    const orgId = request.params.orgId;
+
+    if (!orgId) {
+      throw new UnauthorizedException('Missing orgId');
+    }
+    if (!uuidValidate(orgId)) {
+      return false;
+    }
+
+    const createAppReq = request.body as CreateAppReq;
+    if (!createAppReq) {
+      throw new UnauthorizedException('Missing request body for "createApp"');
+    } else if (createAppReq.teamId && !uuidValidate(createAppReq.teamId)) {
+      throw new UnauthorizedException('Invalid teamId in request body.');
+    }
+
+    const user = request.user as AuthedUser;
+    if (!user) {
+      throw new UnauthorizedException('Not authorized');
+    }
+
+    const userOrg = user.orgs.find((org) => org.id === orgId);
+    const isOrgAdmin = !!userOrg && isAdminOrAbove(userOrg.role);
+
+    let isTeamAdmin = false;
+    if (createAppReq.teamId) {
+      const orgTeamEntity = await this.orgTeamsService.getOrgTeamById(
+        createAppReq.teamId,
+      );
+
+      if (orgTeamEntity.orgId !== orgId) {
+        throw new UnauthorizedException('Team does not belong to the org');
+      }
+
+      const orgTeamUser = await this.orgTeamsService.getOrgTeamUser(
+        orgTeamEntity.id,
+        user.id,
+      );
+
+      isTeamAdmin = !!orgTeamUser && isAdminOrAbove(orgTeamUser.role);
+    }
+
+    return isOrgAdmin || isTeamAdmin;
+  }
 }

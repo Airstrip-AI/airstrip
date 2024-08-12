@@ -13,19 +13,18 @@ import {
 } from '@nestjs/common';
 import { OrgsService } from './orgs.service';
 import { ChangeUserRoleReq, GetUsersInOrgResp, OrgUserResp } from './types/api';
-import { OrgsGuard } from './orgs.guard';
 import { OrganizationUserWithUser } from './types/service';
 import { ApiResponse } from '@nestjs/swagger';
-import { UserRole } from '../../utils/constants';
 import { AuthedRequest } from '../auth/types/service';
 import { MessageResp } from '../../utils/common';
+import { OrgsAdminGuard, OrgsMemberGuard } from './orgs.guard';
 
 @Controller('orgs')
 export class OrgsController {
   constructor(private readonly orgsService: OrgsService) {}
 
   @Get(':orgId/users')
-  @UseGuards(OrgsGuard('*'))
+  @UseGuards(OrgsMemberGuard)
   @ApiResponse({ status: '2XX', type: GetUsersInOrgResp })
   async getUsersInOrg(
     @Param('orgId', ParseUUIDPipe) orgId: string,
@@ -41,7 +40,7 @@ export class OrgsController {
   }
 
   @Put(':orgId/users/:userId/change-role')
-  @UseGuards(OrgsGuard(UserRole.ADMIN))
+  @UseGuards(OrgsAdminGuard)
   @ApiResponse({ status: '2XX', type: MessageResp })
   async changeUserRole(
     @Request() request: AuthedRequest,

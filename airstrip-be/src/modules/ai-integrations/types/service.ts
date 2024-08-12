@@ -20,9 +20,6 @@ export type UpdateAiIntegrationDto = {
   aiProviderApiUrl: string | null;
 };
 
-export type AiIntegrationEntityWithOrgTeamJoined = Omit<
-  AiIntegrationEntity,
-  'restrictedToTeam'
-> & {
+export type AiIntegrationEntityWithOrgTeamJoined = AiIntegrationEntity & {
   restrictedToTeam: OrgTeamEntity | null;
 };
