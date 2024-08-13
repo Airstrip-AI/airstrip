@@ -34,11 +34,10 @@ const features: { title: string; benefits: ReactNode }[] = [
       <>
         <Text>
           <b>Both engineering and business teams</b> can build internal AI apps
-          easily.
+          easily. Use the apps via a chat UI.
         </Text>
-        <Text>
-          Build chatbots or internal tools to extract structured data. Use the
-          apps via a UI or call them with REST API endpoints.
+        <Text fw="500">
+          We are working on REST API endpoints for the apps. Stay tuned!
         </Text>
       </>
     ),
@@ -47,9 +46,8 @@ const features: { title: string; benefits: ReactNode }[] = [
     title: 'All-in-one AI management',
     benefits: (
       <Text>
-        Monitor usage, metrics, and costs of your AI integrations and internal
-        AI apps all in one place. No more pulling usage data from multiple
-        places.
+        Monitor usage and metrics of your AI integrations and internal AI apps
+        all in one place. No more pulling usage data from multiple places.
       </Text>
     ),
   },
