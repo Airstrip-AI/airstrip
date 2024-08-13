@@ -6,8 +6,6 @@ import { showErrorNotification } from '@/utils/misc';
 import { Card, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { BarChart } from '@mantine/charts';
-import Link from 'next/link';
-import { Links } from '@/utils/misc/links';
 
 export default function AppIndexPage() {
   const [activeOrgId, _] = useLocalStorage({
