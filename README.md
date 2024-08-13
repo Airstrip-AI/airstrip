@@ -1,3 +1,7 @@
+<p align="center">
+<img src="https://github.com/user-attachments/assets/a17ffb83-2acb-4531-bb1c-6d297e35d097" width="150" height="150" style="margin-left: auto; margin-right: auto;" />
+</p>
+
 # Airstrip: Open-source Enterprise AI Management Platform
 
 Airstrip is an open-source enterprise AI management platform. You can think of it as a proxy service with access control that allows you to build internal AI apps.
