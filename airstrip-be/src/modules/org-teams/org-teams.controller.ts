@@ -36,6 +36,7 @@ import {
 } from './org-teams.guard';
 import { MessageResp } from '../../utils/common';
 import { OrgsAdminGuard, OrgsMemberGuard } from '../orgs/orgs.guard';
+import { boolean } from 'boolean';
 
 @Controller()
 export class OrgTeamsController {
@@ -81,6 +82,11 @@ export class OrgTeamsController {
     return this.orgTeamEntityToResp(orgTeamEntity);
   }
 
+  /**
+   * @param fetchAll If true, page will be ignored and all org teams will be returned.
+   * This is for the caller's convenience so that pagination is not needed.
+   * If performance turns out to be an issue, we can remove this feature.
+   */
   @Get('orgs/:orgId/org-teams')
   @UseGuards(OrgsMemberGuard)
   @ApiResponse({ status: '2XX', type: GetOrgTeamsResp })
@@ -88,11 +94,15 @@ export class OrgTeamsController {
     @Request() request: AuthedRequest,
     @Param('orgId', ParseUUIDPipe) orgId: string,
     @Query('page', ParseIntPipe) page: number,
+    @Query('fetchAll') fetchAll?: string,
   ): Promise<GetOrgTeamsResp> {
     const orgTeamsPage = await this.orgTeamsService.getOrgTeams(
       request.user,
       orgId,
-      page,
+      {
+        page,
+        fetchAll: boolean(fetchAll),
+      },
     );
 
     return {
@@ -119,19 +129,26 @@ export class OrgTeamsController {
   /**
    * This gets all users in an org and details on whether they are in the team pointed by orgTeamId.
    * Useful for populating a list of users to add to a team.
+   * @param fetchAll If true, page will be ignored and all org teams will be returned.
+   * This is for the caller's convenience so that pagination is not needed.
+   * If performance turns out to be an issue, we can remove this feature.
    */
   @Get('org-teams/:orgTeamId/org-users')
   @UseGuards(OrgTeamsMemberGuard)
   @ApiResponse({ status: '2XX', type: GetOrgUserAndTeamMembershipResp })
   async getOrgUsersAndTeamMembershipDetails(
     @Param('orgTeamId', ParseUUIDPipe) orgTeamId: string,
-    @Query('page', ParseIntPipe) page: number = 0,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('fetchAll') fetchAll?: string,
     @Query('searchTerm') searchTerm?: string,
   ): Promise<GetOrgUserAndTeamMembershipResp> {
     const orgUsersPage =
       await this.orgTeamsService.getOrgUsersAndTeamMembershipDetails(
         orgTeamId,
-        page,
+        {
+          page,
+          fetchAll: boolean(fetchAll),
+        },
         searchTerm,
       );
 

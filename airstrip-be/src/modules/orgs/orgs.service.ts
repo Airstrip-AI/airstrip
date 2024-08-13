@@ -66,7 +66,13 @@ export class OrgsService {
 
   async getUsersInOrg(
     orgId: string,
-    page: number,
+    pagination: {
+      page: number;
+      /**
+       * If true, fetch all users in the org. `page` will be ignored.
+       */
+      fetchAll: boolean;
+    },
     searchTerm?: string,
   ): Promise<{
     data: OrganizationUserWithUser[];
@@ -74,7 +80,7 @@ export class OrgsService {
     nextPageCursor: string | null;
   }> {
     const pageSize = 50;
-    const skip = page * pageSize;
+    const skip = pagination.fetchAll ? 0 : pagination.page * pageSize;
 
     let whereClause:
       | FindOptionsWhere<OrgUserEntity>
@@ -111,14 +117,22 @@ export class OrgsService {
           email: 'ASC',
         },
       },
-      take: pageSize,
-      skip,
+      ...(pagination.fetchAll
+        ? {}
+        : {
+            take: pageSize,
+            skip,
+          }),
     });
 
     return {
       data: orgUsers as OrganizationUserWithUser[],
       total,
-      nextPageCursor: total > skip + orgUsers.length ? String(page + 1) : null,
+      nextPageCursor: pagination.fetchAll
+        ? null
+        : total > skip + orgUsers.length
+          ? String(pagination.page + 1)
+          : null,
     };
   }
 

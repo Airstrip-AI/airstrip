@@ -97,7 +97,13 @@ export class OrgTeamsService {
   async getOrgTeams(
     authedUser: AuthedUser,
     orgId: string,
-    page: number,
+    pagination: {
+      /**
+       * If `fetchAll` is true, `page` is ignored.
+       */
+      page: number;
+      fetchAll: boolean;
+    },
   ): Promise<{
     data: OrgTeamEntityWithAuthedUserRoleAndNumMembers[];
     nextPageCursor: string | null;
@@ -112,8 +118,12 @@ export class OrgTeamsService {
         createdAt: 'DESC',
         name: 'ASC',
       },
-      take: pageSize + 1,
-      skip: page * pageSize,
+      ...(pagination.fetchAll
+        ? {}
+        : {
+            take: pageSize + 1,
+            skip: pageSize * pagination.page,
+          }),
     });
 
     const { authedUserOrgTeamRolesMap, orgTeamUsersCountMap } = orgTeams.length
@@ -126,17 +136,21 @@ export class OrgTeamsService {
           orgTeamUsersCountMap: new Map<string, number>(),
         };
 
-    const data: OrgTeamEntityWithAuthedUserRoleAndNumMembers[] = orgTeams
-      .slice(0, pageSize)
-      .map((team) => ({
-        ...team,
-        authedUserRole: authedUserOrgTeamRolesMap.get(team.id) || null,
-        numMembers: orgTeamUsersCountMap.get(team.id) || 0,
-      }));
+    const data: OrgTeamEntityWithAuthedUserRoleAndNumMembers[] = (
+      pagination.fetchAll ? orgTeams : orgTeams.slice(0, pageSize)
+    ).map((team) => ({
+      ...team,
+      authedUserRole: authedUserOrgTeamRolesMap.get(team.id) || null,
+      numMembers: orgTeamUsersCountMap.get(team.id) || 0,
+    }));
 
     return {
       data,
-      nextPageCursor: orgTeams.length > pageSize ? String(page + 1) : null,
+      nextPageCursor: pagination.fetchAll
+        ? null
+        : orgTeams.length > pageSize
+          ? String(pagination.page + 1)
+          : null,
     };
   }
 
@@ -172,7 +186,13 @@ export class OrgTeamsService {
 
   async getOrgUsersAndTeamMembershipDetails(
     orgTeamId: string,
-    page: number,
+    pagination: {
+      page: number;
+      /**
+       * If `fetchAll` is true, `page` is ignored.
+       */
+      fetchAll: boolean;
+    },
     searchTerm?: string,
   ): Promise<{
     data: (OrganizationUserWithUser & {
@@ -183,7 +203,7 @@ export class OrgTeamsService {
     const team = await this.getOrgTeamById(orgTeamId);
     const orgUsersPage = await this.orgsService.getUsersInOrg(
       team.orgId,
-      page,
+      pagination,
       searchTerm,
     );
     const userIds = orgUsersPage.data.map((orgUser) => orgUser.userId);

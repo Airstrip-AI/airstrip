@@ -56,23 +56,30 @@ export function useCreateTeam({
 
 export function useGetOrgTeams({
   orgId,
-  page,
+  pagination,
   onSuccess,
   onError,
 }: {
   orgId: string;
-  page: string;
+  pagination: {
+    page: string;
+    fetchAll: boolean;
+  };
   onSuccess?: (results: GetOrgTeamsResp) => void;
   onError?: (error: Error) => void;
 }) {
   return useQuery({
-    queryKey: [QueryKeys.ORG_TEAMS, orgId, page],
+    queryKey: [
+      QueryKeys.ORG_TEAMS,
+      orgId,
+      `${pagination.page}-${pagination.fetchAll}`,
+    ],
     queryFn: () => {
       const authToken = getValidToken();
       return getOrgTeams({
         orgId,
         authToken,
-        page,
+        pagination,
       });
     },
     keepPreviousData: true,
@@ -133,25 +140,33 @@ export function useGetOrgTeamUsers({
 
 export function useGetOrgUsersAndTeamMembershipDetails({
   orgTeamId,
-  page,
+  pagination,
   searchTerm,
   onSuccess,
   onError,
 }: {
   orgTeamId: string;
-  page: string;
+  pagination: {
+    page: string;
+    fetchAll: boolean;
+  };
   searchTerm?: string;
   onSuccess?: (results: GetOrgUserAndTeamMembershipResp) => void;
   onError?: (error: Error) => void;
 }) {
   return useQuery({
-    queryKey: [QueryKeys.ORG_TEAM_ORG_USERS, orgTeamId, page, searchTerm || ''],
+    queryKey: [
+      QueryKeys.ORG_TEAM_ORG_USERS,
+      orgTeamId,
+      `${pagination.page}-${pagination.fetchAll}`,
+      searchTerm || '',
+    ],
     queryFn: () => {
       const authToken = getValidToken();
       return getOrgUsersAndTeamMembershipDetails({
         orgTeamId,
         authToken,
-        page,
+        pagination,
         searchTerm,
       });
     },

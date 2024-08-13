@@ -30,7 +30,10 @@ export class OrgsController {
     @Param('orgId', ParseUUIDPipe) orgId: string,
     @Query('page', ParseIntPipe) page: number = 0,
   ): Promise<GetUsersInOrgResp> {
-    const usersInOrgPage = await this.orgsService.getUsersInOrg(orgId, page);
+    const usersInOrgPage = await this.orgsService.getUsersInOrg(orgId, {
+      page,
+      fetchAll: false,
+    });
 
     return {
       data: usersInOrgPage.data.map(this.orgUserEntityToOrgUserResp),

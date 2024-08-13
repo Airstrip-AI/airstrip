@@ -117,7 +117,9 @@ export class AppsService {
     });
 
     return {
-      data: apps.slice(0, pageSize) as AppEntityWithOrgTeamAiProviderJoined[],
+      data: (pagination.fetchAll
+        ? apps
+        : apps.slice(0, pageSize)) as AppEntityWithOrgTeamAiProviderJoined[],
       nextPageCursor: pagination.fetchAll
         ? null
         : apps.length > pageSize

@@ -10,7 +10,6 @@ import { AiProvider } from '@/utils/backend/client/common/types';
 import { showErrorNotification, showSuccessNotification } from '@/utils/misc';
 import { Button, Flex, PasswordInput, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useState } from 'react';
 
 export default function AddAiIntegrationForm({
   orgId,
@@ -19,11 +18,12 @@ export default function AddAiIntegrationForm({
   orgId: string;
   onAdd: (aiIntegration: AiIntegrationKeyResp) => void;
 }) {
-  const [page, setPage] = useState<string>('0');
-
   const { data } = useGetOrgTeams({
     orgId,
-    page,
+    pagination: {
+      page: '0',
+      fetchAll: true,
+    },
   });
 
   const { mutate: createAiIntegrationMutation, isLoading: isAdding } =
@@ -57,10 +57,6 @@ export default function AddAiIntegrationForm({
         value.trim().length > 0 ? null : 'API key is required',
     },
   });
-
-  // Bug: pagination is not implemented as I haven't figured out how to detect scroll events in the Select.
-  // This means that only the first page of teams will be displayed.
-  // Ideal scenario would be to fetch subsequent pages when the user scrolls to the bottom of the list.
 
   return (
     <form

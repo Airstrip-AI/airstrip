@@ -34,14 +34,17 @@ export async function createTeam({
 export async function getOrgTeams({
   orgId,
   authToken,
-  page,
+  pagination,
 }: {
   orgId: string;
-  page: string;
+  pagination: {
+    page: string;
+    fetchAll: boolean;
+  };
   authToken: string;
 }) {
   return await makeGetRequest<GetOrgTeamsResp>({
-    endpoint: `/api/v1/orgs/${orgId}/org-teams?page=${page}`,
+    endpoint: `/api/v1/orgs/${orgId}/org-teams?page=${pagination.page}&fetchAll=${pagination.fetchAll}`,
     authToken,
   });
 }
@@ -77,16 +80,19 @@ export async function getOrgTeamUsers({
 export async function getOrgUsersAndTeamMembershipDetails({
   orgTeamId,
   authToken,
-  page,
+  pagination,
   searchTerm,
 }: {
   orgTeamId: string;
   authToken: string;
-  page: string;
+  pagination: {
+    page: string;
+    fetchAll: boolean;
+  };
   searchTerm?: string;
 }) {
   return await makeGetRequest<GetOrgUserAndTeamMembershipResp>({
-    endpoint: `/api/v1/org-teams/${orgTeamId}/org-users?page=${page}${searchTerm ? `&searchTerm=${searchTerm}` : ''}`,
+    endpoint: `/api/v1/org-teams/${orgTeamId}/org-users?page=${pagination.page}&fetchAll=${pagination.fetchAll}${searchTerm ? `&searchTerm=${searchTerm}` : ''}`,
     authToken,
   });
 }

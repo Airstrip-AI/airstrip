@@ -18,11 +18,13 @@ export default function AddTeamUserSelect({
   onAdd: () => void;
 }) {
   const [searchValue, setSearchValue] = useState<string>('');
-  const [page, setPage] = useState<string>('0');
 
-  const { data, isLoading } = useGetOrgUsersAndTeamMembershipDetails({
+  const { data } = useGetOrgUsersAndTeamMembershipDetails({
     orgTeamId,
-    page,
+    pagination: {
+      page: '0',
+      fetchAll: true,
+    },
     searchTerm: searchValue,
   });
 
@@ -55,10 +57,6 @@ export default function AddTeamUserSelect({
       },
     },
   });
-
-  // Bug: pagination is not implemented as I haven't figured out how to detect scroll events in the Multiselect.
-  // This means that only the first page of users will be displayed.
-  // Ideal scenario would be to fetch subsequent pages when the user scrolls to the bottom of the list.
 
   return (
     <Stack>

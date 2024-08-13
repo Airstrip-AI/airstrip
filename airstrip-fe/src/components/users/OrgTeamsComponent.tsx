@@ -51,7 +51,7 @@ export default function OrgTeamsComponent({
 
   const { data, isLoading } = useGetOrgTeams({
     orgId,
-    page,
+    pagination: { page, fetchAll: false },
     onError: (error) =>
       showErrorNotification(error.message || 'An error occurred.'),
   });
