@@ -15,6 +15,11 @@ export function useGetAppsUsageData({
   return useQuery({
     queryKey: [QueryKeys.APPS_USAGE_DATA, orgId],
     queryFn: () => {
+      if (!orgId) {
+        return {
+          data: [],
+        };
+      }
       const authToken = getValidToken();
       return getAppsUsageData({
         authToken,

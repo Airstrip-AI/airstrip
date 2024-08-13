@@ -1,5 +1,5 @@
 import { getValidToken, QueryKeys } from '@/hooks/helpers';
-import { activeOrgIdKey, useLogout } from '@/hooks/user';
+import { useLogout } from '@/hooks/user';
 import {
   register,
   login,
@@ -15,7 +15,6 @@ import {
   ResetPasswordReq,
 } from '@/utils/backend/client/auth/types';
 import { MessageResp } from '@/utils/backend/client/common/types';
-import { readLocalStorageValue, useLocalStorage } from '@mantine/hooks';
 import { useMutation, useQuery } from 'react-query';
 
 export function useRegister({
@@ -52,25 +51,12 @@ export function useLogin({
 
 export function useCurrentUser() {
   const { logout } = useLogout();
-  const activeOrgId = readLocalStorageValue<string>({
-    key: activeOrgIdKey,
-  });
-  //  the read value from useLocalStorage returns undefined even when a value is present, hence using readLocalStorageValue instead.
-  const [_, setActiveOrgId] = useLocalStorage({
-    key: activeOrgIdKey,
-  });
 
   const { data, isLoading } = useQuery({
     queryKey: [QueryKeys.USER],
     queryFn: async () => {
       const authToken = getValidToken();
       const userProfile = await getCurrentUser(authToken);
-      if (
-        !activeOrgId ||
-        !userProfile.orgs.find((org) => org.id === activeOrgId)
-      ) {
-        setActiveOrgId(userProfile.orgs[0]?.id || '');
-      }
       return userProfile;
     },
     onError() {

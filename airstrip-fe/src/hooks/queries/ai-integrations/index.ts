@@ -145,6 +145,12 @@ export function useGetAiIntegrationsInOrg({
     queryKey: [QueryKeys.AI_INTEGRATIONS, 'orgs', orgId, page],
     queryFn: () => {
       const authToken = getValidToken();
+      if (!orgId) {
+        return {
+          data: [],
+          nextPageCursor: null,
+        };
+      }
       return listAiIntegrationsInOrg({
         orgId,
         authToken,

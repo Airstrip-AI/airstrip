@@ -36,7 +36,7 @@ import {
   rem,
   Stack,
 } from '@mantine/core';
-import { readLocalStorageValue, useDisclosure } from '@mantine/hooks';
+import { useLocalStorage, useDisclosure } from '@mantine/hooks';
 import { MRT_ColumnDef } from 'mantine-react-table';
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -48,7 +48,7 @@ export default function TeamDetailsPage() {
   ] = useDisclosure(false);
 
   const { orgTeamId }: { orgTeamId: string } = useParams();
-  const activeOrgId = readLocalStorageValue<string>({
+  const [activeOrgId] = useLocalStorage({
     key: activeOrgIdKey,
   });
 

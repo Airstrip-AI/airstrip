@@ -106,6 +106,12 @@ export function useListAppsForUser({
   return useQuery({
     queryKey: [QueryKeys.APPS, 'orgs', orgId, page],
     queryFn: () => {
+      if (!orgId) {
+        return {
+          data: [],
+          nextPageCursor: null,
+        };
+      }
       const authToken = getValidToken();
       return listAppsForUser({
         orgId,

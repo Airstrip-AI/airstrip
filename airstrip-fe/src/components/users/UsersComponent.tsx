@@ -6,7 +6,7 @@ import { useCurrentUser } from '@/hooks/queries/user-auth';
 import { activeOrgIdKey } from '@/hooks/user';
 import { isAdminOrAboveInOrg } from '@/utils/misc';
 import { Card, rem, Tabs, Text } from '@mantine/core';
-import { readLocalStorageValue } from '@mantine/hooks';
+import { useLocalStorage } from '@mantine/hooks';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -16,7 +16,7 @@ export default function UsersComponent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const activeOrgId = readLocalStorageValue<string>({
+  const [activeOrgId] = useLocalStorage({
     key: activeOrgIdKey,
   });
   const { currentUser } = useCurrentUser();

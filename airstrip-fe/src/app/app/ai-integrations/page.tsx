@@ -18,7 +18,7 @@ import {
 } from '@/utils/misc';
 import { Links } from '@/utils/misc/links';
 import { Alert, Button, Flex, Modal, rem, Stack, Text } from '@mantine/core';
-import { readLocalStorageValue, useDisclosure } from '@mantine/hooks';
+import { useLocalStorage, useDisclosure } from '@mantine/hooks';
 import { MRT_ColumnDef } from 'mantine-react-table';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -33,7 +33,7 @@ export default function AiIntegrationsPage() {
     { open: openAddAiIntegrationModal, close: closeAddAiIntegrationModal },
   ] = useDisclosure(false);
 
-  const activeOrgId = readLocalStorageValue<string>({
+  const [activeOrgId] = useLocalStorage({
     key: activeOrgIdKey,
   });
 

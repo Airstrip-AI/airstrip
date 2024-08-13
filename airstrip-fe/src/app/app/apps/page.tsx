@@ -12,7 +12,7 @@ import { AppResp } from '@/utils/backend/client/apps/types';
 import { fromNow, isAdminOrAbove, isAdminOrAboveInOrg } from '@/utils/misc';
 import { Links } from '@/utils/misc/links';
 import { Modal, Stack, rem, Text, Button, Flex } from '@mantine/core';
-import { useDisclosure, readLocalStorageValue } from '@mantine/hooks';
+import { useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { MRT_ColumnDef } from 'mantine-react-table';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo } from 'react';
@@ -25,7 +25,7 @@ export default function AppsPage() {
     { open: openCreateAppModal, close: closeCreateAppModal },
   ] = useDisclosure(false);
 
-  const activeOrgId = readLocalStorageValue<string>({
+  const [activeOrgId] = useLocalStorage({
     key: activeOrgIdKey,
   });
 

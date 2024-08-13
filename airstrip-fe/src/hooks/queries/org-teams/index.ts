@@ -254,6 +254,11 @@ export function useGetUserOrgTeams({
   return useQuery({
     queryKey: [QueryKeys.USER_ORG_TEAMS, orgId],
     queryFn: () => {
+      if (!orgId) {
+        return {
+          data: [],
+        };
+      }
       const authToken = getValidToken();
       return getUserOrgTeams({
         orgId,
