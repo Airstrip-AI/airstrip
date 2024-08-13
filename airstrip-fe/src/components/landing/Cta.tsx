@@ -2,6 +2,7 @@
 
 import { Card, Container, Flex, rem, Stack, Text } from '@mantine/core';
 import GetStartedButton from './GetStartedButton';
+import GithubRepoButton from '@/components/github-repo-button/GithubRepoButton';
 
 export default function Cta() {
   return (
@@ -15,7 +16,8 @@ export default function Cta() {
             Start managing your AI integrations, control access, and build
             internal AI apps with ease.
           </Text>
-          <Flex justify="center">
+          <Flex gap="sm" justify="center">
+            <GithubRepoButton variant="white" />
             <GetStartedButton variant="white" />
           </Flex>
         </Stack>

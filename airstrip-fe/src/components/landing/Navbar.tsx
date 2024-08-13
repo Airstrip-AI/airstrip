@@ -13,11 +13,11 @@ import { useDisclosure } from '@mantine/hooks';
 import classes from './Navbar.module.css';
 import Logo from '../logo/Logo';
 import GetStartedButton from './GetStartedButton';
+import GithubRepoButton from '@/components/github-repo-button/GithubRepoButton';
 
 export default function Navbar() {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
-  // TODO: add Github link
   return (
     <Box>
       <header className={classes.header}>
@@ -25,6 +25,7 @@ export default function Navbar() {
           <Logo size={30} withText withLink />
 
           <Group visibleFrom="sm">
+            <GithubRepoButton />
             <GetStartedButton />
           </Group>
 
@@ -49,6 +50,7 @@ export default function Navbar() {
           <Divider my="sm" />
 
           <Group justify="center" grow pb="xl" px="md">
+            <GithubRepoButton />
             <GetStartedButton />
           </Group>
         </ScrollArea>

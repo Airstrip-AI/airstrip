@@ -3,6 +3,7 @@
 import { Container, Flex, rem, Text } from '@mantine/core';
 import GetStartedButton from './GetStartedButton';
 import AbstractDotsAnimation from '../animations/AbstractDotsAnimation';
+import GithubRepoButton from '@/components/github-repo-button/GithubRepoButton';
 
 export default function Hero() {
   return (
@@ -19,7 +20,8 @@ export default function Hero() {
             Manage your AI integrations, control access, and build internal AI
             apps with ease.
           </Text>
-          <Flex pt={rem(40)} justify="center">
+          <Flex gap="sm" pt={rem(40)} justify="center">
+            <GithubRepoButton />
             <GetStartedButton />
           </Flex>
         </div>
