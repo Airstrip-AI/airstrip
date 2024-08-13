@@ -6,6 +6,8 @@ import { showErrorNotification } from '@/utils/misc';
 import { Card, SimpleGrid, Stack, Text } from '@mantine/core';
 import { readLocalStorageValue } from '@mantine/hooks';
 import { BarChart } from '@mantine/charts';
+import Link from 'next/link';
+import { Links } from '@/utils/misc/links';
 
 export default function AppIndexPage() {
   const activeOrgId = readLocalStorageValue<string>({
@@ -80,7 +82,12 @@ export default function AppIndexPage() {
           ))}
         </SimpleGrid>
       ) : (
-        <Text>Looks like you have not created any apps yet.</Text>
+        <Text>
+          Looks like you have not created any apps yet. Start by adding{' '}
+          <Link href={Links.aiIntegrations()}>AI integrations</Link>. After
+          that, you can <Link href={Links.apps()}>create apps</Link> with the
+          integrations.
+        </Text>
       )}
     </Stack>
   );
