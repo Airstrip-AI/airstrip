@@ -28,6 +28,10 @@ export default function AppIndexPage() {
   return (
     <Stack>
       <Text fw="bold">Apps usage</Text>
+      {/* For simplicity, show usage data to all members. */}
+      <Text c="dimmed" size="sm">
+        Usage data by all members
+      </Text>
       {appsUsageDataResp.data.length ? (
         <SimpleGrid cols={{ sm: 1, md: 3, lg: 4 }}>
           {appsUsageDataResp.data.map((appUsageData) => (
@@ -83,10 +87,9 @@ export default function AppIndexPage() {
         </SimpleGrid>
       ) : (
         <Text>
-          Looks like you have not created any apps yet. Start by adding{' '}
-          <Link href={Links.aiIntegrations()}>AI integrations</Link>. After
-          that, you can <Link href={Links.apps()}>create apps</Link> with the
-          integrations.
+          Looks like you have not created any apps yet. If you are an org admin,
+          you can start by adding AI integrations. After that, org and team
+          admins can create apps.
         </Text>
       )}
     </Stack>
