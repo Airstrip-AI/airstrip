@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Flex, rem, Text } from '@mantine/core';
+import { AspectRatio, Card, Container, Flex, rem, Text } from '@mantine/core';
 import GetStartedButton from './GetStartedButton';
 import AbstractDotsAnimation from '../animations/AbstractDotsAnimation';
 import GithubRepoButton from '@/components/github-repo-button/GithubRepoButton';
@@ -26,6 +26,11 @@ export default function Hero() {
           </Flex>
         </div>
       </div>
+      <Card p={0} w="100%" withBorder shadow="lg" mb="xl">
+        <AspectRatio w="100%" ratio={1.78}>
+          <video src="/airstrip-demo.mp4" controls loop width="100%" />
+        </AspectRatio>
+      </Card>
     </Container>
   );
 }
