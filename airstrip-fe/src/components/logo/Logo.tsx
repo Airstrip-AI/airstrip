@@ -18,7 +18,7 @@ export default function Logo({
 }) {
   const logo = (
     <Group gap="0">
-      <Image alt="Logo" src="/logo.png" width={size} height={size} />
+      <Image alt="Logo" src="/logo.svg" width={size} height={size} />
       {withText && <Text fw="bold">{PRODUCT_NAME}</Text>}
     </Group>
   );

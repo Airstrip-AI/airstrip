@@ -12,7 +12,7 @@ const font = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: `${PRODUCT_NAME} | Open-source Enterprise AI Management Platform`,
   openGraph: {
-    images: ['/logo.png'],
+    images: ['/logo.svg'],
   },
   alternates: {
     canonical: './',
