@@ -62,9 +62,11 @@ function AppDetailsForm({ app }: { app: AppResp }) {
       description: (value) =>
         value.trim().length > 0 ? null : 'Description is required',
       type: (value) =>
-        Object.values(AppType).includes(value)
-          ? null
-          : 'A valid app type is required',
+        value === AppType.CHAT ? null : 'App type must be Chat',
+      // type: (value) =>
+      //   Object.values(AppType).includes(value)
+      //     ? null
+      //     : 'A valid app type is required',
       temperature: (value) =>
         value >= 0 && value <= 1 ? null : 'Temperature must be between 0 and 1',
     },
@@ -178,7 +180,8 @@ function AppDetailsForm({ app }: { app: AppResp }) {
                 <TextInput {...form.getInputProps('description')} />
               </Table.Td>
             </Table.Tr>
-            <Table.Tr>
+            {/* Only Chat is supported now */}
+            {/* <Table.Tr>
               <Table.Td>{formFieldLabel('Type')}</Table.Td>
               <Table.Td>
                 <Select
@@ -191,7 +194,7 @@ function AppDetailsForm({ app }: { app: AppResp }) {
                   placeholder="Select app type"
                 />
               </Table.Td>
-            </Table.Tr>
+            </Table.Tr> */}
             <Table.Tr>
               <Table.Td>{formFieldLabel('AI Provider')}</Table.Td>
               <Table.Td>
@@ -282,7 +285,8 @@ function AppDetailsForm({ app }: { app: AppResp }) {
                 />
               </Table.Td>
             </Table.Tr>
-            <Table.Tr>
+            {/* Not supported yet */}
+            {/* <Table.Tr>
               <Table.Td>{formFieldLabel('Output JSON schema')}</Table.Td>
               <Table.Td>
                 <Textarea
@@ -292,7 +296,7 @@ function AppDetailsForm({ app }: { app: AppResp }) {
                   description="For Tool only. Describe the JSON schema of the output."
                 />
               </Table.Td>
-            </Table.Tr>
+            </Table.Tr> */}
           </Table.Tbody>
         </Table>
       </Card>

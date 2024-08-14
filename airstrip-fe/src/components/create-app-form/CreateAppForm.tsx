@@ -29,7 +29,7 @@ export default function CreateAppForm({
     initialValues: {
       name: '',
       description: '',
-      type: '' as AppType,
+      type: AppType.CHAT,
       teamId: '',
     },
     validate: {
@@ -37,9 +37,11 @@ export default function CreateAppForm({
       description: (value) =>
         value.trim().length > 0 ? null : 'Description is required',
       type: (value) =>
-        Object.values(AppType).includes(value)
-          ? null
-          : 'A valid app type is required',
+        value === AppType.CHAT ? null : 'App type must be CHAT',
+      // type: (value) =>
+      //   Object.values(AppType).includes(value)
+      //     ? null
+      //     : 'A valid app type is required',
     },
   });
 
@@ -71,7 +73,8 @@ export default function CreateAppForm({
         label="Description"
         description="A brief description of the app would be helpful"
       />
-      <Select
+      {/* Only Chat is supported now */}
+      {/* <Select
         mb="md"
         {...form.getInputProps('type')}
         data={Object.values(AppType).map((provider) => ({
@@ -79,7 +82,7 @@ export default function CreateAppForm({
           value: provider,
         }))}
         placeholder="Select app type"
-      />
+      /> */}
       <Select
         mb="md"
         label="Select team"
