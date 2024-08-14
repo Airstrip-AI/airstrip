@@ -12,11 +12,12 @@ The goal is to have the engineering/ops team manage the integrations and access 
 
 ## Features
 
-- Bring your own API keys and connect to different LLM providers.
-  - We currently support **OpenAI**, **Mistral**, **Google**, **Cohere**, **Anthropic**, and **self-hosted LLMs** with an OpenAI-compatible interface.
-- Manage teams and control access to different AI integrations.
-- Build internal AI apps by adding prompts and specifying which LLM provider to connect to.
-- View usages across all apps and LLM integrations in one place.
+| | |
+|-|:-:|
+|<h3>Manage AI integrations</h3> Bring your own API keys and connect to different LLM providers. We currently support **OpenAI**, **Mistral**, **Google**, **Cohere**, **Anthropic**, and **self-hosted LLMs** with an OpenAI-compatible interface.| <img width="1512" alt="ai-integrations" src="https://github.com/user-attachments/assets/ee742fc0-0790-44ff-a2ae-55d47ecd5493"> |
+| <h3>Teams and role-based access control</h3> Manage teams and control access to different AI integrations. | <img width="1512" alt="teams" src="https://github.com/user-attachments/assets/c3623b8e-a7c2-4af4-92dd-d06c21b47056"> |
+| <h3>Build and use internal AI apps</h3> Build internal AI apps by adding prompts and specifying which LLM provider to connect to. | <img width="1512" alt="edit-app" src="https://github.com/user-attachments/assets/9511ee23-e42e-4d63-8dad-9f2762ca0af8"> <img width="1512" alt="chat" src="https://github.com/user-attachments/assets/891079db-5c8d-47f4-8c84-18a5fcc38b38"> |
+| <h3>Usage analytics</h3> View usages across all apps and AI integrations in one place. (To be honest, it's quite basic for now. Still working on this.) |  <img width="1511" alt="analytics" src="https://github.com/user-attachments/assets/167d7e9b-caf3-4b42-b3c1-098357610ed8"> |
 
 ## Get started
 
@@ -37,7 +38,7 @@ The command above will spin up 4 containers:
 
 ## Default configuration
 
-You can skip this section if you are happy with the default values.
+**You can skip this section if you are happy with the default values.**
 
 To make it easy to get started, default values are supplied. You can still run the app without changing any of these values. But if you intend to run this in prod or in public, you should either harden your servers or use non-default values, especially for database credentials.
 
@@ -61,25 +62,33 @@ These values in `.env` are for sending emails. These are left blank by default. 
 
 The credentials are used in `.env`, SQL init script, and `docker-compose.yml` (in flyway's command section). They have to be updated together.
 
-## How to use (role-based access control)
+## How to use 
 
-- Upon creating an account, you will be assigned an organization. You can invite people to your organization.
+#### Roles
+- Upon creating an account, you will be assigned an organization which you are an owner of. You can invite people to your organization.
 - There are 3 types of roles: **Owner**, **Admin**, and **Member**.
-  - There is no difference between Owner and Admin at the moment other than Admin is unable to change an Owner's role.
-  - Whatever an Admin can do, an Owner can do too. When you see the term "admin", it means "Admins and Owners" unless otherwise specified.
-  - The 3 roles also apply to team members.
+- There is no difference between Owner and Admin at the moment other than Admin is unable to change an Owner's role.
+- Whatever an Admin can do, an Owner can do too. When you see the term "admin", it means "Admins and Owners" unless otherwise specified.
+- The 3 roles also apply to team members.
+
+#### Teams 
 - Each organization can have many teams. Only org admins can create teams.
 - Org admins and team admins can invite members to the team.
+
+#### AI (LLM) integrations
 - AI integrations can only be created by org admins and are created at the org level.
 - AI integrations can be restricted to a team, i.e. only apps created in the team can use the AI integration.
-- Only org/team admins can create apps in the org/team respectively.
 - Org-wide AI integrations can be used by any team.
+
+#### Apps
+- Only org/team admins can create apps in the org/team respectively.
 - Org-wide apps can be used by any org member.
 - Team apps can only be used by the team's members or org admins.
 
-## Roadmap
+## We are working on...
 
+- Allow data sources to be added to AI apps (currently everything needs to be in the text prompt.)
 - Exposing the apps as REST API endpoints.
-- Better usage data in dashboard.
+- Better usage analytics in dashboard.
 
-Please submit any feature requests in Github issues.
+Please submit any feature requests or issues in Github issues.
