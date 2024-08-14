@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Logo from '../logo/Logo';
 import classes from './Footer.module.css';
 import Link from 'next/link';
+import githubMark from '../../../public/github-mark.svg';
 
 export default function Footer() {
   return (
@@ -16,7 +17,7 @@ export default function Footer() {
         </div>
         <Group gap="sm">
           <Link href={GITHUB_REPO_URL} target="_blank">
-            <Image alt="github" src="/github-mark.svg" width={20} height={20} />
+            <Image alt="github" src={githubMark} width={20} height={20} />
           </Link>
           <Text c="dimmed" size="sm">
             © {new Date().getFullYear()} {PRODUCT_NAME}.

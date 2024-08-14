@@ -28,7 +28,13 @@ export default function Hero() {
       </div>
       <Card p={0} w="100%" withBorder shadow="lg" mb="xl">
         <AspectRatio w="100%" ratio={1.78}>
-          <video src="/airstrip-demo.mp4" controls loop width="100%" />
+          <video
+            // repository name prefix because of github pages. ugly, but works for now.
+            src={`/airstrip/airstrip-demo.mp4`}
+            controls
+            loop
+            width="100%"
+          />
         </AspectRatio>
       </Card>
     </Container>

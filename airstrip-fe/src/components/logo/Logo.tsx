@@ -6,6 +6,7 @@ import classes from './Logo.module.css';
 import Link from 'next/link';
 import { Links } from '@/utils/misc/links';
 import { PRODUCT_NAME } from '@/constants';
+import logoImage from '../../../public/logo.svg';
 
 export default function Logo({
   size,
@@ -18,7 +19,7 @@ export default function Logo({
 }) {
   const logo = (
     <Group gap="0">
-      <Image alt="Logo" src="/logo.svg" width={size} height={size} />
+      <Image alt="Logo" src={logoImage} width={size} height={size} />
       {withText && <Text fw="bold">{PRODUCT_NAME}</Text>}
     </Group>
   );
