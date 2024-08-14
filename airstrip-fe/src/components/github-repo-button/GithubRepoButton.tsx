@@ -15,7 +15,7 @@ export default function GithubRepoButton({ variant }: { variant?: string }) {
         <Image alt="github" src="/github-mark.svg" width={20} height={20} />
       }
     >
-      {PRODUCT_NAME}
+      Check out {PRODUCT_NAME} on GitHub
     </Button>
   );
 }

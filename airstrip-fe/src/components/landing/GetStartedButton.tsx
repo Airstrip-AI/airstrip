@@ -10,14 +10,15 @@ export default function GetStartedButton({
   variant?: string;
   className?: string;
 }) {
-  return (
-    <Button
-      variant={variant}
-      component="a"
-      href={Links.login()}
-      className={className}
-    >
-      Get Started
-    </Button>
-  );
+  return null;
+  // return (
+  //   <Button
+  //     variant={variant}
+  //     component="a"
+  //     href={Links.login()}
+  //     className={className}
+  //   >
+  //     Get Started
+  //   </Button>
+  // );
 }
