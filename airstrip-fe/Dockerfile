@@ -5,7 +5,12 @@ WORKDIR /app
 COPY public public
 COPY src src
 COPY next.config.mjs package.json postcss.config.cjs tailwind.config.ts tsconfig.json yarn.lock ./
-COPY sample.env .env
+
+# Section for env vars that will be built into the image
+
+ARG NEXT_PUBLIC_BE_API_HOST=http://localhost:3001
+
+# End of section for env vars that will be built into the image
 
 RUN yarn && yarn build
 

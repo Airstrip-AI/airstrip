@@ -4,6 +4,8 @@ services:
     build:
       context: ./airstrip-fe
       dockerfile: Dockerfile
+    # frontend does not use env_file because nextjs bakes the env variables into the build,
+    # so using env_file at this point has no effect. To change the env vars, update ARG in frontend's Dockerfile.
     ports:
       - "3000:3000"
   airstrip-be:
@@ -11,6 +13,8 @@ services:
     build:
       context: ./airstrip-be
       dockerfile: Dockerfile
+    env_file:
+      - path: ./airstrip-be/sample.env
     ports:
       - "3001:3001"
     depends_on:

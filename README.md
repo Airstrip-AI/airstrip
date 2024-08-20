@@ -71,23 +71,23 @@ To make it easy to get started, default values are supplied. You can still run t
 
 ### Backend
 
+#### sample.env
+
+`sample.env` is used as `env_file` in `docker-compose.yml` to provide environment variables. If you update the database values (e.g. credentials), make sure to update the [SQL init script](/airstrip-be/docker-entrypoint-initdb.d/init.sql) and flyway section in [docker-compose.yml](./docker-compose.yml).
+
 #### AIRSTRIP_JWT_PUBLIC_JWK and AIRSTRIP_JWT_PRIVATE_JWK
 
-When building the Docker image, a pair of public/private key is generated inside the image. They are used to sign JWT tokens. You can use another pair of keys by setting the environment variables `AIRSTRIP_JWT_PUBLIC_JWK` and `AIRSTRIP_JWT_PRIVATE_JWK` to your keys' file paths in `docker-compose.yml`.
-
-#### .env
-
-`sample.env` is copied as `.env` inside the image. If you update the database values (e.g. credentials), make sure to update the [SQL init script](/airstrip-be/docker-entrypoint-initdb.d/init.sql) and flyway section in [docker-compose.yml](./docker-compose.yml).
+When building the Docker image, a pair of public/private key is generated inside the image. They are used to sign JWT tokens. You can use another pair of keys by setting the environment variables `AIRSTRIP_JWT_PUBLIC_JWK` and `AIRSTRIP_JWT_PRIVATE_JWK` to your keys' file paths.
 
 #### AIRSTRIP_SMTP_HOST, AIRSTRIP_SMTP_PORT, AIRSTRIP_SMTP_USER, AIRSTRIP_SMTP_PASSWORD, and AIRSTRIP_EMAIL_SENDER
 
-These values in `.env` are for sending emails. These are left blank by default. **Without these values, email functionality is disabled**. Currently, email functionality is only used for sending a password reset link and organization invite link.
+These values are for sending emails. These are left blank by default. **Without these values, email functionality is disabled**. Currently, email functionality is only used for sending a password reset link and organization invite link.
 
 ### Postgres
 
 #### Database credentials
 
-The credentials are used in `.env`, SQL init script, and `docker-compose.yml` (in flyway's command section). They have to be updated together.
+The credentials are used in the environment variables, SQL init script, and `docker-compose.yml` (in flyway's command section). They have to be updated together.
 
 ## We are working on...
 

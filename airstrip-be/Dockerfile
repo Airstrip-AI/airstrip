@@ -6,7 +6,6 @@ WORKDIR /app
 
 COPY src src
 COPY nest-cli.json package.json tsconfig.build.json tsconfig.json yarn.lock ./
-COPY sample.env .env
 
 RUN jose jwk gen -i '{"alg": "RS256"}' -o airstrip.rsa.jwk && jose jwk pub -i airstrip.rsa.jwk -o airstrip.rsa.jwk.pub
 
