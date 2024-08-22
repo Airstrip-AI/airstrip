@@ -33,6 +33,7 @@ import {
 import { useForm } from '@mantine/form';
 import { IconCheck, IconExternalLink } from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
+import { ModelSelect } from './model-select';
 
 const formFieldLabel = (label: string) => (
   <Text fw="bold" size="sm">
@@ -246,9 +247,9 @@ function AppDetailsForm({ app }: { app: AppResp }) {
               {/* TODO: improve the UX by making this a searchable+creatable combobox where the list of options will be set based on the AiProvider selected. */}
               <Table.Td>{formFieldLabel('Model')}</Table.Td>
               <Table.Td>
-                <TextInput
-                  {...form.getInputProps('aiModel')}
-                  description="The AI model, e.g. gpt-4o, claude-3-5-sonnet-20240620, gemini-1.5-pro"
+                <ModelSelect
+                  form={form}
+                  aiProvidersData={allowedAiProvidersForApp}
                 />
               </Table.Td>
             </Table.Tr>
@@ -257,6 +258,7 @@ function AppDetailsForm({ app }: { app: AppResp }) {
               <Table.Td>
                 <NumberInput
                   {...form.getInputProps('temperature')}
+                  step={0.1}
                   min={0}
                   max={1}
                   description="The creativity of the AI. 0 is very predictable, 1 is very creative."
