@@ -16,7 +16,7 @@ import {
   SaveChatMessageResp,
 } from './types/api';
 import { AuthedRequest } from '../auth/types/service';
-import { AppsAdminGuard } from '../apps/apps.guard';
+import { AppsMemberGuard } from '../apps/apps.guard';
 import { ChatsUserGuard } from './chats.guard';
 
 @Controller()
@@ -24,7 +24,7 @@ export class ChatMessagesController {
   constructor(private readonly chatMessagesService: ChatMessagesService) {}
 
   @Post('apps/:appId/chats')
-  @UseGuards(AppsAdminGuard)
+  @UseGuards(AppsMemberGuard)
   @ApiResponse({ status: '2XX', type: CreateChatWithFirstMessageResp })
   async createNewChatWithFirstMessage(
     @Request() req: AuthedRequest,
