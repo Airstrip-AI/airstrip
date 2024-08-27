@@ -9,6 +9,7 @@ export type CreateAiIntegrationDto = {
   aiProvider: AiProvider;
   aiProviderApiKey: string;
   aiProviderApiUrl: string | null;
+  aiModel: string;
 };
 
 export type UpdateAiIntegrationDto = {
@@ -18,6 +19,7 @@ export type UpdateAiIntegrationDto = {
   aiProvider: AiProvider;
   aiProviderApiKey: string;
   aiProviderApiUrl: string | null;
+  aiModel: string;
 };
 
 export type AiIntegrationEntityWithOrgTeamJoined = AiIntegrationEntity & {

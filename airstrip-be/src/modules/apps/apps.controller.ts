@@ -145,7 +145,6 @@ export class AppsController {
             description: appEntity.aiProvider.description,
           }
         : null,
-      aiModel: appEntity.aiModel,
       temperature: appEntity.temperature,
     };
   }

@@ -112,13 +112,6 @@ export class AppEntity {
   aiProvider?: AiIntegrationEntity | null;
 
   @Column({
-    name: 'ai_model',
-    nullable: true,
-    type: 'text',
-  })
-  aiModel: string | null;
-
-  @Column({
     name: 'temperature',
     type: 'float',
   })

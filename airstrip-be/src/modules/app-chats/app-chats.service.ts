@@ -31,20 +31,13 @@ export class AppChatsService {
       throw new BadRequestException(
         'App is disabled as no AI provider API key is set.',
       );
-    } else if (
-      aiProvider.aiProvider === AiProvider.OPENAI_COMPATIBLE &&
-      !aiProvider.aiProviderApiUrl
-    ) {
-      throw new BadRequestException(
-        `App is disabled as no AI provider API URL is set for provider type '${aiProvider.aiProvider}'.`,
-      );
-    } else if (!app.aiModel) {
+    } else if (!aiProvider.aiModel) {
       throw new BadRequestException('App is disabled as no AI model is set.');
     }
 
     const languageModel = this.getLanguageModel(
       aiProvider.aiProvider,
-      app.aiModel,
+      aiProvider.aiModel,
       {
         apiKey: aiProvider.aiProviderApiKey,
         baseURL: aiProvider.aiProviderApiUrl || undefined,

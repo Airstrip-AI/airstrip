@@ -1,5 +1,6 @@
 'use client';
 
+import { ModelSelect } from '@/app/app/apps/[appId]/model-select';
 import Breadcrumbs from '@/components/breadcrumbs/Breadcrumbs';
 import { showConfirmDeleteAiIntegrationModal } from '@/components/delete-ai-integration/helpers';
 import {
@@ -50,6 +51,7 @@ function AiIntegrationDetailsForm({
       aiProvider: aiIntegration.aiProvider,
       aiProviderApiUrl: aiIntegration.aiProviderApiUrl || '',
       aiProviderApiKey: aiIntegration.aiProviderApiKey,
+      aiModel: aiIntegration.aiModel,
     },
     validate: {
       name: (value) => (value.trim().length > 0 ? null : 'Name is required'),
@@ -66,8 +68,8 @@ function AiIntegrationDetailsForm({
 
   const { mutate: updateAiIntegrationMutation } = useUpdateAiIntegration({
     onSuccess: (resp) => {
-      showSuccessNotification(`AI integration ${resp.name} updated.`),
-        form.resetDirty();
+      showSuccessNotification(`AI integration ${resp.name} updated.`);
+      form.resetDirty();
     },
     onError: (error) =>
       showErrorNotification(error.message || 'An error occurred.'),
@@ -96,6 +98,7 @@ function AiIntegrationDetailsForm({
               aiProvider: values.aiProvider,
               aiProviderApiUrl: values.aiProviderApiUrl?.trim() || null,
               aiProviderApiKey: values.aiProviderApiKey,
+              aiModel: values.aiModel,
             },
           });
         })}
@@ -135,20 +138,29 @@ function AiIntegrationDetailsForm({
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
+                <Table.Td>{formFieldLabel('Model')}</Table.Td>
+                <Table.Td>
+                  <ModelSelect
+                    form={form}
+                    aiProvider={form.values.aiProvider}
+                  />
+                </Table.Td>
+              </Table.Tr>
+              <Table.Tr>
+                <Table.Td>{formFieldLabel('API key')}</Table.Td>
+                <Table.Td>
+                  <PasswordInput
+                    {...form.getInputProps('aiProviderApiKey')}
+                    description="The API key for the AI provider"
+                  />
+                </Table.Td>
+              </Table.Tr>
+              <Table.Tr>
                 <Table.Td>{formFieldLabel('API URL')}</Table.Td>
                 <Table.Td>
                   <TextInput
                     {...form.getInputProps('aiProviderApiUrl')}
                     description="Optional. The API URL for the AI provider. Leave blank if not applicable."
-                  />
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>API key</Table.Td>
-                <Table.Td>
-                  <PasswordInput
-                    {...form.getInputProps('aiProviderApiKey')}
-                    description="The API key for the AI provider"
                   />
                 </Table.Td>
               </Table.Tr>

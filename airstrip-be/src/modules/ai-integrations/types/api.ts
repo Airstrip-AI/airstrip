@@ -28,6 +28,10 @@ export class CreateAiIntegrationReq {
   @IsString()
   @ApiProperty()
   aiProviderApiUrl: string | null;
+
+  @IsString()
+  @ApiProperty()
+  aiModel: string;
 }
 
 export class UpdateAiIntegrationReq {
@@ -56,6 +60,10 @@ export class UpdateAiIntegrationReq {
   @IsString()
   @ApiProperty()
   aiProviderApiUrl: string | null;
+
+  @IsString()
+  @ApiProperty()
+  aiModel: string;
 }
 
 export class RestrictedToTeamResp {
@@ -96,6 +104,9 @@ export class AiIntegrationKeyResp {
 
   @ApiProperty()
   aiProviderApiUrl: string | null;
+
+  @ApiProperty()
+  aiModel: string;
 }
 
 export class ListAiIntegrationsResp {

@@ -77,4 +77,9 @@ export class AiIntegrationEntity {
     nullable: true,
   })
   aiProviderApiUrl: string | null;
+
+  @Column({
+    name: 'ai_model',
+  })
+  aiModel: string;
 }

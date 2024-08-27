@@ -45,6 +45,7 @@ export class AiIntegrationsController {
         aiProvider: body.aiProvider,
         aiProviderApiKey: body.aiProviderApiKey,
         aiProviderApiUrl: body.aiProviderApiUrl,
+        aiModel: body.aiModel,
       });
 
     return aiIntegrationEntityWithOrgTeamToResp(aiIntegrationEntity);
@@ -104,6 +105,7 @@ export class AiIntegrationsController {
         aiProvider: body.aiProvider,
         aiProviderApiKey: body.aiProviderApiKey,
         aiProviderApiUrl: body.aiProviderApiUrl,
+        aiModel: body.aiModel,
       });
 
     return aiIntegrationEntityWithOrgTeamToResp(aiIntegrationEntity);

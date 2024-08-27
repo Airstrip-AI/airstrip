@@ -33,7 +33,6 @@ import {
 import { useForm } from '@mantine/form';
 import { IconCheck, IconExternalLink } from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
-import { ModelSelect } from './model-select';
 
 const formFieldLabel = (label: string) => (
   <Text fw="bold" size="sm">
@@ -55,7 +54,6 @@ function AppDetailsForm({ app }: { app: AppResp }) {
       systemPrompt: app.systemPrompt || '',
       introductionMessage: app.introductionMessage || '',
       outputJsonSchema: app.outputJsonSchema || '',
-      aiModel: app.aiModel || '',
       temperature: app.temperature,
     },
     validate: {
@@ -76,6 +74,7 @@ function AppDetailsForm({ app }: { app: AppResp }) {
   const { mutate: updateAppMutation } = useUpdateApp({
     onSuccess: (app) => {
       showSuccessNotification(`App ${app.name} updated.`);
+      form.resetDirty();
     },
     onError: (error) =>
       showErrorNotification(error.message || 'An error occurred.'),
@@ -124,7 +123,6 @@ function AppDetailsForm({ app }: { app: AppResp }) {
             systemPrompt: values.systemPrompt || null,
             introductionMessage: values.introductionMessage || null,
             outputJsonSchema: values.outputJsonSchema || null,
-            aiModel: values.aiModel?.trim() || null,
             temperature: values.temperature,
           },
         });
@@ -240,16 +238,6 @@ function AppDetailsForm({ app }: { app: AppResp }) {
                       </Group>
                     );
                   }}
-                />
-              </Table.Td>
-            </Table.Tr>
-            <Table.Tr>
-              {/* TODO: improve the UX by making this a searchable+creatable combobox where the list of options will be set based on the AiProvider selected. */}
-              <Table.Td>{formFieldLabel('Model')}</Table.Td>
-              <Table.Td>
-                <ModelSelect
-                  form={form}
-                  aiProvidersData={allowedAiProvidersForApp}
                 />
               </Table.Td>
             </Table.Tr>

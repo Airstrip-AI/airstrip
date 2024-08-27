@@ -147,7 +147,6 @@ export class AppsService {
     app.systemPrompt = dto.systemPrompt;
     app.introductionMessage = dto.introductionMessage;
     app.outputJsonSchema = dto.outputJsonSchema;
-    app.aiModel = dto.aiModel;
     app.temperature = dto.temperature;
     await this.appRepository.save(app);
 

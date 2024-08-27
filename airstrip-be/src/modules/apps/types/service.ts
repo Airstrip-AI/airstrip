@@ -19,7 +19,6 @@ export type UpdateAppServiceDto = {
   systemPrompt: string | null;
   introductionMessage: string | null;
   outputJsonSchema: string | null;
-  aiModel: string | null;
   temperature: number;
 };
 

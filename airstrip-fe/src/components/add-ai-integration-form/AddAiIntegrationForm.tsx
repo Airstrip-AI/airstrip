@@ -1,5 +1,6 @@
 'use client';
 
+import { ModelSelect } from '@/app/app/apps/[appId]/model-select';
 import { useCreateAiIntegration } from '@/hooks/queries/ai-integrations';
 import { useGetOrgTeams } from '@/hooks/queries/org-teams';
 import {
@@ -44,6 +45,7 @@ export default function AddAiIntegrationForm({
       aiProvider: '' as AiProvider,
       aiProviderApiKey: '',
       aiProviderApiUrl: '',
+      aiModel: '',
     },
     validate: {
       name: (value) => (value.trim().length > 0 ? null : 'Name is required'),
@@ -55,6 +57,8 @@ export default function AddAiIntegrationForm({
           : 'A valid AI provider is required',
       aiProviderApiKey: (value) =>
         value.trim().length > 0 ? null : 'API key is required',
+      aiModel: (value) =>
+        value.trim().length > 0 ? null : 'Model is required',
     },
   });
 
@@ -70,6 +74,7 @@ export default function AddAiIntegrationForm({
             aiProvider: values.aiProvider,
             aiProviderApiKey: values.aiProviderApiKey.trim(),
             aiProviderApiUrl: values.aiProviderApiUrl?.trim() || null,
+            aiModel: values.aiModel.trim(),
           },
         });
       })}
@@ -115,6 +120,7 @@ export default function AddAiIntegrationForm({
         placeholder="Select AI provider"
         description={`For self-hosted providers which are compatible with OpenAI's APIs, select '${AiProvider.OPENAI_COMPATIBLE}'. `}
       />
+      <ModelSelect form={form} aiProvider={form.values.aiProvider} />
       <PasswordInput
         mb="md"
         {...form.getInputProps('aiProviderApiKey')}

@@ -7,6 +7,7 @@ export class CreateAiIntegrationReq {
   aiProvider: AiProvider;
   aiProviderApiKey: string;
   aiProviderApiUrl: string | null;
+  aiModel: string;
 }
 
 export class UpdateAiIntegrationReq {
@@ -16,6 +17,7 @@ export class UpdateAiIntegrationReq {
   aiProvider: AiProvider;
   aiProviderApiKey: string;
   aiProviderApiUrl: string | null;
+  aiModel: string;
 }
 
 export class RestrictedToTeamResp {
@@ -34,6 +36,7 @@ export class AiIntegrationKeyResp {
   aiProvider: AiProvider;
   aiProviderApiKey: string;
   aiProviderApiUrl: string | null;
+  aiModel: string;
 }
 
 export class ListAiIntegrationsResp {

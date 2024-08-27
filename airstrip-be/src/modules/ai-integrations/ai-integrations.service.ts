@@ -56,6 +56,7 @@ export class AiIntegrationsService {
       aiProvider: dto.aiProvider,
       aiProviderApiKey: dto.aiProviderApiKey,
       aiProviderApiUrl: dto.aiProviderApiUrl,
+      aiModel: dto.aiModel,
     });
 
     aiIntegration.restrictedToTeam = orgTeam;
@@ -97,6 +98,7 @@ export class AiIntegrationsService {
       aiProvider: dto.aiProvider,
       aiProviderApiKey: dto.aiProviderApiKey,
       aiProviderApiUrl: dto.aiProviderApiUrl,
+      aiModel: dto.aiModel,
     });
 
     aiIntegration.restrictedToTeam = orgTeam;

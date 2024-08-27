@@ -29,5 +29,6 @@ export function aiIntegrationEntityWithOrgTeamToResp(
     aiProvider: aiIntegrationEntity.aiProvider,
     aiProviderApiUrl: aiIntegrationEntity.aiProviderApiUrl,
     aiProviderApiKey: aiIntegrationEntity.aiProviderApiKey,
+    aiModel: aiIntegrationEntity.aiModel,
   };
 }

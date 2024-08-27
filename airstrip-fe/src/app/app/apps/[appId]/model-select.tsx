@@ -1,31 +1,28 @@
-import {
-  GetAllowedAiProvidersForAppResp,
-  UpdateAppReq,
-} from '@/utils/backend/client/apps/types';
 import { Select } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect, useMemo } from 'react';
 import { models } from './models';
+import {
+  CreateAiIntegrationReq,
+  UpdateAiIntegrationReq,
+} from '@/utils/backend/client/ai-integrations/types';
+import { AiProvider } from '@/utils/backend/client/common/types';
 
 interface Props {
-  form: UseFormReturnType<UpdateAppReq>;
-  aiProvidersData?: GetAllowedAiProvidersForAppResp;
+  form: UseFormReturnType<CreateAiIntegrationReq | UpdateAiIntegrationReq>;
+  aiProvider: AiProvider;
 }
 
-export function ModelSelect({ form, aiProvidersData }: Props) {
-  const { aiProviderId } = form.values;
-
+export function ModelSelect({ form, aiProvider }: Props) {
   const modelOptions = useMemo(() => {
-    const providerData = aiProvidersData?.data.find(
-      (data) => data.id === aiProviderId,
-    );
-    const modelList = providerData ? models[providerData.aiProvider] : [];
-
-    return modelList;
-  }, [aiProviderId]);
+    return aiProvider ? models[aiProvider] : [];
+  }, [aiProvider]);
 
   useEffect(() => {
-    form.setFieldValue('aiModel', modelOptions[0]);
+    const aiModel = modelOptions.find((v) => v === form.values.aiModel);
+    if (!aiModel) {
+      form.setFieldValue('aiModel', modelOptions[0]);
+    }
   }, [modelOptions]);
 
   return (

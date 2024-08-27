@@ -20,7 +20,6 @@ export class UpdateAppReq {
   systemPrompt: string | null;
   introductionMessage: string | null;
   outputJsonSchema: string | null;
-  aiModel: string | null;
   temperature: number;
 }
 
@@ -54,7 +53,6 @@ export class AppResp {
   systemPrompt: string | null;
   introductionMessage: string | null;
   outputJsonSchema: string | null;
-  aiModel: string | null;
   temperature: number;
 }
 

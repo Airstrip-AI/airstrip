@@ -64,11 +64,6 @@ export class UpdateAppReq {
   outputJsonSchema: string | null;
 
   @IsOptional()
-  @IsString()
-  @ApiProperty()
-  aiModel: string | null;
-
-  @IsOptional()
   @IsNumber()
   @Min(0)
   @ApiProperty()
@@ -141,9 +136,6 @@ export class AppResp {
 
   @ApiProperty()
   outputJsonSchema: string | null;
-
-  @ApiProperty()
-  aiModel: string | null;
 
   @ApiProperty()
   temperature: number;
