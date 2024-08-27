@@ -47,7 +47,7 @@ export class AppChatsService {
       app.aiModel,
       {
         apiKey: aiProvider.aiProviderApiKey,
-        apiUrl: aiProvider.aiProviderApiUrl || undefined,
+        baseURL: aiProvider.aiProviderApiUrl || undefined,
       },
     );
 
@@ -74,7 +74,7 @@ export class AppChatsService {
     model: string,
     genAiSettings: {
       apiKey: string;
-      apiUrl?: string;
+      baseURL?: string;
     },
   ) {
     let languageModel: LanguageModel;
