@@ -1,6 +1,6 @@
-import type { NextRequest } from 'next/server';
-import { appPrefix, Links } from '@/utils/misc/links';
 import { currentUserJwtKey } from '@/hooks/user';
+import { appPrefix, Links } from '@/utils/misc/links';
+import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const currentUserJwt = request.cookies.get(currentUserJwtKey);
@@ -14,7 +14,8 @@ export function middleware(request: NextRequest) {
     );
   } else if (
     currentUserJwt &&
-    request.nextUrl.pathname.startsWith(Links.login())
+    (request.nextUrl.pathname.startsWith(Links.login()) ||
+      request.nextUrl.pathname.startsWith(Links.register()))
   ) {
     return Response.redirect(new URL(Links.appHome(), request.url));
   } else if (request.nextUrl.pathname.startsWith(Links.publicInvites())) {
