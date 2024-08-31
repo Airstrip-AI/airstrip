@@ -10,3 +10,12 @@ export const roleColors = {
   [UserRole.ADMIN]: 'blue',
   [UserRole.MEMBER]: 'green',
 };
+
+export const AIRSTRIP_DB_HOST = process.env.AIRSTRIP_DB_HOST || 'localhost';
+export const AIRSTRIP_DB_PORT = parseInt(
+  process.env.AIRSTRIP_DB_PORT || '5432',
+  10,
+);
+export const AIRSTRIP_DB_USER = process.env.AIRSTRIP_DB_USER || '';
+export const AIRSTRIP_DB_PASSWORD = process.env.AIRSTRIP_DB_PASSWORD || '';
+export const AIRSTRIP_DB_NAME = process.env.AIRSTRIP_DB_NAME || '';
