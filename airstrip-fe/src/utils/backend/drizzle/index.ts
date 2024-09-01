@@ -3,20 +3,26 @@ import {
   AIRSTRIP_DB_NAME,
   AIRSTRIP_DB_PASSWORD,
   AIRSTRIP_DB_PORT,
+  AIRSTRIP_DB_SSL_CERT,
   AIRSTRIP_DB_USER,
 } from '@/constants';
-import {} from 'drizzle-orm';
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { Client } from 'pg';
+import { Client, ClientConfig } from 'pg';
 
-import * as schema from '@/utils/backend/drizzle/schema';
+import * as schema from '@/utils/backend/drizzle/combined';
 
-const clientConfig = {
+const clientConfig: ClientConfig = {
   host: AIRSTRIP_DB_HOST,
   port: AIRSTRIP_DB_PORT,
   user: AIRSTRIP_DB_USER,
   password: AIRSTRIP_DB_PASSWORD,
   database: AIRSTRIP_DB_NAME,
+  ssl: AIRSTRIP_DB_SSL_CERT
+    ? {
+        rejectUnauthorized: true,
+        ca: AIRSTRIP_DB_SSL_CERT,
+      }
+    : false,
 };
 
 const configEntries = Object.entries(clientConfig);

@@ -1,290 +1,478 @@
-import { relations, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import {
   boolean,
+  doublePrecision,
   foreignKey,
   index,
+  integer,
   jsonb,
-  numeric,
-  pgTable,
+  pgSchema,
   primaryKey,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   uuid,
+  varchar,
 } from 'drizzle-orm/pg-core';
 import { UserRole } from '../client/common/types';
 
-// Users table
-export const users = pgTable(
+export const airstrip = pgSchema('airstrip');
+
+export const users = airstrip.table(
   'users',
   {
-    id: uuid('id').defaultRandom().primaryKey(),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    id: uuid('id')
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
     email: text('email').notNull(),
     passwordHash: text('password_hash').notNull(),
     firstName: text('first_name').notNull(),
     verified: boolean('verified').default(false).notNull(),
-    verifiedAt: timestamp('verified_at'),
-    verifyToken: text('verify_token').unique(),
-    verifyTokenExpiresAt: timestamp('verify_token_expires_at'),
-    resetPasswordToken: text('reset_password_token').unique(),
-    resetPasswordTokenExpiresAt: timestamp('reset_password_token_expires_at'),
-    resetPasswordTokenCreatedAt: timestamp('reset_password_token_created_at'),
+    verifiedAt: timestamp('verified_at', {
+      withTimezone: true,
+    }),
+    verifyToken: text('verify_token'),
+    verifyTokenExpiresAt: timestamp('verify_token_expires_at', {
+      withTimezone: true,
+    }),
+    resetPasswordToken: text('reset_password_token'),
+    resetPasswordTokenExpiresAt: timestamp('reset_password_token_expires_at', {
+      withTimezone: true,
+    }),
+    resetPasswordTokenCreatedAt: timestamp('reset_password_token_created_at', {
+      withTimezone: true,
+    }),
   },
-  (table) => ({
-    lowerEmailIndex: uniqueIndex('users_lower_email_idx').on(sql`lower(email)`),
-  }),
+  (table) => {
+    return {
+      lowerIdx: uniqueIndex('users_lower_idx').using(
+        'btree',
+        sql`lower(email)`,
+      ),
+      usersVerifyTokenKey: unique('users_verify_token_key').on(
+        table.verifyToken,
+      ),
+      usersResetPasswordTokenKey: unique('users_reset_password_token_key').on(
+        table.resetPasswordToken,
+      ),
+    };
+  },
 );
 
-// Organizations table
-export const organizations = pgTable('organizations', {
-  id: uuid('id').defaultRandom().primaryKey(),
+export const organizations = airstrip.table('organizations', {
+  id: uuid('id')
+    .default(sql`uuid_generate_v4()`)
+    .primaryKey()
+    .notNull(),
   name: text('name').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });
 
-// Org Users table
-export const orgUsers = pgTable(
-  'org_users',
-  {
-    userId: uuid('user_id')
-      .references(() => users.id, { onDelete: 'cascade' })
-      .notNull(),
-    orgId: uuid('org_id')
-      .references(() => organizations.id, { onDelete: 'cascade' })
-      .notNull(),
-    role: text('role').$type<UserRole>().notNull(),
-    joinedOrgAt: timestamp('joined_org_at').defaultNow().notNull(),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.userId, table.orgId] }),
-  }),
-);
-
-export const orgUsersToUserRelations = relations(orgUsers, ({ one }) => ({
-  user: one(users, {
-    fields: [orgUsers.userId],
-    references: [users.id],
-  }),
-}));
-
-// Org Teams table
-export const orgTeams = pgTable(
+export const orgTeams = airstrip.table(
   'org_teams',
   {
-    id: uuid('id').defaultRandom().primaryKey(),
-    orgId: uuid('org_id')
-      .references(() => organizations.id, { onDelete: 'cascade' })
+    id: uuid('id')
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
       .notNull(),
-    name: text('name').notNull(),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
-  },
-  (table) => ({
-    orgIdIndex: index('org_teams_org_id_idx').on(table.orgId),
-  }),
-);
-
-// Org Team Users table
-export const orgTeamUsers = pgTable(
-  'org_team_users',
-  {
-    orgTeamId: uuid('org_team_id')
-      .references(() => orgTeams.id, { onDelete: 'cascade' })
-      .notNull(),
-    userId: uuid('user_id').notNull(),
     orgId: uuid('org_id').notNull(),
-    role: text('role').$type<UserRole>().notNull(),
-    joinedTeamAt: timestamp('joined_team_at').defaultNow().notNull(),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    name: text('name').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.orgTeamId, table.userId] }),
-    orgTeamUsersRelations: foreignKey({
-      columns: [table.userId, table.orgId],
-      foreignColumns: [orgUsers.userId, orgUsers.orgId],
-    }).onDelete('cascade'),
-  }),
+  (table) => {
+    return {
+      orgIdIdx: index('org_teams_org_id_idx').using(
+        'btree',
+        table.orgId.asc().nullsLast(),
+      ),
+      orgTeamsOrgIdFkey: foreignKey({
+        columns: [table.orgId],
+        foreignColumns: [organizations.id],
+        name: 'org_teams_org_id_fkey',
+      }).onDelete('cascade'),
+    };
+  },
 );
 
-export const orgTeamUsersRelations = relations(orgTeamUsers, ({ one }) => ({
-  orgTeam: one(orgTeams, {
-    fields: [orgTeamUsers.orgId],
-    references: [orgTeams.id],
-  }),
-  user: one(users, {
-    fields: [orgTeamUsers.userId],
-    references: [users.id],
-  }),
-}));
-
-// Org Invites table
-export const orgInvites = pgTable(
+export const orgInvites = airstrip.table(
   'org_invites',
   {
-    id: uuid('id').defaultRandom().primaryKey(),
-    orgId: uuid('org_id')
-      .references(() => organizations.id, { onDelete: 'cascade' })
+    id: uuid('id')
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
       .notNull(),
-    inviterId: uuid('inviter_id')
-      .references(() => users.id, { onDelete: 'cascade' })
-      .notNull(),
+    orgId: uuid('org_id').notNull(),
+    inviterId: uuid('inviter_id').notNull(),
     email: text('email').notNull(),
     role: text('role').$type<UserRole>().notNull(),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    acceptedAt: timestamp('accepted_at'),
-    token: text('token').unique().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    acceptedAt: timestamp('accepted_at', {
+      withTimezone: true,
+    }),
+    token: text('token').notNull(),
   },
-  (table) => ({
-    orgEmailUnique: uniqueIndex('org_invites_org_email_unique').on(
-      table.orgId,
-      table.email,
-    ),
-  }),
+  (table) => {
+    return {
+      orgInvitesOrgIdFkey: foreignKey({
+        columns: [table.orgId],
+        foreignColumns: [organizations.id],
+        name: 'org_invites_org_id_fkey',
+      }).onDelete('cascade'),
+      orgInvitesInviterIdFkey: foreignKey({
+        columns: [table.inviterId],
+        foreignColumns: [users.id],
+        name: 'org_invites_inviter_id_fkey',
+      }).onDelete('cascade'),
+      orgInvitesOrgIdEmailKey: unique('org_invites_org_id_email_key').on(
+        table.orgId,
+        table.email,
+      ),
+      orgInvitesTokenKey: unique('org_invites_token_key').on(table.token),
+    };
+  },
 );
 
-// AI Integrations table
-export const aiIntegrations = pgTable(
+export const aiIntegrations = airstrip.table(
   'ai_integrations',
   {
-    id: uuid('id').defaultRandom().primaryKey(),
-    orgId: uuid('org_id')
-      .references(() => organizations.id, { onDelete: 'cascade' })
+    id: uuid('id')
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
       .notNull(),
-    restrictedToTeamId: uuid('restricted_to_team_id').references(
-      // null means unrestricted
-      () => orgTeams.id,
-      { onDelete: 'set null' },
-    ),
+    orgId: uuid('org_id').notNull(),
+    restrictedToTeamId: uuid('restricted_to_team_id'),
     name: text('name').notNull(),
     description: text('description').notNull(),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
     aiProvider: text('ai_provider').notNull(),
-    aiProviderApiKey: text('ai_provider_api_key').unique().notNull(),
+    aiProviderApiKey: text('ai_provider_api_key').notNull(),
     aiProviderApiUrl: text('ai_provider_api_url'),
-    aiModel: text('ai_model').notNull(),
   },
-  (table) => ({
-    orgProviderTeamIndex: index('ai_integrations_org_provider_team_idx').on(
-      table.orgId,
-      table.aiProvider,
-      table.restrictedToTeamId,
-    ),
-  }),
+  (table) => {
+    return {
+      orgIdAiProviderRestrictedToTeamIdIdx: index(
+        'ai_integrations_org_id_ai_provider_restricted_to_team_id_idx',
+      ).using(
+        'btree',
+        table.orgId.asc().nullsLast(),
+        table.aiProvider.asc().nullsLast(),
+        table.restrictedToTeamId.asc().nullsLast(),
+      ),
+      aiIntegrationsOrgIdFkey: foreignKey({
+        columns: [table.orgId],
+        foreignColumns: [organizations.id],
+        name: 'ai_integrations_org_id_fkey',
+      }).onDelete('cascade'),
+      aiIntegrationsRestrictedToTeamIdFkey: foreignKey({
+        columns: [table.restrictedToTeamId],
+        foreignColumns: [orgTeams.id],
+        name: 'ai_integrations_restricted_to_team_id_fkey',
+      }).onDelete('set null'),
+      aiIntegrationsAiProviderApiKeyKey: unique(
+        'ai_integrations_ai_provider_api_key_key',
+      ).on(table.aiProviderApiKey),
+    };
+  },
 );
 
-export const aiIntegrationsToOrgTeamRelations = relations(
-  aiIntegrations,
-  ({ one }) => ({
-    restrictedToTeam: one(orgTeams, {
-      fields: [aiIntegrations.restrictedToTeamId],
-      references: [orgTeams.id],
-    }),
-  }),
+export const chatMessages = airstrip.table(
+  'chat_messages',
+  {
+    id: uuid('id')
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    chatId: uuid('chat_id').notNull(),
+    role: text('role').$type<UserRole>().notNull(),
+    clientGeneratedId: text('client_generated_id').notNull(),
+    content: text('content').notNull(),
+    attachments: jsonb('attachments'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => {
+    return {
+      chatIdIdx: index('chat_messages_chat_id_idx').using(
+        'btree',
+        table.chatId.asc().nullsLast(),
+      ),
+      roleIdx: index('chat_messages_role_idx').using(
+        'btree',
+        table.role.asc().nullsLast(),
+      ),
+      chatMessagesChatIdFkey: foreignKey({
+        columns: [table.chatId],
+        foreignColumns: [chats.id],
+        name: 'chat_messages_chat_id_fkey',
+      }).onDelete('cascade'),
+      chatMessagesClientGeneratedIdKey: unique(
+        'chat_messages_client_generated_id_key',
+      ).on(table.clientGeneratedId),
+    };
+  },
 );
 
-// Apps table
-export const apps = pgTable(
+export const apps = airstrip.table(
   'apps',
   {
-    id: uuid('id').defaultRandom().primaryKey(),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
-    orgId: uuid('org_id')
-      .references(() => organizations.id, { onDelete: 'cascade' })
+    id: uuid('id')
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
       .notNull(),
-    teamId: uuid('team_id').references(() => orgTeams.id, {
-      onDelete: 'set null',
-    }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    orgId: uuid('org_id').notNull(),
+    teamId: uuid('team_id'),
     name: text('name').notNull(),
     description: text('description').notNull(),
     type: text('type').notNull(),
-    aiProviderId: uuid('ai_provider_id').references(() => aiIntegrations.id, {
-      onDelete: 'set null',
-    }),
+    aiProviderId: uuid('ai_provider_id'),
     systemPrompt: text('system_prompt'),
     introductionMessage: text('introduction_message'),
     outputJsonSchema: text('output_json_schema'),
-    temperature: numeric('temperature', { precision: 2, scale: 1 })
-      .default('1.0')
-      .notNull(),
+    aiModel: text('ai_model'),
+    temperature: doublePrecision('temperature').default(1).notNull(),
   },
-  (table) => ({
-    orgTeamProviderIndex: index('apps_org_team_provider_idx').on(
-      table.orgId,
-      table.teamId,
-      table.aiProviderId,
-    ),
-  }),
+  (table) => {
+    return {
+      orgIdTeamIdAiProviderIdIdx: index(
+        'apps_org_id_team_id_ai_provider_id_idx',
+      ).using(
+        'btree',
+        table.orgId.asc().nullsLast(),
+        table.teamId.asc().nullsLast(),
+        table.aiProviderId.asc().nullsLast(),
+      ),
+      appsOrgIdFkey: foreignKey({
+        columns: [table.orgId],
+        foreignColumns: [organizations.id],
+        name: 'apps_org_id_fkey',
+      }).onDelete('cascade'),
+      appsTeamIdFkey: foreignKey({
+        columns: [table.teamId],
+        foreignColumns: [orgTeams.id],
+        name: 'apps_team_id_fkey',
+      }).onDelete('set null'),
+      appsAiProviderIdFkey: foreignKey({
+        columns: [table.aiProviderId],
+        foreignColumns: [aiIntegrations.id],
+        name: 'apps_ai_provider_id_fkey',
+      }).onDelete('set null'),
+    };
+  },
 );
 
-// Chats table
-export const chats = pgTable(
+export const chats = airstrip.table(
   'chats',
   {
-    id: uuid('id').defaultRandom().primaryKey(),
-    orgId: uuid('org_id')
-      .references(() => organizations.id, { onDelete: 'cascade' })
+    id: uuid('id')
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
       .notNull(),
-    appId: uuid('app_id')
-      .references(() => apps.id, { onDelete: 'cascade' })
+    orgId: uuid('org_id').notNull(),
+    appId: uuid('app_id').notNull(),
+    userId: uuid('user_id'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
       .notNull(),
-    userId: uuid('user_id').references(() => users.id, {
-      onDelete: 'set null',
-    }),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => ({
-    orgAppIndex: index('chats_org_app_idx').on(table.orgId, table.appId),
-    userIdIndex: index('chats_user_id_idx').on(table.userId),
-  }),
+  (table) => {
+    return {
+      orgIdAppIdIdx: index('chats_org_id_app_id_idx').using(
+        'btree',
+        table.orgId.asc().nullsLast(),
+        table.appId.asc().nullsLast(),
+      ),
+      userIdIdx: index('chats_user_id_idx').using(
+        'btree',
+        table.userId.asc().nullsLast(),
+      ),
+      chatsOrgIdFkey: foreignKey({
+        columns: [table.orgId],
+        foreignColumns: [organizations.id],
+        name: 'chats_org_id_fkey',
+      }).onDelete('cascade'),
+      chatsAppIdFkey: foreignKey({
+        columns: [table.appId],
+        foreignColumns: [apps.id],
+        name: 'chats_app_id_fkey',
+      }).onDelete('cascade'),
+      chatsUserIdFkey: foreignKey({
+        columns: [table.userId],
+        foreignColumns: [users.id],
+        name: 'chats_user_id_fkey',
+      }).onDelete('set null'),
+    };
+  },
 );
 
-// Chat Messages table
-export const chatMessages = pgTable(
-  'chat_messages',
-  {
-    id: uuid('id').defaultRandom().primaryKey(),
-    chatId: uuid('chat_id')
-      .references(() => chats.id, { onDelete: 'cascade' })
-      .notNull(),
-    role: text('role').$type<UserRole>().notNull(),
-    clientGeneratedId: text('client_generated_id').unique().notNull(),
-    content: text('content').notNull(),
-    attachments: jsonb('attachments'),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-  },
-  (table) => ({
-    chatIdIndex: index('chat_messages_chat_id_idx').on(table.chatId),
-    roleIndex: index('chat_messages_role_idx').on(table.role),
-  }),
-);
-
-// This schema should represent the SQL structure you provided.
-
-export const messageTokenUsageData = pgTable(
+export const messageTokenUsageData = airstrip.table(
   'message_token_usage_data',
   {
     chatMessageId: uuid('chat_message_id').primaryKey().notNull(),
     aiProvider: text('ai_provider').notNull(),
     aiModel: text('ai_model').notNull(),
-    orgId: uuid('org_id')
-      .references(() => organizations.id, { onDelete: 'cascade' })
-      .notNull(),
-    appId: uuid('app_id').references(() => apps.id, { onDelete: 'set null' }),
+    orgId: uuid('org_id').notNull(),
+    appId: uuid('app_id'),
     usage: jsonb('usage').notNull(),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
-  (messageTokenUsageData) => ({
-    orgAppIndex: index('org_app_index').on(
-      messageTokenUsageData.orgId,
-      messageTokenUsageData.appId,
-    ),
-  }),
+  (table) => {
+    return {
+      orgIdAppIdIdx: index('message_token_usage_data_org_id_app_id_idx').using(
+        'btree',
+        table.orgId.asc().nullsLast(),
+        table.appId.asc().nullsLast(),
+      ),
+      messageTokenUsageDataOrgIdFkey: foreignKey({
+        columns: [table.orgId],
+        foreignColumns: [organizations.id],
+        name: 'message_token_usage_data_org_id_fkey',
+      }).onDelete('cascade'),
+      messageTokenUsageDataAppIdFkey: foreignKey({
+        columns: [table.appId],
+        foreignColumns: [apps.id],
+        name: 'message_token_usage_data_app_id_fkey',
+      }).onDelete('set null'),
+    };
+  },
 );
+
+export const orgUsers = airstrip.table(
+  'org_users',
+  {
+    userId: uuid('user_id').notNull(),
+    orgId: uuid('org_id').notNull(),
+    role: text('role').$type<UserRole>().notNull(),
+    joinedOrgAt: timestamp('joined_org_at', {
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => {
+    return {
+      orgUsersUserIdFkey: foreignKey({
+        columns: [table.userId],
+        foreignColumns: [users.id],
+        name: 'org_users_user_id_fkey',
+      }).onDelete('cascade'),
+      orgUsersOrgIdFkey: foreignKey({
+        columns: [table.orgId],
+        foreignColumns: [organizations.id],
+        name: 'org_users_org_id_fkey',
+      }).onDelete('cascade'),
+      orgUsersPkey: primaryKey({
+        columns: [table.userId, table.orgId],
+        name: 'org_users_pkey',
+      }),
+    };
+  },
+);
+
+export const orgTeamUsers = airstrip.table(
+  'org_team_users',
+  {
+    orgTeamId: uuid('org_team_id').notNull(),
+    userId: uuid('user_id').notNull(),
+    orgId: uuid('org_id').notNull(),
+    role: text('role').$type<UserRole>().notNull(),
+    joinedTeamAt: timestamp('joined_team_at', {
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => {
+    return {
+      orgTeamUsersOrgTeamIdFkey: foreignKey({
+        columns: [table.orgTeamId],
+        foreignColumns: [orgTeams.id],
+        name: 'org_team_users_org_team_id_fkey',
+      }).onDelete('cascade'),
+      orgTeamUsersUserIdOrgIdFkey: foreignKey({
+        columns: [table.userId, table.orgId],
+        foreignColumns: [orgUsers.userId, orgUsers.orgId],
+        name: 'org_team_users_user_id_org_id_fkey',
+      }).onDelete('cascade'),
+      orgTeamUsersPkey: primaryKey({
+        columns: [table.orgTeamId, table.userId],
+        name: 'org_team_users_pkey',
+      }),
+    };
+  },
+);
+
+// ===== Start: Remnant of flyway table =====
+// This is to prevent migration from dropping flyway history table
+// We can remove this if no longer needed.
+export const flywaySchemaHistoryInAirstrip = airstrip.table(
+  'flyway_schema_history',
+  {
+    installedRank: integer('installed_rank').primaryKey().notNull(),
+    version: varchar('version', { length: 50 }),
+    description: varchar('description', { length: 200 }).notNull(),
+    type: varchar('type', { length: 20 }).notNull(),
+    script: varchar('script', { length: 1000 }).notNull(),
+    checksum: integer('checksum'),
+    installedBy: varchar('installed_by', { length: 100 }).notNull(),
+    installedOn: timestamp('installed_on', { mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    executionTime: integer('execution_time').notNull(),
+    success: boolean('success').notNull(),
+  },
+  (table) => {
+    return {
+      sIdx: index('flyway_schema_history_s_idx').using(
+        'btree',
+        table.success.asc().nullsLast(),
+      ),
+    };
+  },
+);
+// ===== End: Remnant of flyway table =====

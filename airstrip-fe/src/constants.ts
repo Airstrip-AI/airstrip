@@ -19,3 +19,4 @@ export const AIRSTRIP_DB_PORT = parseInt(
 export const AIRSTRIP_DB_USER = process.env.AIRSTRIP_DB_USER || '';
 export const AIRSTRIP_DB_PASSWORD = process.env.AIRSTRIP_DB_PASSWORD || '';
 export const AIRSTRIP_DB_NAME = process.env.AIRSTRIP_DB_NAME || '';
+export const AIRSTRIP_DB_SSL_CERT = process.env.AIRSTRIP_DB_SSL_CERT || '';

@@ -62,7 +62,7 @@ export async function getUsersInOrg(
   const orgUsersData = await db.query.orgUsers.findMany({
     where,
     with: {
-      user: true,
+      users: true,
     },
     orderBy(fields, { asc }) {
       return [asc(fields.joinedOrgAt)]; // originally was supposed to sort by user email, but haven't figured out how to do that
@@ -157,7 +157,7 @@ export async function findOrgUsersByEmailIn(orgId: string, emails: string[]) {
 
   const orgUsers = db.query.orgUsers.findMany({
     with: {
-      user: true,
+      users: true,
     },
     where: (orgUsers, { eq }) => {
       return and(eq(orgUsers.orgId, orgId), inArray(orgUsers.userId, userIds));
@@ -173,7 +173,7 @@ export async function findOrgUsersByEmailIn(orgId: string, emails: string[]) {
   //     },
   //   },
   //   relations: {
-  //     user: true,
+  //     users: true,
   //   },
   // })) as OrganizationUserWithUser[];
 }

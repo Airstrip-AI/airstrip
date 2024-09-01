@@ -34,7 +34,6 @@ export async function createAiIntegration(req: CreateAiIntegrationReq) {
       aiProvider: req.aiProvider,
       aiProviderApiKey: req.aiProviderApiKey,
       aiProviderApiUrl: req.aiProviderApiUrl,
-      aiModel: req.aiModel,
     })
     .returning();
 
@@ -74,7 +73,6 @@ export async function updateAiIntegration(req: UpdateAiIntegrationReq) {
       aiProvider: req.aiProvider,
       aiProviderApiKey: req.aiProviderApiKey,
       aiProviderApiUrl: req.aiProviderApiUrl,
-      aiModel: req.aiModel,
     })
     .returning();
 
