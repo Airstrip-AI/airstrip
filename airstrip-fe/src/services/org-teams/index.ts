@@ -232,7 +232,7 @@ export async function getOrgTeamUsers(orgTeamId: string, page: number) {
   const orgTeamUsersData = await db.query.orgTeamUsers.findMany({
     where: eq(orgTeamUsers.orgTeamId, orgTeamId),
     with: {
-      user: true,
+      orgUsers: true,
     },
     orderBy(fields, { asc }) {
       return [asc(fields.joinedTeamAt)]; // by right should be user.email
@@ -252,7 +252,7 @@ export async function getOrgTeamUsers(orgTeamId: string, page: number) {
   //   take: pageSize + 1,
   //   skip: page * pageSize,
   //   relations: {
-  //     user: true,
+  //     users: true,
   //   },
   // })) as OrgTeamUserWithUserJoined[];
 
@@ -281,7 +281,7 @@ export async function getUserOrgTeams(orgId: string, userId: string) {
   const data = await db.query.orgTeamUsers.findMany({
     where: and(eq(orgTeamUsers.userId, userId), eq(orgTeamUsers.orgId, orgId)),
     with: {
-      orgTeam: true,
+      orgTeams: true,
     },
   });
 
