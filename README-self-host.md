@@ -15,7 +15,7 @@ Airstrip uses [Infisical](https://github.com/Infisical/infisical) for vault stor
 ```
 cd ext-services/infisical
 cp sample.env .env
-docker compose -f docker-compose.infisical.yml up -d
+docker compose -f docker-compose.infisical.yml up
 ```
 
 Infisical will now be running at http://localhost:4000.
@@ -44,7 +44,7 @@ AIRSTRIP_INFISICAL_PROJECT_ENV=prod
 ```
 
 ```
-docker compose -f docker-compose.db.yml -f docker-compose.airstrip.yml up -d
+docker compose -f docker-compose.db.yml -f docker-compose.airstrip.yml up
 ```
 
 That's all you need to get started. For details on the default values and how to change them, refer to [this (optional) section](#default-configuration).
