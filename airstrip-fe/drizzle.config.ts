@@ -30,4 +30,7 @@ export default defineConfig({
       : false,
   },
   schemaFilter: 'airstrip',
+  migrations: {
+    schema: 'airstrip',
+  },
 }) satisfies Config;

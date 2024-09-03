@@ -1,4 +1,4 @@
-import { currentUserJwtKey } from '@/hooks/user';
+import { currentUserJwtKey } from '@/constants';
 import { appPrefix, Links } from '@/utils/misc/links';
 import type { NextRequest } from 'next/server';
 

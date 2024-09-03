@@ -1,29 +1,28 @@
 'use client';
 
-import { getValidToken } from '@/hooks/helpers';
-import { AppResp } from '@/utils/backend/client/apps/types';
-import { getBackendUrl } from '@/utils/backend/utils';
-import { Alert, Card, Stack, Text } from '@mantine/core';
-import { useEffect, useState } from 'react';
-import { Message } from 'ai';
-import { useChat } from 'ai/react';
 import ChatList from '@/components/chat/ChatList';
-import { ChatScrollAnchor } from '@/components/chat/ChatScrollAnchor';
 import ChatPanel from '@/components/chat/ChatPanel';
-import { useMediaQuery } from '@mantine/hooks';
+import { ChatScrollAnchor } from '@/components/chat/ChatScrollAnchor';
+import { getValidToken } from '@/hooks/helpers';
 import {
   useCreateNewChatWithFirstMessage,
   useSaveChatMessage,
 } from '@/hooks/queries/chat-messages';
-import { showErrorNotification } from '@/utils/misc';
 import { useSaveUsageDataByClientGeneratedId } from '@/hooks/queries/message-token-usage-data';
+import type { AppEntity } from '@/services/apps';
 import { UsageData } from '@/utils/backend/client/message-token-usage-data/types';
+import { showErrorNotification } from '@/utils/misc';
+import { Alert, Card, Stack, Text } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
+import { Message } from 'ai';
+import { useChat } from 'ai/react';
+import { useEffect, useState } from 'react';
 
 export default function Chat({
   app,
   id: initialChatId,
 }: {
-  app: AppResp;
+  app: AppEntity;
   id: string | null;
 }) {
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -49,10 +48,11 @@ export default function Chat({
     isLoading,
     stop,
   } = useChat({
-    api: new URL(`/api/v1/apps/${app.id}/stream-chat`, getBackendUrl()).href,
-    headers: {
-      Authorization: `Bearer ${authToken}`,
-    },
+    api: `/api/apps/${app.id}/stream-chat`,
+    // api: new URL(`/api/v1/apps/${app.id}/stream-chat`, getBackendUrl()).href,
+    // headers: {
+    //   Authorization: `Bearer ${authToken}`,
+    // },
     keepLastMessageOnError: true,
     onFinish: (message, options) =>
       setUsageData((prev) => {
@@ -141,7 +141,7 @@ export default function Chat({
 
   const hasMessages = !!messages.length;
 
-  if (!app.aiProvider?.provider) {
+  if (!app.aiProvider?.aiProvider) {
     return (
       <Alert color="red" variant="outline">
         This app does not have an AI provider set up. Please contact the admin
@@ -156,7 +156,7 @@ export default function Chat({
         <div style={{ paddingBottom: isSmallScreen ? '80px' : '200px' }}>
           <ChatList
             messages={messages}
-            aiProvider={app.aiProvider?.provider}
+            aiProvider={app.aiProvider?.aiProvider}
             error={error}
           />
           {/* BUG: doesn't scroll to bottom while text is printing on screen */}

@@ -1,6 +1,8 @@
 // Ref: https://www.npmjs.com/package/mem0ai
 // Refactored to TS and to use fetch instead of Axios
 
+import { MemoryData } from './type';
+
 class APIError extends Error {
   constructor(message: string) {
     super(message);
@@ -25,19 +27,22 @@ function apiErrorHandler<T extends (...args: any[]) => Promise<any>>(fn: T): T {
   } as T;
 }
 
+const defaultHost = 'https://api.mem0.ai/v1';
+
 class MemoryClient {
   private apiKey: string;
   private host: string;
 
-  constructor(apiKey?: string, host: string = 'https://api.mem0.ai/v1') {
+  constructor(apiKey?: string, host?: string) {
     this.apiKey = apiKey || '';
-    this.host = host;
+    this.host = host || defaultHost;
 
     if (!this.apiKey) {
       throw new Error('API Key not provided. Please provide an API Key.');
     }
 
-    this._validateApiKey();
+    // Disable running this since we're using actions, and we don't want to keep validating for every action call
+    // this._validateApiKey();
 
     // Apply error handler to methods
     this.add = apiErrorHandler(this.add.bind(this));
@@ -102,7 +107,10 @@ class MemoryClient {
     });
   }
 
-  async search(query: string, options: Record<string, any> = {}): Promise<any> {
+  async search(
+    query: string,
+    options: Record<string, any> = {},
+  ): Promise<MemoryData[]> {
     const payload = { query, ...options };
     return await this.request('/memories/search/', {
       method: 'POST',
@@ -156,4 +164,4 @@ class MemoryClient {
   }
 }
 
-export { APIError, MemoryClient, apiErrorHandler };
+export { APIError, apiErrorHandler, MemoryClient };

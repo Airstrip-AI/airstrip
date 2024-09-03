@@ -1,6 +1,6 @@
 'use server';
 
-import { currentUserJwtKey } from '@/hooks/user';
+import { currentUserJwtKey } from '@/constants';
 import { UserProfileResp } from '@/utils/backend/client/auth/types';
 import { makeGetRequest } from '@/utils/backend/utils';
 import { Links } from '@/utils/misc/links';
@@ -14,7 +14,6 @@ export async function authGuard(guards: InjectableGuard[]) {
 
   if (!authToken) {
     redirectToLogin();
-    return;
   }
 
   const user = await makeGetRequest<UserProfileResp>({
@@ -25,7 +24,6 @@ export async function authGuard(guards: InjectableGuard[]) {
   for (const guard of guards) {
     if (!(await guard(user))) {
       redirectToLogin();
-      return;
     }
   }
 
@@ -35,7 +33,7 @@ export async function authGuard(guards: InjectableGuard[]) {
   };
 }
 
-function redirectToLogin() {
+function redirectToLogin(): never {
   cookies().delete(currentUserJwtKey);
 
   redirect(Links.login());

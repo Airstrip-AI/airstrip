@@ -12,7 +12,7 @@ ARG NEXT_PUBLIC_BE_API_HOST=http://localhost:3001
 
 # End of section for env vars that will be built into the image
 
-RUN yarn && yarn build
+RUN yarn && yarn migrate-db-schema && yarn build
 
 CMD ["yarn", "start"]
 

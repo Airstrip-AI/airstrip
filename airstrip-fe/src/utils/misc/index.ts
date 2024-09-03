@@ -53,7 +53,7 @@ export function minutesAgo(date: Date): number {
   return Math.floor((Date.now() - date.getTime()) / 60000);
 }
 
-export function fromNow(date: string): string {
+export function fromNow(date: string | Date): string {
   return dayjs(date).fromNow();
 }
 

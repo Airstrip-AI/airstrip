@@ -1,3 +1,8 @@
+import {
+  AiProvider,
+  AppType,
+  UserRole,
+} from '@/utils/backend/client/common/types';
 import { sql } from 'drizzle-orm';
 import {
   boolean,
@@ -15,7 +20,6 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
-import { UserRole } from '../client/common/types';
 
 export const airstrip = pgSchema('airstrip');
 
@@ -36,9 +40,7 @@ export const users = airstrip.table(
     passwordHash: text('password_hash').notNull(),
     firstName: text('first_name').notNull(),
     verified: boolean('verified').default(false).notNull(),
-    verifiedAt: timestamp('verified_at', {
-      withTimezone: true,
-    }),
+    verifiedAt: timestamp('verified_at', { withTimezone: true }),
     verifyToken: text('verify_token'),
     verifyTokenExpiresAt: timestamp('verify_token_expires_at', {
       withTimezone: true,
@@ -126,9 +128,7 @@ export const orgInvites = airstrip.table(
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
-    acceptedAt: timestamp('accepted_at', {
-      withTimezone: true,
-    }),
+    acceptedAt: timestamp('accepted_at', { withTimezone: true }),
     token: text('token').notNull(),
   },
   (table) => {
@@ -148,54 +148,6 @@ export const orgInvites = airstrip.table(
         table.email,
       ),
       orgInvitesTokenKey: unique('org_invites_token_key').on(table.token),
-    };
-  },
-);
-
-export const aiIntegrations = airstrip.table(
-  'ai_integrations',
-  {
-    id: uuid('id')
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    orgId: uuid('org_id').notNull(),
-    restrictedToTeamId: uuid('restricted_to_team_id'),
-    name: text('name').notNull(),
-    description: text('description').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    aiProvider: text('ai_provider').notNull(),
-    aiProviderApiKey: text('ai_provider_api_key').notNull(),
-    aiProviderApiUrl: text('ai_provider_api_url'),
-  },
-  (table) => {
-    return {
-      orgIdAiProviderRestrictedToTeamIdIdx: index(
-        'ai_integrations_org_id_ai_provider_restricted_to_team_id_idx',
-      ).using(
-        'btree',
-        table.orgId.asc().nullsLast(),
-        table.aiProvider.asc().nullsLast(),
-        table.restrictedToTeamId.asc().nullsLast(),
-      ),
-      aiIntegrationsOrgIdFkey: foreignKey({
-        columns: [table.orgId],
-        foreignColumns: [organizations.id],
-        name: 'ai_integrations_org_id_fkey',
-      }).onDelete('cascade'),
-      aiIntegrationsRestrictedToTeamIdFkey: foreignKey({
-        columns: [table.restrictedToTeamId],
-        foreignColumns: [orgTeams.id],
-        name: 'ai_integrations_restricted_to_team_id_fkey',
-      }).onDelete('set null'),
-      aiIntegrationsAiProviderApiKeyKey: unique(
-        'ai_integrations_ai_provider_api_key_key',
-      ).on(table.aiProviderApiKey),
     };
   },
 );
@@ -255,13 +207,17 @@ export const apps = airstrip.table(
     teamId: uuid('team_id'),
     name: text('name').notNull(),
     description: text('description').notNull(),
-    type: text('type').notNull(),
+    type: text('type').$type<AppType>().notNull(),
     aiProviderId: uuid('ai_provider_id'),
     systemPrompt: text('system_prompt'),
     introductionMessage: text('introduction_message'),
     outputJsonSchema: text('output_json_schema'),
-    aiModel: text('ai_model'),
     temperature: doublePrecision('temperature').default(1).notNull(),
+    memory: boolean('memory').default(false).notNull(),
+    memoryQuery: text('memory_query')
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
   },
   (table) => {
     return {
@@ -336,35 +292,47 @@ export const chats = airstrip.table(
   },
 );
 
-export const messageTokenUsageData = airstrip.table(
-  'message_token_usage_data',
+export const aiIntegrations = airstrip.table(
+  'ai_integrations',
   {
-    chatMessageId: uuid('chat_message_id').primaryKey().notNull(),
-    aiProvider: text('ai_provider').notNull(),
-    aiModel: text('ai_model').notNull(),
+    id: uuid('id')
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
     orgId: uuid('org_id').notNull(),
-    appId: uuid('app_id'),
-    usage: jsonb('usage').notNull(),
+    restrictedToTeamId: uuid('restricted_to_team_id'),
+    name: text('name').notNull(),
+    description: text('description').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    aiProvider: text('ai_provider').$type<AiProvider>().notNull(),
+    aiProviderApiKey: text('ai_provider_api_key').notNull(),
+    aiProviderApiUrl: text('ai_provider_api_url'),
+    aiModel: text('ai_model').notNull(),
   },
   (table) => {
     return {
-      orgIdAppIdIdx: index('message_token_usage_data_org_id_app_id_idx').using(
+      orgIdAiProviderRestrictedToTeamIdIdx: index(
+        'ai_integrations_org_id_ai_provider_restricted_to_team_id_idx',
+      ).using(
         'btree',
         table.orgId.asc().nullsLast(),
-        table.appId.asc().nullsLast(),
+        table.aiProvider.asc().nullsLast(),
+        table.restrictedToTeamId.asc().nullsLast(),
       ),
-      messageTokenUsageDataOrgIdFkey: foreignKey({
+      aiIntegrationsOrgIdFkey: foreignKey({
         columns: [table.orgId],
         foreignColumns: [organizations.id],
-        name: 'message_token_usage_data_org_id_fkey',
+        name: 'ai_integrations_org_id_fkey',
       }).onDelete('cascade'),
-      messageTokenUsageDataAppIdFkey: foreignKey({
-        columns: [table.appId],
-        foreignColumns: [apps.id],
-        name: 'message_token_usage_data_app_id_fkey',
+      aiIntegrationsRestrictedToTeamIdFkey: foreignKey({
+        columns: [table.restrictedToTeamId],
+        foreignColumns: [orgTeams.id],
+        name: 'ai_integrations_restricted_to_team_id_fkey',
       }).onDelete('set null'),
     };
   },
@@ -376,9 +344,7 @@ export const orgUsers = airstrip.table(
     userId: uuid('user_id').notNull(),
     orgId: uuid('org_id').notNull(),
     role: text('role').$type<UserRole>().notNull(),
-    joinedOrgAt: timestamp('joined_org_at', {
-      withTimezone: true,
-    })
+    joinedOrgAt: timestamp('joined_org_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
@@ -415,9 +381,7 @@ export const orgTeamUsers = airstrip.table(
     userId: uuid('user_id').notNull(),
     orgId: uuid('org_id').notNull(),
     role: text('role').$type<UserRole>().notNull(),
-    joinedTeamAt: timestamp('joined_team_at', {
-      withTimezone: true,
-    })
+    joinedTeamAt: timestamp('joined_team_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
@@ -450,7 +414,7 @@ export const orgTeamUsers = airstrip.table(
 // ===== Start: Remnant of flyway table =====
 // This is to prevent migration from dropping flyway history table
 // We can remove this if no longer needed.
-export const flywaySchemaHistoryInAirstrip = airstrip.table(
+export const flywaySchemaHistory = airstrip.table(
   'flyway_schema_history',
   {
     installedRank: integer('installed_rank').primaryKey().notNull(),
@@ -460,9 +424,7 @@ export const flywaySchemaHistoryInAirstrip = airstrip.table(
     script: varchar('script', { length: 1000 }).notNull(),
     checksum: integer('checksum'),
     installedBy: varchar('installed_by', { length: 100 }).notNull(),
-    installedOn: timestamp('installed_on', { mode: 'string' })
-      .defaultNow()
-      .notNull(),
+    installedOn: timestamp('installed_on', {}).defaultNow().notNull(),
     executionTime: integer('execution_time').notNull(),
     success: boolean('success').notNull(),
   },

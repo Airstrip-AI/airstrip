@@ -27,8 +27,10 @@ const clientConfig: ClientConfig = {
 
 const configEntries = Object.entries(clientConfig);
 
+const exemptedKeys = ['ssl'];
+
 for (const [key, value] of configEntries) {
-  if (!value) {
+  if (!value && !exemptedKeys.includes(key)) {
     throw new Error(`Missing environment variable: ${key}`);
   }
 }

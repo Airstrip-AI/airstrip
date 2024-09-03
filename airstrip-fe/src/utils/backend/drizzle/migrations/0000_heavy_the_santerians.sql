@@ -1,7 +1,6 @@
 -- Current sql file was generated after introspecting the database
 -- If you want to run this migration please uncomment this code before executing migrations
-/*
-CREATE SCHEMA "airstrip";
+
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "airstrip"."flyway_schema_history" (
 	"installed_rank" integer PRIMARY KEY NOT NULL,
@@ -62,20 +61,6 @@ CREATE TABLE IF NOT EXISTS "airstrip"."org_invites" (
 	CONSTRAINT "org_invites_token_key" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "airstrip"."ai_integrations" (
-	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
-	"org_id" uuid NOT NULL,
-	"restricted_to_team_id" uuid,
-	"name" text NOT NULL,
-	"description" text NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"ai_provider" text NOT NULL,
-	"ai_provider_api_key" text NOT NULL,
-	"ai_provider_api_url" text,
-	CONSTRAINT "ai_integrations_ai_provider_api_key_key" UNIQUE("ai_provider_api_key")
-);
---> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "airstrip"."chat_messages" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
 	"chat_id" uuid NOT NULL,
@@ -100,7 +85,6 @@ CREATE TABLE IF NOT EXISTS "airstrip"."apps" (
 	"system_prompt" text,
 	"introduction_message" text,
 	"output_json_schema" text,
-	"ai_model" text,
 	"temperature" double precision DEFAULT 1 NOT NULL
 );
 --> statement-breakpoint
@@ -112,14 +96,18 @@ CREATE TABLE IF NOT EXISTS "airstrip"."chats" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "airstrip"."message_token_usage_data" (
-	"chat_message_id" uuid PRIMARY KEY NOT NULL,
-	"ai_provider" text NOT NULL,
-	"ai_model" text NOT NULL,
+CREATE TABLE IF NOT EXISTS "airstrip"."ai_integrations" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
 	"org_id" uuid NOT NULL,
-	"app_id" uuid,
-	"usage" jsonb NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+	"restricted_to_team_id" uuid,
+	"name" text NOT NULL,
+	"description" text NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"ai_provider" text NOT NULL,
+	"ai_provider_api_key" text NOT NULL,
+	"ai_provider_api_url" text,
+	"ai_model" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "airstrip"."org_users" (
@@ -157,18 +145,6 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "airstrip"."org_invites" ADD CONSTRAINT "org_invites_inviter_id_fkey" FOREIGN KEY ("inviter_id") REFERENCES "airstrip"."users"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "airstrip"."ai_integrations" ADD CONSTRAINT "ai_integrations_org_id_fkey" FOREIGN KEY ("org_id") REFERENCES "airstrip"."organizations"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "airstrip"."ai_integrations" ADD CONSTRAINT "ai_integrations_restricted_to_team_id_fkey" FOREIGN KEY ("restricted_to_team_id") REFERENCES "airstrip"."org_teams"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -216,13 +192,13 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "airstrip"."message_token_usage_data" ADD CONSTRAINT "message_token_usage_data_org_id_fkey" FOREIGN KEY ("org_id") REFERENCES "airstrip"."organizations"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "airstrip"."ai_integrations" ADD CONSTRAINT "ai_integrations_org_id_fkey" FOREIGN KEY ("org_id") REFERENCES "airstrip"."organizations"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "airstrip"."message_token_usage_data" ADD CONSTRAINT "message_token_usage_data_app_id_fkey" FOREIGN KEY ("app_id") REFERENCES "airstrip"."apps"("id") ON DELETE set null ON UPDATE no action;
+ ALTER TABLE "airstrip"."ai_integrations" ADD CONSTRAINT "ai_integrations_restricted_to_team_id_fkey" FOREIGN KEY ("restricted_to_team_id") REFERENCES "airstrip"."org_teams"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -254,11 +230,9 @@ END $$;
 CREATE INDEX IF NOT EXISTS "flyway_schema_history_s_idx" ON "airstrip"."flyway_schema_history" USING btree ("success");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "users_lower_idx" ON "airstrip"."users" USING btree (lower(email));--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "org_teams_org_id_idx" ON "airstrip"."org_teams" USING btree ("org_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "ai_integrations_org_id_ai_provider_restricted_to_team_id_idx" ON "airstrip"."ai_integrations" USING btree ("org_id","ai_provider","restricted_to_team_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "chat_messages_chat_id_idx" ON "airstrip"."chat_messages" USING btree ("chat_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "chat_messages_role_idx" ON "airstrip"."chat_messages" USING btree ("role");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "apps_org_id_team_id_ai_provider_id_idx" ON "airstrip"."apps" USING btree ("org_id","team_id","ai_provider_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "chats_org_id_app_id_idx" ON "airstrip"."chats" USING btree ("org_id","app_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "chats_user_id_idx" ON "airstrip"."chats" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "message_token_usage_data_org_id_app_id_idx" ON "airstrip"."message_token_usage_data" USING btree ("org_id","app_id");
-*/
+CREATE INDEX IF NOT EXISTS "ai_integrations_org_id_ai_provider_restricted_to_team_id_idx" ON "airstrip"."ai_integrations" USING btree ("org_id","ai_provider","restricted_to_team_id");

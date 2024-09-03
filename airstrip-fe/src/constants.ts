@@ -21,4 +21,8 @@ export const AIRSTRIP_DB_PASSWORD = process.env.AIRSTRIP_DB_PASSWORD || '';
 export const AIRSTRIP_DB_NAME = process.env.AIRSTRIP_DB_NAME || '';
 export const AIRSTRIP_DB_SSL_CERT = process.env.AIRSTRIP_DB_SSL_CERT || '';
 
+export const MEM0_API_HOST = process.env.MEM0_API_HOST;
 export const MEM0_API_KEY = process.env.MEM0_API_KEY || '';
+
+export const currentUserJwtKey = 'currentUserJwt';
+export const activeOrgIdKey = 'active-org-id';

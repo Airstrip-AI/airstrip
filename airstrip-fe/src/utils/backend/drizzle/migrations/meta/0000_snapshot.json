@@ -433,147 +433,6 @@
         }
       }
     },
-    "airstrip.ai_integrations": {
-      "name": "ai_integrations",
-      "schema": "airstrip",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "uuid_generate_v4()"
-        },
-        "org_id": {
-          "name": "org_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "restricted_to_team_id": {
-          "name": "restricted_to_team_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "ai_provider": {
-          "name": "ai_provider",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ai_provider_api_key": {
-          "name": "ai_provider_api_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ai_provider_api_url": {
-          "name": "ai_provider_api_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {
-        "ai_integrations_org_id_ai_provider_restricted_to_team_id_idx": {
-          "name": "ai_integrations_org_id_ai_provider_restricted_to_team_id_idx",
-          "columns": [
-            {
-              "expression": "org_id",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "uuid_ops",
-              "isExpression": false
-            },
-            {
-              "expression": "ai_provider",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "uuid_ops",
-              "isExpression": false
-            },
-            {
-              "expression": "restricted_to_team_id",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "uuid_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "ai_integrations_org_id_fkey": {
-          "name": "ai_integrations_org_id_fkey",
-          "tableFrom": "ai_integrations",
-          "tableTo": "organizations",
-          "schemaTo": "airstrip",
-          "columnsFrom": [
-            "org_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "ai_integrations_restricted_to_team_id_fkey": {
-          "name": "ai_integrations_restricted_to_team_id_fkey",
-          "tableFrom": "ai_integrations",
-          "tableTo": "org_teams",
-          "schemaTo": "airstrip",
-          "columnsFrom": [
-            "restricted_to_team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "ai_integrations_ai_provider_api_key_key": {
-          "columns": [
-            "ai_provider_api_key"
-          ],
-          "nullsNotDistinct": false,
-          "name": "ai_integrations_ai_provider_api_key_key"
-        }
-      }
-    },
     "airstrip.chat_messages": {
       "name": "chat_messages",
       "schema": "airstrip",
@@ -759,12 +618,6 @@
         },
         "output_json_schema": {
           "name": "output_json_schema",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "ai_model": {
-          "name": "ai_model",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -981,27 +834,16 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "airstrip.message_token_usage_data": {
-      "name": "message_token_usage_data",
+    "airstrip.ai_integrations": {
+      "name": "ai_integrations",
       "schema": "airstrip",
       "columns": {
-        "chat_message_id": {
-          "name": "chat_message_id",
+        "id": {
+          "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
-        },
-        "ai_provider": {
-          "name": "ai_provider",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ai_model": {
-          "name": "ai_model",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "uuid_generate_v4()"
         },
         "org_id": {
           "name": "org_id",
@@ -1009,15 +851,21 @@
           "primaryKey": false,
           "notNull": true
         },
-        "app_id": {
-          "name": "app_id",
+        "restricted_to_team_id": {
+          "name": "restricted_to_team_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
-        "usage": {
-          "name": "usage",
-          "type": "jsonb",
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -1027,11 +875,42 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "ai_provider": {
+          "name": "ai_provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ai_provider_api_key": {
+          "name": "ai_provider_api_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ai_provider_api_url": {
+          "name": "ai_provider_api_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ai_model": {
+          "name": "ai_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {
-        "message_token_usage_data_org_id_app_id_idx": {
-          "name": "message_token_usage_data_org_id_app_id_idx",
+        "ai_integrations_org_id_ai_provider_restricted_to_team_id_idx": {
+          "name": "ai_integrations_org_id_ai_provider_restricted_to_team_id_idx",
           "columns": [
             {
               "expression": "org_id",
@@ -1041,10 +920,17 @@
               "isExpression": false
             },
             {
-              "expression": "app_id",
+              "expression": "ai_provider",
               "asc": true,
               "nulls": "last",
-              "opclass": "uuid_ops",
+              "opclass": "text_ops",
+              "isExpression": false
+            },
+            {
+              "expression": "restricted_to_team_id",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
               "isExpression": false
             }
           ],
@@ -1055,9 +941,9 @@
         }
       },
       "foreignKeys": {
-        "message_token_usage_data_org_id_fkey": {
-          "name": "message_token_usage_data_org_id_fkey",
-          "tableFrom": "message_token_usage_data",
+        "ai_integrations_org_id_fkey": {
+          "name": "ai_integrations_org_id_fkey",
+          "tableFrom": "ai_integrations",
           "tableTo": "organizations",
           "schemaTo": "airstrip",
           "columnsFrom": [
@@ -1069,13 +955,13 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "message_token_usage_data_app_id_fkey": {
-          "name": "message_token_usage_data_app_id_fkey",
-          "tableFrom": "message_token_usage_data",
-          "tableTo": "apps",
+        "ai_integrations_restricted_to_team_id_fkey": {
+          "name": "ai_integrations_restricted_to_team_id_fkey",
+          "tableFrom": "ai_integrations",
+          "tableTo": "org_teams",
           "schemaTo": "airstrip",
           "columnsFrom": [
-            "app_id"
+            "restricted_to_team_id"
           ],
           "columnsTo": [
             "id"

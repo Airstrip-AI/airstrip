@@ -4,7 +4,6 @@ import {
   apps,
   chatMessages,
   chats,
-  messageTokenUsageData,
   organizations,
   orgInvites,
   orgTeams,
@@ -18,19 +17,18 @@ export const orgTeamsRelations = relations(orgTeams, ({ one, many }) => ({
     fields: [orgTeams.orgId],
     references: [organizations.id],
   }),
-  aiIntegrationss: many(aiIntegrations),
   apps: many(apps),
-  orgTeamUserss: many(orgTeamUsers),
+  aiIntegrations: many(aiIntegrations),
+  orgTeamUsers: many(orgTeamUsers),
 }));
 
 export const organizationsRelations = relations(organizations, ({ many }) => ({
-  orgTeamss: many(orgTeams),
-  orgInvitess: many(orgInvites),
-  aiIntegrationss: many(aiIntegrations),
+  orgTeams: many(orgTeams),
+  orgInvites: many(orgInvites),
   apps: many(apps),
-  chatss: many(chats),
-  messageTokenUsageDatas: many(messageTokenUsageData),
-  orgUserss: many(orgUsers),
+  chats: many(chats),
+  aiIntegrations: many(aiIntegrations),
+  orgUsers: many(orgUsers),
 }));
 
 export const orgInvitesRelations = relations(orgInvites, ({ one }) => ({
@@ -45,25 +43,10 @@ export const orgInvitesRelations = relations(orgInvites, ({ one }) => ({
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
-  orgInvitess: many(orgInvites),
-  chatss: many(chats),
-  orgUserss: many(orgUsers),
+  orgInvites: many(orgInvites),
+  chats: many(chats),
+  orgUsers: many(orgUsers),
 }));
-
-export const aiIntegrationsRelations = relations(
-  aiIntegrations,
-  ({ one, many }) => ({
-    organizations: one(organizations, {
-      fields: [aiIntegrations.orgId],
-      references: [organizations.id],
-    }),
-    restrictedToTeam: one(orgTeams, {
-      fields: [aiIntegrations.restrictedToTeamId],
-      references: [orgTeams.id],
-    }),
-    apps: many(apps),
-  }),
-);
 
 export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
   chats: one(chats, {
@@ -73,7 +56,7 @@ export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
 }));
 
 export const chatsRelations = relations(chats, ({ one, many }) => ({
-  chatMessagess: many(chatMessages),
+  chatMessages: many(chatMessages),
   organizations: one(organizations, {
     fields: [chats.orgId],
     references: [organizations.id],
@@ -89,32 +72,32 @@ export const chatsRelations = relations(chats, ({ one, many }) => ({
 }));
 
 export const appsRelations = relations(apps, ({ one, many }) => ({
-  organizations: one(organizations, {
+  org: one(organizations, {
     fields: [apps.orgId],
     references: [organizations.id],
   }),
-  orgTeams: one(orgTeams, {
+  team: one(orgTeams, {
     fields: [apps.teamId],
     references: [orgTeams.id],
   }),
-  aiIntegrations: one(aiIntegrations, {
+  aiProvider: one(aiIntegrations, {
     fields: [apps.aiProviderId],
     references: [aiIntegrations.id],
   }),
-  chatss: many(chats),
-  messageTokenUsageDatas: many(messageTokenUsageData),
+  chats: many(chats),
 }));
 
-export const messageTokenUsageDataRelations = relations(
-  messageTokenUsageData,
-  ({ one }) => ({
+export const aiIntegrationsRelations = relations(
+  aiIntegrations,
+  ({ one, many }) => ({
+    apps: many(apps),
     organizations: one(organizations, {
-      fields: [messageTokenUsageData.orgId],
+      fields: [aiIntegrations.orgId],
       references: [organizations.id],
     }),
-    apps: one(apps, {
-      fields: [messageTokenUsageData.appId],
-      references: [apps.id],
+    restrictedToTeam: one(orgTeams, {
+      fields: [aiIntegrations.restrictedToTeamId],
+      references: [orgTeams.id],
     }),
   }),
 );
@@ -128,7 +111,7 @@ export const orgUsersRelations = relations(orgUsers, ({ one, many }) => ({
     fields: [orgUsers.orgId],
     references: [organizations.id],
   }),
-  orgTeamUserss: many(orgTeamUsers),
+  orgTeamUsers: many(orgTeamUsers),
 }));
 
 export const orgTeamUsersRelations = relations(orgTeamUsers, ({ one }) => ({

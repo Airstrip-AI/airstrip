@@ -1,11 +1,12 @@
+import { getApp, updateApp } from '@/actions/apps';
+import { checkOptionalFeatures } from '@/actions/optional-features';
 import { getValidToken, QueryKeys } from '@/hooks/helpers';
+import { AppEntity } from '@/services/apps';
 import {
   checkUserPrivilegesForApp,
   createApp,
   getAllowedAiProvidersForApp,
-  getApp,
   listAppsForUser,
-  updateApp,
 } from '@/utils/backend/client/apps';
 import {
   AppResp,
@@ -47,21 +48,19 @@ export function useUpdateApp({
   onSuccess,
   onError,
 }: {
-  onSuccess: (resp: AppResp) => void;
+  onSuccess: (resp: AppEntity) => void;
   onError: (error: Error) => void;
 }) {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ appId, body }: { appId: string; body: UpdateAppReq }) => {
-      const authToken = getValidToken();
       return updateApp({
         appId,
-        authToken,
         body,
       });
     },
-    onSuccess: (resp: AppResp) => {
+    onSuccess: (resp: AppEntity) => {
       queryClient.invalidateQueries([QueryKeys.APPS]);
       onSuccess(resp);
     },
@@ -75,17 +74,21 @@ export function useGetApp({
   onError,
 }: {
   appId: string;
-  onSuccess?: (results: AppResp) => void;
+  onSuccess?: (results: AppEntity) => void;
   onError?: (error: Error) => void;
 }) {
   return useQuery({
     queryKey: [QueryKeys.APPS, appId],
-    queryFn: () => {
-      const authToken = getValidToken();
-      return getApp({
-        appId,
-        authToken,
-      });
+    queryFn: async () => {
+      const [optionalFeatures, appConfig] = await Promise.all([
+        checkOptionalFeatures(),
+        getApp(appId),
+      ]);
+
+      return {
+        ...appConfig,
+        memory: optionalFeatures.memoryAllowed && appConfig.memory,
+      };
     },
     onSuccess,
     onError,
@@ -169,5 +172,16 @@ export function useCheckUserPrivilegesForApp({
     },
     onSuccess,
     onError,
+  });
+}
+
+export function useOptionalFeatures() {
+  return useQuery({
+    queryKey: [QueryKeys.OPTIONAL_FEATURES],
+    queryFn: () => {
+      return checkOptionalFeatures();
+    },
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+    cacheTime: 24 * 60 * 60 * 1000, // 24 hours
   });
 }

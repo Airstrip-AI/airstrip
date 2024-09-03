@@ -20,6 +20,8 @@ export class UpdateAppReq {
   introductionMessage: string | null;
   outputJsonSchema: string | null;
   temperature: number;
+  memory: boolean;
+  memoryQuery: string[];
 }
 
 class OrgResp {
@@ -53,6 +55,8 @@ export class AppResp {
   introductionMessage: string | null;
   outputJsonSchema: string | null;
   temperature: number;
+  memory: boolean;
+  memoryQuery: string[];
 }
 
 export class ListAppsResp {

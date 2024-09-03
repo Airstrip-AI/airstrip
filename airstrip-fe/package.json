@@ -8,9 +8,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "introspect": "drizzle-kit introspect --config=drizzle.config.ts"
+    "introspect-db-schema": "drizzle-kit introspect",
+    "generate-db-schema": "drizzle-kit generate",
+    "migrate-db-schema": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^0.0.48",
+    "@ai-sdk/cohere": "^0.0.22",
+    "@ai-sdk/google": "^0.0.46",
+    "@ai-sdk/mistral": "^0.0.38",
+    "@ai-sdk/openai": "^0.0.55",
     "@mantine/charts": "^7.12.0",
     "@mantine/code-highlight": "^7.12.0",
     "@mantine/core": "^7.11.2",

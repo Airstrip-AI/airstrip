@@ -1,3 +1,4 @@
+import { activeOrgIdKey, currentUserJwtKey } from '@/constants';
 import { UserProfileResp } from '@/utils/backend/client/auth/types';
 import { Links } from '@/utils/misc/links';
 import { useLocalStorage } from '@mantine/hooks';
@@ -6,8 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from 'react-query';
 
-export const currentUserJwtKey = 'currentUserJwt';
-export const activeOrgIdKey = 'active-org-id';
+export { activeOrgIdKey };
 
 export function getUserAuthToken() {
   return getCookie(currentUserJwtKey) as string | undefined;
