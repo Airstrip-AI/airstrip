@@ -466,6 +466,84 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-2.0.3.tgz#4a2868d75d6d6963e423bcf90b7fd1be343409d3"
   integrity sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==
 
+"@infisical/sdk-android-arm-eabi@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-android-arm-eabi/-/sdk-android-arm-eabi-2.3.5.tgz#b063a2d55e546a160224861637bf0727f9f89645"
+  integrity sha512-7KGWJ5X/RV6sIHWt3mjNg+zykzYvbHIKmNKBHTTAOuULKpTIAoQyFD1q3XMylP2AaVh8BJtgVOODO4/Uxexlug==
+
+"@infisical/sdk-android-arm64@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-android-arm64/-/sdk-android-arm64-2.3.5.tgz#6b9b1e210c1f8d29ad5adaffcf32b8d865fb3404"
+  integrity sha512-jHCvwYYchtTWryAGX2MvddRVZFdGrdoakGTMrvPQ0ZyM1XnLo3Q9tb35RCjTTylE1q114OKGRymM2JZ10ygiRw==
+
+"@infisical/sdk-darwin-arm64@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-darwin-arm64/-/sdk-darwin-arm64-2.3.5.tgz#7113e006f78556ae49e1ed62c3737fff24ad76a6"
+  integrity sha512-UEe38OTxjlOMo2HVplmT6pmXwks0c9lckKDUKK/MNfp0H9n4RJKXd8jco1BeG713eNR7bX01Q2c74XgLJhf58Q==
+
+"@infisical/sdk-darwin-x64@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-darwin-x64/-/sdk-darwin-x64-2.3.5.tgz#54c2c547f892fb7299ae2fe0ccfec1c86f3f0432"
+  integrity sha512-mMz/1N+aZjvIXPHMnfl9DmyYWCXjRsa/Uxj94pXjJGZ3GMsANRTR08GVRI2S2XWMODiV5D9zY2mQ3/eY5E5Y/A==
+
+"@infisical/sdk-linux-arm-gnueabihf@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-linux-arm-gnueabihf/-/sdk-linux-arm-gnueabihf-2.3.5.tgz#cde313d1199d04e68a04b034b1487e545937cf59"
+  integrity sha512-GjVQNdv8aYn+mZgW/sRFirwb0iMRX7ShBC0N8MsgrSBxnSpH2nFiUFj8hFi2DOvR5NbJ+KQpabfvP0eodozKSg==
+
+"@infisical/sdk-linux-arm64-gnu@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-linux-arm64-gnu/-/sdk-linux-arm64-gnu-2.3.5.tgz#c3ab172546912ab70db3de96ade8c28e7e3f6d7f"
+  integrity sha512-hclvvD1eAYB6JP58mo5TfBjE+vSGSv30fNuXeaheO4yOLfnaGyCCR6E6F96uxNNCAVkVO4RXRhiSSCT6K3f3jA==
+
+"@infisical/sdk-linux-arm64-musl@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-linux-arm64-musl/-/sdk-linux-arm64-musl-2.3.5.tgz#8ce5c42be0848da2a5aa9a598606cc14ab001da3"
+  integrity sha512-RFYd49eXoUtXXUsQb9Cqiu0RKp32GrsEATj9GlMJYharDn8BZhYr6lpDb+7EZolbjg+A40JvT98nqN2EliUwgA==
+
+"@infisical/sdk-linux-x64-gnu@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-linux-x64-gnu/-/sdk-linux-x64-gnu-2.3.5.tgz#4162664b30b080f847f17e5f2a73cacd1f97db09"
+  integrity sha512-E0JB4fowk9cmfQGBJw8QNXy9TBewB42kyQhCYARQtPvleXqoK48DUs7mzRIawLUbyCA5ldcy2jFbj/ZXWWYNOA==
+
+"@infisical/sdk-linux-x64-musl@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-linux-x64-musl/-/sdk-linux-x64-musl-2.3.5.tgz#9e6d9393a5be21e246801d1d4da7fe958d0c64ad"
+  integrity sha512-3+irZY69oepYAwXXgTUDIW6PbjLRmj79rzA4CSKfF3a0wBLlR+6e+1NT+nu87BtP3wSBej3y1JAnfw853AekDA==
+
+"@infisical/sdk-win32-arm64-msvc@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-win32-arm64-msvc/-/sdk-win32-arm64-msvc-2.3.5.tgz#5153f2b739df6e3788b5d3dd40d03890a9601a2a"
+  integrity sha512-DVZMglFSE3Xqj7/Bsv/4KfhfAO970BsSdOL3LrlRvcN3Dkocuthh3rHw6U5jg92FfMw+hMN9DzlhTqtUBZWYjQ==
+
+"@infisical/sdk-win32-ia32-msvc@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-win32-ia32-msvc/-/sdk-win32-ia32-msvc-2.3.5.tgz#f6f05fef95206f7106ec2f06886b733ef207136d"
+  integrity sha512-dw3XuR2myJ2leB3+KStFsHB2zIJ29TArvoU/zGw/cdCOj1dRKF7WcahWg1id+ydwoeOv+HVZ+RsS8sZR5gYblQ==
+
+"@infisical/sdk-win32-x64-msvc@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk-win32-x64-msvc/-/sdk-win32-x64-msvc-2.3.5.tgz#5f286ea8922d838d764b80fa69009b747f0d23c4"
+  integrity sha512-SWzYndKhHih4zE/OYWfv9QoYaj5oDBhNSKZAlw1XFYdlUU41nTCN1nruD9RRdmjoJ/pF0sn2Mr9v+OiXStnC+A==
+
+"@infisical/sdk@^2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@infisical/sdk/-/sdk-2.3.5.tgz#87d4d2084de72ad240550ff833f741bfa9414f80"
+  integrity sha512-vaQmDyzOFRkiZqstifk2dHTctkfizhlv7/+Ds6PFVWPGUpRUqP4PoR4yRdx2405IKWVx/ABuqQ4S8e9ix1kwzg==
+  optionalDependencies:
+    "@infisical/sdk-android-arm-eabi" "2.3.5"
+    "@infisical/sdk-android-arm64" "2.3.5"
+    "@infisical/sdk-darwin-arm64" "2.3.5"
+    "@infisical/sdk-darwin-x64" "2.3.5"
+    "@infisical/sdk-linux-arm-gnueabihf" "2.3.5"
+    "@infisical/sdk-linux-arm64-gnu" "2.3.5"
+    "@infisical/sdk-linux-arm64-musl" "2.3.5"
+    "@infisical/sdk-linux-x64-gnu" "2.3.5"
+    "@infisical/sdk-linux-x64-musl" "2.3.5"
+    "@infisical/sdk-win32-arm64-msvc" "2.3.5"
+    "@infisical/sdk-win32-ia32-msvc" "2.3.5"
+    "@infisical/sdk-win32-x64-msvc" "2.3.5"
+
 "@isaacs/cliui@^8.0.2":
   version "8.0.2"
   resolved "https://registry.yarnpkg.com/@isaacs/cliui/-/cliui-8.0.2.tgz#b37667b7bc181c168782259bab42474fbf52b550"

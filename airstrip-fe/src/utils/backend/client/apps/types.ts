@@ -1,4 +1,3 @@
-import { AiIntegrationKeyResp } from '@/utils/backend/client/ai-integrations/types';
 import {
   AiProvider,
   AppType,

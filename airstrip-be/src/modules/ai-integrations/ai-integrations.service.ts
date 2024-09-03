@@ -1,41 +1,61 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AiIntegrationEntity } from './ai-integration.entity';
 import { IsNull, Repository } from 'typeorm';
 import {
-  AiIntegrationEntityWithOrgTeamJoined,
+  AiIntegrationWithApiKeyAndOrgTeamServiceDto,
+  AiIntegrationWithOrgTeamServiceDto,
   CreateAiIntegrationDto,
   UpdateAiIntegrationDto,
 } from './types/service';
 import { OrgTeamsService } from '../org-teams/org-teams.service';
 import { OrgTeamEntity } from '../org-teams/org-team.entity';
+import { InfisicalClient } from '@infisical/sdk';
+import { nanoid } from 'nanoid';
+
+export const AI_INTEGRATIONS_SERVICE_CONFIG = 'AI_INTEGRATIONS_SERVICE_CONFIG';
+
+export type AiIntegrationsServiceConfig = {
+  infisicalApiUrl: string;
+  infisicalClientId: string;
+  infisicalClientSecret: string;
+  infisicalProjectId: string;
+  infisicalEnvironment: string;
+};
 
 @Injectable()
 export class AiIntegrationsService {
+  private readonly infisicalClient: InfisicalClient;
+
   constructor(
     @InjectRepository(AiIntegrationEntity)
     private readonly aiIntegrationRepository: Repository<AiIntegrationEntity>,
     private readonly orgTeamsService: OrgTeamsService,
-  ) {}
+    @Inject(AI_INTEGRATIONS_SERVICE_CONFIG)
+    private readonly config: AiIntegrationsServiceConfig,
+  ) {
+    this.infisicalClient = new InfisicalClient({
+      siteUrl: this.config.infisicalApiUrl,
+      cacheTtl: 600, // increase cacheTtl from default of 5mins to 10mins since api keys shouldn't change often
+      auth: {
+        universalAuth: {
+          clientId: this.config.infisicalClientId,
+          clientSecret: this.config.infisicalClientSecret,
+        },
+      },
+    });
+  }
 
   async createAiIntegration(
     orgId: string,
     dto: CreateAiIntegrationDto,
-  ): Promise<AiIntegrationEntityWithOrgTeamJoined> {
-    const duplicateApiKey = await this.aiIntegrationRepository.findOne({
-      where: {
-        aiProviderApiKey: dto.aiProviderApiKey,
-      },
-    });
-
-    if (duplicateApiKey) {
-      throw new BadRequestException('This API key is already in use.');
-    }
-
+  ): Promise<AiIntegrationWithApiKeyAndOrgTeamServiceDto> {
     let orgTeam: OrgTeamEntity | null = null;
     if (dto.restrictedToTeamId) {
       orgTeam = await this.orgTeamsService.getOrgTeamById(
@@ -54,20 +74,28 @@ export class AiIntegrationsService {
       name: dto.name,
       description: dto.description,
       aiProvider: dto.aiProvider,
-      aiProviderApiKey: dto.aiProviderApiKey,
+      aiProviderKeyVaultKey: await this.storeKeyInVault({
+        secretValue: dto.aiProviderApiKey,
+        secretName: nanoid(), // must be unique
+        mode: 'create',
+      }),
       aiProviderApiUrl: dto.aiProviderApiUrl,
       aiModel: dto.aiModel,
     });
 
-    aiIntegration.restrictedToTeam = orgTeam;
+    const { aiProviderKeyVaultKey, ...rest } = aiIntegration;
 
-    return aiIntegration as AiIntegrationEntityWithOrgTeamJoined;
+    return {
+      ...rest,
+      restrictedToTeam: orgTeam,
+      aiProviderApiKey: dto.aiProviderApiKey,
+    };
   }
 
   async updateAiIntegration(
     aiIntegrationId: string,
     dto: UpdateAiIntegrationDto,
-  ): Promise<AiIntegrationEntityWithOrgTeamJoined> {
+  ): Promise<AiIntegrationWithApiKeyAndOrgTeamServiceDto> {
     let aiIntegration = await this.aiIntegrationRepository.findOne({
       where: {
         id: aiIntegrationId,
@@ -96,19 +124,42 @@ export class AiIntegrationsService {
       name: dto.name,
       description: dto.description,
       aiProvider: dto.aiProvider,
-      aiProviderApiKey: dto.aiProviderApiKey,
+      aiProviderKeyVaultKey: await this.storeKeyInVault({
+        secretValue: dto.aiProviderApiKey,
+        secretName: aiIntegration.aiProviderKeyVaultKey,
+        mode: 'update',
+      }),
       aiProviderApiUrl: dto.aiProviderApiUrl,
       aiModel: dto.aiModel,
     });
 
-    aiIntegration.restrictedToTeam = orgTeam;
-    return aiIntegration as AiIntegrationEntityWithOrgTeamJoined;
+    const { aiProviderKeyVaultKey, ...rest } = aiIntegration;
+
+    return {
+      ...rest,
+      restrictedToTeam: orgTeam,
+      aiProviderApiKey: dto.aiProviderApiKey,
+    };
   }
 
   async deleteAiIntegration(aiIntegrationId: string): Promise<void> {
     if (!aiIntegrationId) {
       return;
     }
+
+    const aiIntegrationEntity = await this.aiIntegrationRepository.findOne({
+      where: {
+        id: aiIntegrationId,
+      },
+    });
+
+    if (!aiIntegrationEntity) {
+      return;
+    }
+
+    await this.deleteKeyInVault({
+      secretName: aiIntegrationEntity.aiProviderKeyVaultKey,
+    });
 
     await this.aiIntegrationRepository.delete({
       id: aiIntegrationId,
@@ -117,28 +168,33 @@ export class AiIntegrationsService {
 
   async getAiIntegration(
     aiIntegrationId: string,
-  ): Promise<AiIntegrationEntityWithOrgTeamJoined> {
-    const aiIntegration = (await this.aiIntegrationRepository.findOne({
+  ): Promise<AiIntegrationWithApiKeyAndOrgTeamServiceDto> {
+    const aiIntegration = await this.aiIntegrationRepository.findOne({
       where: {
         id: aiIntegrationId,
       },
       relations: {
         restrictedToTeam: true,
       },
-    })) as AiIntegrationEntityWithOrgTeamJoined;
+    });
 
     if (!aiIntegration) {
       throw new NotFoundException('AI integration not found.');
     }
 
-    return aiIntegration;
+    const { aiProviderKeyVaultKey, ...rest } = aiIntegration;
+
+    return {
+      ...rest,
+      aiProviderApiKey: await this.readKeyFromVault(aiProviderKeyVaultKey),
+    } as AiIntegrationWithApiKeyAndOrgTeamServiceDto;
   }
 
   async listAiIntegrationsInOrg(
     orgId: string,
     page: number,
   ): Promise<{
-    data: AiIntegrationEntityWithOrgTeamJoined[];
+    data: AiIntegrationWithOrgTeamServiceDto[];
     nextPageCursor: string | null;
   }> {
     const pageSize = 50;
@@ -152,7 +208,7 @@ export class AiIntegrationsService {
       },
       take: pageSize + 1,
       skip: page * pageSize,
-    })) as AiIntegrationEntityWithOrgTeamJoined[];
+    })) as AiIntegrationWithOrgTeamServiceDto[];
 
     return {
       data: aiIntegrationsPage.slice(0, pageSize),
@@ -162,7 +218,7 @@ export class AiIntegrationsService {
   }
 
   async getAllOrgWideAiIntegrations(orgId: string): Promise<{
-    data: AiIntegrationEntityWithOrgTeamJoined[];
+    data: AiIntegrationWithOrgTeamServiceDto[];
   }> {
     return {
       data: (await this.aiIntegrationRepository.find({
@@ -175,12 +231,12 @@ export class AiIntegrationsService {
         relations: {
           restrictedToTeam: true,
         },
-      })) as AiIntegrationEntityWithOrgTeamJoined[],
+      })) as AiIntegrationWithOrgTeamServiceDto[],
     };
   }
 
   async getAllAiIntegrationsAccessibleByTeam(orgTeamId: string): Promise<{
-    data: AiIntegrationEntityWithOrgTeamJoined[];
+    data: AiIntegrationWithOrgTeamServiceDto[];
   }> {
     const orgTeam = await this.orgTeamsService.getOrgTeamById(orgTeamId);
     return {
@@ -198,7 +254,61 @@ export class AiIntegrationsService {
         relations: {
           restrictedToTeam: true,
         },
-      })) as AiIntegrationEntityWithOrgTeamJoined[],
+      })) as AiIntegrationWithOrgTeamServiceDto[],
     };
+  }
+
+  async readKeyFromVault(secretName: string): Promise<string> {
+    return (
+      await this.infisicalClient.getSecret({
+        environment: this.config.infisicalEnvironment,
+        projectId: this.config.infisicalProjectId,
+        secretName,
+        path: '/',
+        type: 'shared',
+      })
+    ).secretValue;
+  }
+
+  private async storeKeyInVault({
+    secretValue,
+    secretName,
+    mode,
+  }: {
+    secretValue: string;
+    secretName: string;
+    mode: 'create' | 'update';
+  }): Promise<string> {
+    const body = {
+      projectId: this.config.infisicalProjectId,
+      environment: this.config.infisicalEnvironment,
+      secretName,
+      secretValue,
+      path: '/',
+      type: 'shared',
+    };
+    if (mode === 'update') {
+      const updateSecretResp = await this.infisicalClient.updateSecret(body);
+      return updateSecretResp.secretKey;
+    } else if (mode === 'create') {
+      const createSecretResp = await this.infisicalClient.createSecret(body);
+      return createSecretResp.secretKey;
+    } else {
+      throw new InternalServerErrorException('Invalid mode.');
+    }
+  }
+
+  private async deleteKeyInVault({
+    secretName,
+  }: {
+    secretName: string;
+  }): Promise<void> {
+    await this.infisicalClient.deleteSecret({
+      secretName,
+      environment: this.config.infisicalEnvironment,
+      projectId: this.config.infisicalProjectId,
+      path: '/',
+      type: 'shared',
+    });
   }
 }

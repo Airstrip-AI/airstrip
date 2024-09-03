@@ -2,23 +2,33 @@
 <img src="https://github.com/user-attachments/assets/a17ffb83-2acb-4531-bb1c-6d297e35d097" width="150" height="150" style="margin-left: auto; margin-right: auto;" />
 </p>
 
-# Airstrip: Open-source Enterprise AI Management Platform
+# Airstrip: Open-source enterprise generative AI platform
 
-Airstrip is an open-source enterprise AI management platform. You can think of it as a proxy service with access control that allows you to build internal AI apps.
+Airstrip is an open-source enterprise generative AI platform. Airstrip combines the best-in-class open-source tools to provide a complete and secure platform that allows you to build generative AI apps easily.
 
-With Airstrip, you can manage your integrations with different LLM providers and control which members can use them.
+- [x] Teams and RBAC.
+- [x] LLM Integrations.
+  - [x] Vault storage for API keys.
+- [] ( :construction: ) RAG and Chunking.
+- [] ( :construction: ) Memory layer for enhanced context.
+- [] ( :bulb: ) LLM usage analytics.
+- [] ( :bulb: ) Rate-limits
+- [] ( :bulb: ) REST APIs.
 
-The goal is to have the engineering/ops team manage the integrations while everyone else, including non-technical teams, can create internal AI apps easily.
+| **Legend**     |         |
+| -------------- | ------- |
+| :bulb:         | Planned |
+| :construction: | WIP     |
 
-## Get started
+<!-- TODO: add list of open-source tools used -->
 
-Everything has been dockerized. Simply run:
+## Getting started
 
-```
-PGDATA_DIR=<directory for postgres data> docker compose up
-```
+The fastest way to try Airstrip is signing up for free at [Airstrip Cloud](https://airstrip.pro/).
 
-That's all you need to get started. For details on the default values and how to change them, refer to [this (optional) section](#default-configuration).
+### Run Airstrip locally
+
+To set up and run Airstrip locally, follow the instructions for [self-hosting](./README-self-host.md).
 
 ## Features
 
@@ -56,43 +66,6 @@ That's all you need to get started. For details on the default values and how to
 - Org-wide apps can be used by any org member.
 - Team apps can only be used by the team's members or org admins.
 
-## Default configuration
-
-**You can skip this section if you are happy with the default values.**
-
-The `docker compose up` command will spin up 4 containers:
-
-1. **Frontend** - This is the webapp and will be available at `http://localhost:3000`.
-2. **Backend** - This is the backend and will be available at `http://localhost:3001`.
-3. **Postgres database** - Postgres database at port `5432`.
-4. **Flyway** - This is for running database migrations at startup. Once complete, the container will stop running.
-
-To make it easy to get started, default values are supplied. You can still run the app without changing any of these values. But if you intend to run this in prod or in public, you should either harden your servers or use non-default values, especially for database credentials.
-
-### Backend
-
-#### sample.env
-
-`sample.env` is used as `env_file` in `docker-compose.yml` to provide environment variables. If you update the database values (e.g. credentials), make sure to update the [SQL init script](/airstrip-be/docker-entrypoint-initdb.d/init.sql) and flyway section in [docker-compose.yml](./docker-compose.yml).
-
-#### AIRSTRIP_JWT_PUBLIC_JWK and AIRSTRIP_JWT_PRIVATE_JWK
-
-When building the Docker image, a pair of public/private key is generated inside the image. They are used to sign JWT tokens. You can use another pair of keys by setting the environment variables `AIRSTRIP_JWT_PUBLIC_JWK` and `AIRSTRIP_JWT_PRIVATE_JWK` to your keys' file paths.
-
-#### AIRSTRIP_SMTP_HOST, AIRSTRIP_SMTP_PORT, AIRSTRIP_SMTP_USER, AIRSTRIP_SMTP_PASSWORD, and AIRSTRIP_EMAIL_SENDER
-
-These values are for sending emails. These are left blank by default. **Without these values, email functionality is disabled**. Currently, email functionality is only used for sending a password reset link and organization invite link.
-
-### Postgres
-
-#### Database credentials
-
-The credentials are used in the environment variables, SQL init script, and `docker-compose.yml` (in flyway's command section). They have to be updated together.
-
-## We are working on...
-
-- Allow data sources to be added to AI apps (currently everything needs to be in the text prompt.)
-- Exposing the apps as REST API endpoints.
-- Better usage analytics in dashboard.
+## Feature requests/Bug reports
 
 Please submit any feature requests or issues in Github issues.

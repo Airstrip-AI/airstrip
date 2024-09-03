@@ -9,7 +9,7 @@ import {
   useUpdateAiIntegration,
 } from '@/hooks/queries/ai-integrations';
 import {
-  AiIntegrationKeyResp,
+  AiIntegrationWithApiKeyResp,
   UpdateAiIntegrationReq,
 } from '@/utils/backend/client/ai-integrations/types';
 import { AiProvider } from '@/utils/backend/client/common/types';
@@ -40,7 +40,7 @@ const formFieldLabel = (label: string) => (
 function AiIntegrationDetailsForm({
   aiIntegration,
 }: {
-  aiIntegration: AiIntegrationKeyResp;
+  aiIntegration: AiIntegrationWithApiKeyResp;
 }) {
   const router = useRouter();
   const form = useForm<UpdateAiIntegrationReq>({

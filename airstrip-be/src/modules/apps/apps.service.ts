@@ -15,8 +15,8 @@ import {
 import { AuthedUser } from '../auth/types/service';
 import { OrgTeamsService } from '../org-teams/org-teams.service';
 import { AiIntegrationsService } from '../ai-integrations/ai-integrations.service';
-import { AiIntegrationEntityWithOrgTeamJoined } from '../ai-integrations/types/service';
 import { isAdminOrAbove, UserRole } from '../../utils/constants';
+import { AiIntegrationWithOrgTeamServiceDto } from '../ai-integrations/types/service';
 
 @Injectable()
 export class AppsService {
@@ -175,7 +175,7 @@ export class AppsService {
   }
 
   async getAllowedAiProvidersForApp(appId: string): Promise<{
-    data: AiIntegrationEntityWithOrgTeamJoined[];
+    data: AiIntegrationWithOrgTeamServiceDto[];
   }> {
     const app = await this.appRepository.findOne({
       where: {

@@ -66,10 +66,13 @@ export class AiIntegrationEntity {
   })
   aiProvider: AiProvider;
 
+  /**
+   * NOTE: This does not store the actual key, but a reference to the key stored in the secrets vault.
+   */
   @Column({
     name: 'ai_provider_api_key',
   })
-  aiProviderApiKey: string;
+  aiProviderKeyVaultKey: string;
 
   @Column({
     name: 'ai_provider_api_url',

@@ -1,9 +1,9 @@
-import { AiIntegrationKeyResp } from '@/utils/backend/client/ai-integrations/types';
+import { AiIntegrationResp } from '@/utils/backend/client/ai-integrations/types';
 import { modals } from '@mantine/modals';
 import { Text } from '@mantine/core';
 
 export const showConfirmDeleteAiIntegrationModal = (
-  aiIntegration: AiIntegrationKeyResp,
+  aiIntegration: AiIntegrationResp,
   onConfirm: () => void,
 ) => {
   modals.openConfirmModal({

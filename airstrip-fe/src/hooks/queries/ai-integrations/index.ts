@@ -8,7 +8,7 @@ import {
   updateAiIntegration,
 } from '@/utils/backend/client/ai-integrations';
 import {
-  AiIntegrationKeyResp,
+  AiIntegrationWithApiKeyResp,
   CreateAiIntegrationReq,
   ListAiIntegrationsResp,
   UpdateAiIntegrationReq,
@@ -20,7 +20,7 @@ export function useCreateAiIntegration({
   onSuccess,
   onError,
 }: {
-  onSuccess: (resp: AiIntegrationKeyResp) => void;
+  onSuccess: (resp: AiIntegrationWithApiKeyResp) => void;
   onError: (error: Error) => void;
 }) {
   const queryClient = useQueryClient();
@@ -40,7 +40,7 @@ export function useCreateAiIntegration({
         body,
       });
     },
-    onSuccess: (resp: AiIntegrationKeyResp) => {
+    onSuccess: (resp: AiIntegrationWithApiKeyResp) => {
       queryClient.invalidateQueries([QueryKeys.AI_INTEGRATIONS]);
       onSuccess(resp);
     },
@@ -52,7 +52,7 @@ export function useUpdateAiIntegration({
   onSuccess,
   onError,
 }: {
-  onSuccess: (resp: AiIntegrationKeyResp) => void;
+  onSuccess: (resp: AiIntegrationWithApiKeyResp) => void;
   onError: (error: Error) => void;
 }) {
   const queryClient = useQueryClient();
@@ -72,7 +72,7 @@ export function useUpdateAiIntegration({
         body,
       });
     },
-    onSuccess: (resp: AiIntegrationKeyResp) => {
+    onSuccess: (resp: AiIntegrationWithApiKeyResp) => {
       queryClient.invalidateQueries([QueryKeys.AI_INTEGRATIONS]);
       onSuccess(resp);
     },
@@ -113,7 +113,7 @@ export function useGetAiIntegration({
   onError,
 }: {
   aiIntegrationId: string;
-  onSuccess?: (results: AiIntegrationKeyResp) => void;
+  onSuccess?: (results: AiIntegrationWithApiKeyResp) => void;
   onError?: (error: Error) => void;
 }) {
   return useQuery({

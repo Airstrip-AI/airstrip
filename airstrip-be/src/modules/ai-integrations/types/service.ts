@@ -22,6 +22,18 @@ export type UpdateAiIntegrationDto = {
   aiModel: string;
 };
 
-export type AiIntegrationEntityWithOrgTeamJoined = AiIntegrationEntity & {
+export type AiIntegrationWithOrgTeamServiceDto = Omit<
+  AiIntegrationEntity,
+  'aiProviderKeyVaultKey'
+> & {
   restrictedToTeam: OrgTeamEntity | null;
 };
+
+/**
+ * This has the decrypted API key.
+ */
+export type AiIntegrationWithApiKeyAndOrgTeamServiceDto =
+  AiIntegrationWithOrgTeamServiceDto & {
+    aiProviderApiKey: string;
+    restrictedToTeam: OrgTeamEntity | null;
+  };

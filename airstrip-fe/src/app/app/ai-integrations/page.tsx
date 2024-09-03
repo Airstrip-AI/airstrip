@@ -9,7 +9,7 @@ import {
 } from '@/hooks/queries/ai-integrations';
 import { useCurrentUser } from '@/hooks/queries/user-auth';
 import { activeOrgIdKey } from '@/hooks/user';
-import { AiIntegrationKeyResp } from '@/utils/backend/client/ai-integrations/types';
+import { AiIntegrationResp } from '@/utils/backend/client/ai-integrations/types';
 import {
   fromNow,
   isAdminOrAboveInOrg,
@@ -76,7 +76,7 @@ export default function AiIntegrationsPage() {
     </>
   );
 
-  const columns = useMemo<MRT_ColumnDef<AiIntegrationKeyResp>[]>(
+  const columns = useMemo<MRT_ColumnDef<AiIntegrationResp>[]>(
     () => [
       {
         header: 'Provider',

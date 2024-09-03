@@ -4,7 +4,7 @@ import { ModelSelect } from '@/app/app/apps/[appId]/model-select';
 import { useCreateAiIntegration } from '@/hooks/queries/ai-integrations';
 import { useGetOrgTeams } from '@/hooks/queries/org-teams';
 import {
-  AiIntegrationKeyResp,
+  AiIntegrationWithApiKeyResp,
   CreateAiIntegrationReq,
 } from '@/utils/backend/client/ai-integrations/types';
 import { AiProvider } from '@/utils/backend/client/common/types';
@@ -17,7 +17,7 @@ export default function AddAiIntegrationForm({
   onAdd,
 }: {
   orgId: string;
-  onAdd: (aiIntegration: AiIntegrationKeyResp) => void;
+  onAdd: (aiIntegration: AiIntegrationWithApiKeyResp) => void;
 }) {
   const { data } = useGetOrgTeams({
     orgId,

@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { AiIntegrationsService } from './ai-integrations.service';
 import {
-  AiIntegrationKeyResp,
+  AiIntegrationWithApiKeyResp,
   CreateAiIntegrationReq,
   GetAllAiIntegrationsAccessibleByTeamResp,
   ListAiIntegrationsResp,
@@ -22,9 +22,12 @@ import {
 import { ApiResponse } from '@nestjs/swagger';
 import { AiIntegrationsAdminGuard } from './ai-integrations.guard';
 import { MessageResp } from '../../utils/common';
-import { aiIntegrationEntityWithOrgTeamToResp } from './types/common';
 import { OrgsAdminGuard } from '../orgs/orgs.guard';
 import { OrgTeamsAdminGuard } from '../org-teams/org-teams.guard';
+import {
+  aiIntegrationWithApiKeyAndOrgTeamToResp,
+  aiIntegrationWithOrgTeamToResp,
+} from './types/common';
 
 @Controller()
 export class AiIntegrationsController {
@@ -32,11 +35,11 @@ export class AiIntegrationsController {
 
   @Post('orgs/:orgId/ai-integrations')
   @UseGuards(OrgsAdminGuard)
-  @ApiResponse({ status: '2XX', type: AiIntegrationKeyResp })
+  @ApiResponse({ status: '2XX', type: AiIntegrationWithApiKeyResp })
   async createAiIntegration(
     @Param('orgId', ParseUUIDPipe) orgId: string,
     @Body() body: CreateAiIntegrationReq,
-  ): Promise<AiIntegrationKeyResp> {
+  ): Promise<AiIntegrationWithApiKeyResp> {
     const aiIntegrationEntity =
       await this.aiIntegrationsService.createAiIntegration(orgId, {
         restrictedToTeamId: body.restrictedToTeamId,
@@ -48,7 +51,7 @@ export class AiIntegrationsController {
         aiModel: body.aiModel,
       });
 
-    return aiIntegrationEntityWithOrgTeamToResp(aiIntegrationEntity);
+    return aiIntegrationWithApiKeyAndOrgTeamToResp(aiIntegrationEntity);
   }
 
   @Get('orgs/:orgId/ai-integrations')
@@ -62,9 +65,7 @@ export class AiIntegrationsController {
       await this.aiIntegrationsService.listAiIntegrationsInOrg(orgId, page);
 
     return {
-      data: aiIntegrationEntitiesPage.data.map(
-        aiIntegrationEntityWithOrgTeamToResp,
-      ),
+      data: aiIntegrationEntitiesPage.data.map(aiIntegrationWithOrgTeamToResp),
       nextPageCursor: aiIntegrationEntitiesPage.nextPageCursor,
     };
   }
@@ -84,19 +85,17 @@ export class AiIntegrationsController {
       );
 
     return {
-      data: aiIntegrationEntitiesPage.data.map(
-        aiIntegrationEntityWithOrgTeamToResp,
-      ),
+      data: aiIntegrationEntitiesPage.data.map(aiIntegrationWithOrgTeamToResp),
     };
   }
 
   @Put('ai-integrations/:aiIntegrationId')
   @UseGuards(AiIntegrationsAdminGuard)
-  @ApiResponse({ status: '2XX', type: AiIntegrationKeyResp })
+  @ApiResponse({ status: '2XX', type: AiIntegrationWithApiKeyResp })
   async updateAiIntegration(
     @Param('aiIntegrationId', ParseUUIDPipe) aiIntegrationId: string,
     @Body() body: UpdateAiIntegrationReq,
-  ): Promise<AiIntegrationKeyResp> {
+  ): Promise<AiIntegrationWithApiKeyResp> {
     const aiIntegrationEntity =
       await this.aiIntegrationsService.updateAiIntegration(aiIntegrationId, {
         restrictedToTeamId: body.restrictedToTeamId,
@@ -108,7 +107,7 @@ export class AiIntegrationsController {
         aiModel: body.aiModel,
       });
 
-    return aiIntegrationEntityWithOrgTeamToResp(aiIntegrationEntity);
+    return aiIntegrationWithApiKeyAndOrgTeamToResp(aiIntegrationEntity);
   }
 
   @Delete('ai-integrations/:aiIntegrationId')
@@ -125,13 +124,13 @@ export class AiIntegrationsController {
 
   @Get('ai-integrations/:aiIntegrationId')
   @UseGuards(AiIntegrationsAdminGuard)
-  @ApiResponse({ status: '2XX', type: AiIntegrationKeyResp })
+  @ApiResponse({ status: '2XX', type: AiIntegrationWithApiKeyResp })
   async getAiIntegration(
     @Param('aiIntegrationId', ParseUUIDPipe) aiIntegrationId: string,
-  ): Promise<AiIntegrationKeyResp> {
+  ): Promise<AiIntegrationWithApiKeyResp> {
     const aiIntegrationEntity =
       await this.aiIntegrationsService.getAiIntegration(aiIntegrationId);
 
-    return aiIntegrationEntityWithOrgTeamToResp(aiIntegrationEntity);
+    return aiIntegrationWithApiKeyAndOrgTeamToResp(aiIntegrationEntity);
   }
 }

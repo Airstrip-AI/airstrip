@@ -22,6 +22,7 @@
     "@ai-sdk/google": "^0.0.30",
     "@ai-sdk/mistral": "^0.0.25",
     "@ai-sdk/openai": "^0.0.40",
+    "@infisical/sdk": "^2.3.5",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
     "@nestjs/core": "^10.0.0",

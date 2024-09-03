@@ -1,5 +1,8 @@
-import { AiIntegrationKeyResp } from './api';
-import { AiIntegrationEntityWithOrgTeamJoined } from './service';
+import { AiIntegrationResp, AiIntegrationWithApiKeyResp } from './api';
+import {
+  AiIntegrationWithApiKeyAndOrgTeamServiceDto,
+  AiIntegrationWithOrgTeamServiceDto,
+} from './service';
 
 export enum AiProvider {
   OPENAI = 'OPENAI',
@@ -10,25 +13,33 @@ export enum AiProvider {
   ANTHROPIC = 'ANTHROPIC',
 }
 
-export function aiIntegrationEntityWithOrgTeamToResp(
-  aiIntegrationEntity: AiIntegrationEntityWithOrgTeamJoined,
-): AiIntegrationKeyResp {
+export function aiIntegrationWithOrgTeamToResp(
+  dto: AiIntegrationWithOrgTeamServiceDto,
+): AiIntegrationResp {
   return {
-    id: aiIntegrationEntity.id,
-    createdAt: aiIntegrationEntity.createdAt,
-    updatedAt: aiIntegrationEntity.updatedAt,
-    orgId: aiIntegrationEntity.orgId,
-    restrictedToTeam: aiIntegrationEntity.restrictedToTeam
+    id: dto.id,
+    createdAt: dto.createdAt,
+    updatedAt: dto.updatedAt,
+    orgId: dto.orgId,
+    restrictedToTeam: dto.restrictedToTeam
       ? {
-          id: aiIntegrationEntity.restrictedToTeam.id,
-          name: aiIntegrationEntity.restrictedToTeam.name,
+          id: dto.restrictedToTeam.id,
+          name: dto.restrictedToTeam.name,
         }
       : null,
-    name: aiIntegrationEntity.name,
-    description: aiIntegrationEntity.description,
-    aiProvider: aiIntegrationEntity.aiProvider,
-    aiProviderApiUrl: aiIntegrationEntity.aiProviderApiUrl,
-    aiProviderApiKey: aiIntegrationEntity.aiProviderApiKey,
-    aiModel: aiIntegrationEntity.aiModel,
+    name: dto.name,
+    description: dto.description,
+    aiProvider: dto.aiProvider,
+    aiProviderApiUrl: dto.aiProviderApiUrl,
+    aiModel: dto.aiModel,
+  };
+}
+
+export function aiIntegrationWithApiKeyAndOrgTeamToResp(
+  dto: AiIntegrationWithApiKeyAndOrgTeamServiceDto,
+): AiIntegrationWithApiKeyResp {
+  return {
+    ...aiIntegrationWithOrgTeamToResp(dto),
+    aiProviderApiKey: dto.aiProviderApiKey,
   };
 }

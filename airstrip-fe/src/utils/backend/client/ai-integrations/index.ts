@@ -1,5 +1,5 @@
 import {
-  AiIntegrationKeyResp,
+  AiIntegrationWithApiKeyResp,
   CreateAiIntegrationReq,
   GetAllAiIntegrationsAccessibleByTeamResp,
   ListAiIntegrationsResp,
@@ -22,7 +22,10 @@ export async function createAiIntegration({
   authToken: string;
   body: CreateAiIntegrationReq;
 }) {
-  return await makePostRequest<CreateAiIntegrationReq, AiIntegrationKeyResp>({
+  return await makePostRequest<
+    CreateAiIntegrationReq,
+    AiIntegrationWithApiKeyResp
+  >({
     endpoint: `/api/v1/orgs/${orgId}/ai-integrations`,
     authToken,
     body,
@@ -38,7 +41,10 @@ export async function updateAiIntegration({
   authToken: string;
   body: UpdateAiIntegrationReq;
 }) {
-  return await makePutRequest<UpdateAiIntegrationReq, AiIntegrationKeyResp>({
+  return await makePutRequest<
+    UpdateAiIntegrationReq,
+    AiIntegrationWithApiKeyResp
+  >({
     endpoint: `/api/v1/ai-integrations/${aiIntegrationId}`,
     authToken,
     body,
@@ -65,7 +71,7 @@ export async function getAiIntegration({
   aiIntegrationId: string;
   authToken: string;
 }) {
-  return await makeGetRequest<AiIntegrationKeyResp>({
+  return await makeGetRequest<AiIntegrationWithApiKeyResp>({
     endpoint: `/api/v1/ai-integrations/${aiIntegrationId}`,
     authToken,
   });

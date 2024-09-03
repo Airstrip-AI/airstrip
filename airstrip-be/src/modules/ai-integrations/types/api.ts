@@ -74,7 +74,7 @@ export class RestrictedToTeamResp {
   name: string;
 }
 
-export class AiIntegrationKeyResp {
+export class AiIntegrationResp {
   @ApiProperty()
   id: string;
 
@@ -100,23 +100,25 @@ export class AiIntegrationKeyResp {
   aiProvider: AiProvider;
 
   @ApiProperty()
-  aiProviderApiKey: string;
-
-  @ApiProperty()
   aiProviderApiUrl: string | null;
 
   @ApiProperty()
   aiModel: string;
 }
 
+export class AiIntegrationWithApiKeyResp extends AiIntegrationResp {
+  @ApiProperty()
+  aiProviderApiKey: string;
+}
+
 export class ListAiIntegrationsResp {
-  @ApiProperty({ type: [AiIntegrationKeyResp] })
-  data: AiIntegrationKeyResp[];
+  @ApiProperty({ type: [AiIntegrationResp] })
+  data: AiIntegrationResp[];
 
   nextPageCursor: string | null;
 }
 
 export class GetAllAiIntegrationsAccessibleByTeamResp {
-  @ApiProperty({ type: [AiIntegrationKeyResp] })
-  data: AiIntegrationKeyResp[];
+  @ApiProperty({ type: [AiIntegrationResp] })
+  data: AiIntegrationResp[];
 }

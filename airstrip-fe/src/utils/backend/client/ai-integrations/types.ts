@@ -25,7 +25,7 @@ export class RestrictedToTeamResp {
   name: string;
 }
 
-export class AiIntegrationKeyResp {
+export class AiIntegrationResp {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -34,16 +34,19 @@ export class AiIntegrationKeyResp {
   name: string;
   description: string;
   aiProvider: AiProvider;
-  aiProviderApiKey: string;
   aiProviderApiUrl: string | null;
   aiModel: string;
 }
 
+export class AiIntegrationWithApiKeyResp extends AiIntegrationResp {
+  aiProviderApiKey: string;
+}
+
 export class ListAiIntegrationsResp {
-  data: AiIntegrationKeyResp[];
+  data: AiIntegrationResp[];
   nextPageCursor: string | null;
 }
 
 export class GetAllAiIntegrationsAccessibleByTeamResp {
-  data: AiIntegrationKeyResp[];
+  data: AiIntegrationResp[];
 }
