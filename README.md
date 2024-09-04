@@ -8,7 +8,7 @@ Airstrip is an open-source enterprise generative AI platform. Airstrip combines 
 
 - [x] Teams and RBAC.
 - [x] LLM Integrations.
-  - [x] Vault storage for API keys.
+  - [x] API keys encryption.
 - [] ( :construction: ) RAG and Chunking.
 - [] ( :construction: ) Memory layer for enhanced context.
 - [] ( :bulb: ) LLM usage analytics.
@@ -26,9 +26,21 @@ Airstrip is an open-source enterprise generative AI platform. Airstrip combines 
 
 The fastest way to try Airstrip is signing up for free at [Airstrip Cloud](https://airstrip.pro/).
 
+> [!NOTE]  
+> We treat your API keys seriously. All API keys are encrypted and only decrypted at the point of usage. We also use [Infisical](https://infisical.com/) for storing our keys securely and access to them are restricted.
+
 ### Run Airstrip locally
 
-To set up and run Airstrip locally, follow the instructions for [self-hosting](./README-self-host.md).
+**Prereqs**: Make sure you have Git and Docker installed.
+
+```
+cp airstrip-be/sample.env airstrip-be/.env
+docker compose up
+```
+
+That's all you need to get started. The default setup uses the sample encryption key in `sample.env`. It is advisable to change it for production usage. If you are already using [Infisical](https://infisical.com/) and you wish to store and use your encryption key in it, you may do so by updating the `.env` file.
+
+For details on the default values and how to change them, refer to [this (optional) section](#default-configuration).
 
 ## Features
 
@@ -65,6 +77,54 @@ To set up and run Airstrip locally, follow the instructions for [self-hosting](.
 - Only org/team admins can create apps in the org/team respectively.
 - Org-wide apps can be used by any org member.
 - Team apps can only be used by the team's members or org admins.
+
+## Default configuration
+
+<details>
+  <summary>You can skip this section if you are happy with the default values. Advisable to read and change the values if you are deploying on a server.</summary>
+
+### Backend
+
+#### .env
+
+`.env` is used as `env_file` in `docker-compose.yml` to provide environment variables. If you update the database values (e.g. credentials), make sure to update the [SQL init script](/airstrip-be/docker-entrypoint-initdb.d/init.sql) and flyway section in [docker-compose.yml](./docker-compose.yml).
+
+#### AIRSTRIP_JWT_PUBLIC_JWK and AIRSTRIP_JWT_PRIVATE_JWK
+
+When building the Docker image, a pair of public/private key is generated inside the image. They are used to sign JWT tokens. You can use another pair of keys by setting the environment variables `AIRSTRIP_JWT_PUBLIC_JWK` and `AIRSTRIP_JWT_PRIVATE_JWK` to your keys' file paths.
+
+#### AIRSTRIP_SMTP_HOST, AIRSTRIP_SMTP_PORT, AIRSTRIP_SMTP_USER, AIRSTRIP_SMTP_PASSWORD, and AIRSTRIP_EMAIL_SENDER
+
+These values are for sending emails. These are left blank by default. **Without these values, email functionality is disabled**. Currently, email functionality is only used for sending a password reset link and organization invite link.
+
+#### AIRSTRIP_INFISICAL\*
+
+Update these values to store and use encryption key (for encrypting your API keys) in Infisical.
+
+```
+AIRSTRIP_USE_INFISICAL_FOR_ENCKEY=true
+
+AIRSTRIP_INFISICAL_API_URL=
+AIRSTRIP_INFISICAL_CLIENT_ID=
+AIRSTRIP_INFISICAL_CLIENT_SECRET=
+AIRSTRIP_INFISICAL_PROJECT_ID=
+AIRSTRIP_INFISICAL_SECRET_NAME=
+
+# defaults to prod
+AIRSTRIP_INFISICAL_PROJECT_ENV=
+# defaults to /
+AIRSTRIP_INFISICAL_SECRET_PATH=
+# defaults to shared
+AIRSTRIP_INFISICAL_SECRET_TYPE=
+```
+
+### Postgres
+
+#### Database credentials
+
+The credentials are used in the environment variables, SQL init script, and `docker-compose.yml` (in flyway's command section). They have to be updated together.
+
+</details>
 
 ## Feature requests/Bug reports
 

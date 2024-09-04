@@ -1,8 +1,6 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,41 +14,16 @@ import {
 } from './types/service';
 import { OrgTeamsService } from '../org-teams/org-teams.service';
 import { OrgTeamEntity } from '../org-teams/org-team.entity';
-import { InfisicalClient } from '@infisical/sdk';
-import { nanoid } from 'nanoid';
-
-export const AI_INTEGRATIONS_SERVICE_CONFIG = 'AI_INTEGRATIONS_SERVICE_CONFIG';
-
-export type AiIntegrationsServiceConfig = {
-  infisicalApiUrl: string;
-  infisicalClientId: string;
-  infisicalClientSecret: string;
-  infisicalProjectId: string;
-  infisicalEnvironment: string;
-};
+import { EncryptionService } from '../encryption/encryption.service';
 
 @Injectable()
 export class AiIntegrationsService {
-  private readonly infisicalClient: InfisicalClient;
-
   constructor(
     @InjectRepository(AiIntegrationEntity)
     private readonly aiIntegrationRepository: Repository<AiIntegrationEntity>,
     private readonly orgTeamsService: OrgTeamsService,
-    @Inject(AI_INTEGRATIONS_SERVICE_CONFIG)
-    private readonly config: AiIntegrationsServiceConfig,
-  ) {
-    this.infisicalClient = new InfisicalClient({
-      siteUrl: this.config.infisicalApiUrl,
-      cacheTtl: 600, // increase cacheTtl from default of 5mins to 10mins since api keys shouldn't change often
-      auth: {
-        universalAuth: {
-          clientId: this.config.infisicalClientId,
-          clientSecret: this.config.infisicalClientSecret,
-        },
-      },
-    });
-  }
+    private readonly encryptionService: EncryptionService,
+  ) {}
 
   async createAiIntegration(
     orgId: string,
@@ -74,16 +47,14 @@ export class AiIntegrationsService {
       name: dto.name,
       description: dto.description,
       aiProvider: dto.aiProvider,
-      aiProviderKeyVaultKey: await this.storeKeyInVault({
-        secretValue: dto.aiProviderApiKey,
-        secretName: nanoid(), // must be unique
-        mode: 'create',
-      }),
+      aiProviderApiKeyEncrypted: await this.encryptionService.encrypt(
+        dto.aiProviderApiKey,
+      ),
       aiProviderApiUrl: dto.aiProviderApiUrl,
       aiModel: dto.aiModel,
     });
 
-    const { aiProviderKeyVaultKey, ...rest } = aiIntegration;
+    const { aiProviderApiKeyEncrypted, ...rest } = aiIntegration;
 
     return {
       ...rest,
@@ -124,16 +95,14 @@ export class AiIntegrationsService {
       name: dto.name,
       description: dto.description,
       aiProvider: dto.aiProvider,
-      aiProviderKeyVaultKey: await this.storeKeyInVault({
-        secretValue: dto.aiProviderApiKey,
-        secretName: aiIntegration.aiProviderKeyVaultKey,
-        mode: 'update',
-      }),
+      aiProviderApiKeyEncrypted: await this.encryptionService.encrypt(
+        dto.aiProviderApiKey,
+      ),
       aiProviderApiUrl: dto.aiProviderApiUrl,
       aiModel: dto.aiModel,
     });
 
-    const { aiProviderKeyVaultKey, ...rest } = aiIntegration;
+    const { aiProviderApiKeyEncrypted, ...rest } = aiIntegration;
 
     return {
       ...rest,
@@ -146,20 +115,6 @@ export class AiIntegrationsService {
     if (!aiIntegrationId) {
       return;
     }
-
-    const aiIntegrationEntity = await this.aiIntegrationRepository.findOne({
-      where: {
-        id: aiIntegrationId,
-      },
-    });
-
-    if (!aiIntegrationEntity) {
-      return;
-    }
-
-    await this.deleteKeyInVault({
-      secretName: aiIntegrationEntity.aiProviderKeyVaultKey,
-    });
 
     await this.aiIntegrationRepository.delete({
       id: aiIntegrationId,
@@ -182,11 +137,13 @@ export class AiIntegrationsService {
       throw new NotFoundException('AI integration not found.');
     }
 
-    const { aiProviderKeyVaultKey, ...rest } = aiIntegration;
+    const { aiProviderApiKeyEncrypted, ...rest } = aiIntegration;
 
     return {
       ...rest,
-      aiProviderApiKey: await this.readKeyFromVault(aiProviderKeyVaultKey),
+      aiProviderApiKey: await this.encryptionService.decrypt(
+        aiProviderApiKeyEncrypted,
+      ),
     } as AiIntegrationWithApiKeyAndOrgTeamServiceDto;
   }
 
@@ -256,59 +213,5 @@ export class AiIntegrationsService {
         },
       })) as AiIntegrationWithOrgTeamServiceDto[],
     };
-  }
-
-  async readKeyFromVault(secretName: string): Promise<string> {
-    return (
-      await this.infisicalClient.getSecret({
-        environment: this.config.infisicalEnvironment,
-        projectId: this.config.infisicalProjectId,
-        secretName,
-        path: '/',
-        type: 'shared',
-      })
-    ).secretValue;
-  }
-
-  private async storeKeyInVault({
-    secretValue,
-    secretName,
-    mode,
-  }: {
-    secretValue: string;
-    secretName: string;
-    mode: 'create' | 'update';
-  }): Promise<string> {
-    const body = {
-      projectId: this.config.infisicalProjectId,
-      environment: this.config.infisicalEnvironment,
-      secretName,
-      secretValue,
-      path: '/',
-      type: 'shared',
-    };
-    if (mode === 'update') {
-      const updateSecretResp = await this.infisicalClient.updateSecret(body);
-      return updateSecretResp.secretKey;
-    } else if (mode === 'create') {
-      const createSecretResp = await this.infisicalClient.createSecret(body);
-      return createSecretResp.secretKey;
-    } else {
-      throw new InternalServerErrorException('Invalid mode.');
-    }
-  }
-
-  private async deleteKeyInVault({
-    secretName,
-  }: {
-    secretName: string;
-  }): Promise<void> {
-    await this.infisicalClient.deleteSecret({
-      secretName,
-      environment: this.config.infisicalEnvironment,
-      projectId: this.config.infisicalProjectId,
-      path: '/',
-      type: 'shared',
-    });
   }
 }

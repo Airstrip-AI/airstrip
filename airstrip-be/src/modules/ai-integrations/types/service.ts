@@ -24,7 +24,7 @@ export type UpdateAiIntegrationDto = {
 
 export type AiIntegrationWithOrgTeamServiceDto = Omit<
   AiIntegrationEntity,
-  'aiProviderKeyVaultKey'
+  'aiProviderApiKeyEncrypted'
 > & {
   restrictedToTeam: OrgTeamEntity | null;
 };

@@ -9,13 +9,13 @@ import { createCohere } from '@ai-sdk/cohere';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createMistral } from '@ai-sdk/mistral';
 import { convertToCoreMessages, LanguageModel, Message, streamText } from 'ai';
-import { AiIntegrationsService } from '../ai-integrations/ai-integrations.service';
+import { EncryptionService } from '../encryption/encryption.service';
 
 @Injectable()
 export class AppChatsService {
   constructor(
     private readonly appsService: AppsService,
-    private readonly aiIntegrationsService: AiIntegrationsService,
+    private readonly encryptionService: EncryptionService,
   ) {}
 
   async streamChatWithApp(
@@ -31,7 +31,7 @@ export class AppChatsService {
       throw new BadRequestException(
         'App is disabled as no AI provider is set.',
       );
-    } else if (!aiProvider.aiProviderKeyVaultKey) {
+    } else if (!aiProvider.aiProviderApiKeyEncrypted) {
       throw new BadRequestException(
         'App is disabled as no AI provider API key is set.',
       );
@@ -39,8 +39,8 @@ export class AppChatsService {
       throw new BadRequestException('App is disabled as no AI model is set.');
     }
 
-    const apiKey = await this.aiIntegrationsService.readKeyFromVault(
-      aiProvider.aiProviderKeyVaultKey,
+    const apiKey = await this.encryptionService.decrypt(
+      aiProvider.aiProviderApiKeyEncrypted,
     );
 
     const languageModel = this.getLanguageModel(

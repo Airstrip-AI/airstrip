@@ -1,0 +1,46 @@
+services:
+  db:
+    image: "postgres:14"
+    container_name: "airstrip-db"
+    restart: always
+    volumes:
+      - ./airstrip-be/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+  flyway:
+    image: flyway/flyway
+    container_name: "airstrip-be-migration-runner"
+    command: -url=jdbc:postgresql://db:5432/airstrip -user=airstrip -password=airstrip -baselineOnMigrate=false -outOfOrder=false -failOnMissingLocations=true -connectRetries=10 migrate
+    volumes:
+      - ./airstrip-be/migrations:/flyway/sql
+    depends_on:
+      - db
+  fe:
+    container_name: "airstrip-fe"
+    build:
+      context: ./airstrip-fe
+      dockerfile: Dockerfile
+    # frontend does not use env_file because nextjs bakes the env variables into the build,
+    # so using env_file at this point has no effect. To change the env vars, update ARG in frontend's Dockerfile.
+    ports:
+      - "3000:3000"
+  be:
+    container_name: "airstrip-be"
+    build:
+      context: ./airstrip-be
+      dockerfile: Dockerfile
+    env_file: ./airstrip-be/.env
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    environment:
+      - AIRSTRIP_DB_HOST=db
+
+volumes:
+  pg_data:
+    driver: local
