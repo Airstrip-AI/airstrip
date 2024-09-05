@@ -11,6 +11,8 @@ export const roleColors = {
   [UserRole.MEMBER]: 'green',
 };
 
+export const BROWSER_BE_API_HOST =
+  process.env.NEXT_PUBLIC_BROWSER_BE_API_HOST || '';
 export const AIRSTRIP_DB_HOST = process.env.AIRSTRIP_DB_HOST || 'localhost';
 export const AIRSTRIP_DB_PORT = parseInt(
   process.env.AIRSTRIP_DB_PORT || '5432',

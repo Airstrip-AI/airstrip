@@ -1,4 +1,4 @@
-import { BE_API_HOST } from '@/constants';
+import { BE_API_HOST, BROWSER_BE_API_HOST } from '@/constants';
 
 export async function makeGetRequest<T>({
   endpoint,
@@ -97,6 +97,13 @@ export async function makeDeleteRequest<T>({
 export function getBackendUrl(): string {
   if (!BE_API_HOST) {
     throw new Error('API URL not set');
+  }
+
+  // BE APIs can be called from browser or routes/server actions
+  // On docker environment, the url pointing to BE service is different on each environment
+  // e.g. 'http://be' for docker, 'http://localhost' for browser
+  if (typeof window !== 'undefined') {
+    return BROWSER_BE_API_HOST || BE_API_HOST;
   }
 
   return BE_API_HOST;

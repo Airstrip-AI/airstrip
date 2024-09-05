@@ -9,14 +9,13 @@ import {
 import { config } from 'dotenv';
 import { Config, defineConfig } from 'drizzle-kit';
 
-config({ path: '.env' });
+config();
 
 export default defineConfig({
   schema: './src/utils/backend/drizzle/schema.ts',
   out: './src/utils/backend/drizzle/migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: `postgresql://${AIRSTRIP_DB_USER}:${AIRSTRIP_DB_PASSWORD}@${AIRSTRIP_DB_HOST}:${AIRSTRIP_DB_PORT}/${AIRSTRIP_DB_NAME}`,
     host: AIRSTRIP_DB_HOST,
     database: AIRSTRIP_DB_NAME,
     user: AIRSTRIP_DB_USER,
