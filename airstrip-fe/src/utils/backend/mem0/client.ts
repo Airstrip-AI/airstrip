@@ -56,7 +56,7 @@ class MemoryClient {
 
   private async _validateApiKey(): Promise<void> {
     try {
-      await this.get('/memories');
+      await this.get('/memories/');
     } catch (error) {
       throw new Error(
         'Invalid API Key. Please get a valid API Key from https://app.mem0.ai',
@@ -87,14 +87,14 @@ class MemoryClient {
     options: Record<string, any> = {},
   ): Promise<any> {
     const payload = this._preparePayload(messages, options);
-    return await this.request('/memories', {
+    return await this.request('/memories/', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
   }
 
   async get(memoryId: string): Promise<any> {
-    return await this.request(`/memories/${memoryId}`, {
+    return await this.request(`/memories/${memoryId}/`, {
       method: 'GET',
     });
   }
@@ -112,14 +112,14 @@ class MemoryClient {
     options: Record<string, any> = {},
   ): Promise<MemoryData[]> {
     const payload = { query, ...options };
-    return await this.request('/memories/search', {
+    return await this.request('/memories/search/', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
   }
 
   async delete(memoryId: string): Promise<any> {
-    return await this.request(`/memories/${memoryId}`, {
+    return await this.request(`/memories/${memoryId}/`, {
       method: 'DELETE',
     });
   }
@@ -133,13 +133,13 @@ class MemoryClient {
   }
 
   async history(memoryId: string): Promise<any> {
-    return await this.request(`/memories/${memoryId}/history`, {
+    return await this.request(`/memories/${memoryId}/history/`, {
       method: 'GET',
     });
   }
 
   async users(): Promise<any> {
-    return await this.request('/entities', {
+    return await this.request('/entities/', {
       method: 'GET',
     });
   }
