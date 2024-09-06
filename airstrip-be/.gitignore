@@ -3,8 +3,6 @@
 *.jwk
 *.jwk.pub
 
-flyway.conf
-
 # compiled output
 /dist
 /node_modules

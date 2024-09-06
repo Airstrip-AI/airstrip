@@ -410,31 +410,3 @@ export const orgTeamUsers = airstrip.table(
     };
   },
 );
-
-// ===== Start: Remnant of flyway table =====
-// This is to prevent migration from dropping flyway history table
-// We can remove this if no longer needed.
-export const flywaySchemaHistory = airstrip.table(
-  'flyway_schema_history',
-  {
-    installedRank: integer('installed_rank').primaryKey().notNull(),
-    version: varchar('version', { length: 50 }),
-    description: varchar('description', { length: 200 }).notNull(),
-    type: varchar('type', { length: 20 }).notNull(),
-    script: varchar('script', { length: 1000 }).notNull(),
-    checksum: integer('checksum'),
-    installedBy: varchar('installed_by', { length: 100 }).notNull(),
-    installedOn: timestamp('installed_on', {}).defaultNow().notNull(),
-    executionTime: integer('execution_time').notNull(),
-    success: boolean('success').notNull(),
-  },
-  (table) => {
-    return {
-      sIdx: index('flyway_schema_history_s_idx').using(
-        'btree',
-        table.success.asc().nullsLast(),
-      ),
-    };
-  },
-);
-// ===== End: Remnant of flyway table =====

@@ -87,7 +87,7 @@ For details on the default values and how to change them, refer to [this (option
 
 #### .env
 
-`.env` is used as `env_file` in `docker-compose.yml` to provide environment variables. If you update the database values (e.g. credentials), make sure to update the [SQL init script](/airstrip-be/docker-entrypoint-initdb.d/init.sql) and flyway section in [docker-compose.yml](./docker-compose.yml).
+`.env` is used as `env_file` in `docker-compose.yml` to provide environment variables. If you update the database values (e.g. credentials), make sure to update the [SQL init script](/airstrip-be/docker-entrypoint-initdb.d/init.sql).
 
 #### AIRSTRIP_JWT_PUBLIC_JWK and AIRSTRIP_JWT_PRIVATE_JWK
 
@@ -122,7 +122,7 @@ AIRSTRIP_INFISICAL_SECRET_TYPE=
 
 #### Database credentials
 
-The credentials are used in the environment variables, SQL init script, and `docker-compose.yml` (in flyway's command section). They have to be updated together.
+The credentials are used in the environment variables and SQL init script. They have to be updated together.
 
 </details>
 

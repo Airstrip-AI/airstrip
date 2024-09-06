@@ -11,14 +11,6 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - '5432:5432'
-  # flyway:
-  #   image: flyway/flyway
-  #   container_name: 'airstrip-be-migration-runner'
-  #   command: -url=jdbc:postgresql://db:5432/airstrip -user=airstrip -password=airstrip -baselineOnMigrate=false -outOfOrder=false -failOnMissingLocations=true -connectRetries=10 migrate
-  #   volumes:
-  #     - ./airstrip-be/migrations:/flyway/sql
-  #   depends_on:
-  #     - db
   fe:
     container_name: 'airstrip-fe'
     build:

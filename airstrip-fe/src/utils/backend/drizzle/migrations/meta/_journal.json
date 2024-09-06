@@ -15,6 +15,13 @@
       "when": 1725428808197,
       "tag": "0001_abandoned_korvac",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1725610479924,
+      "tag": "0002_faulty_the_renegades",
+      "breakpoints": true
     }
   ]
 }
