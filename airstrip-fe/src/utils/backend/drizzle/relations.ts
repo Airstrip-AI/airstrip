@@ -1,9 +1,11 @@
 import { relations } from 'drizzle-orm/relations';
 import {
   aiIntegrations,
+  appKbSources,
   apps,
   chatMessages,
   chats,
+  kbSources,
   organizations,
   orgInvites,
   orgTeams,
@@ -85,6 +87,7 @@ export const appsRelations = relations(apps, ({ one, many }) => ({
     references: [aiIntegrations.id],
   }),
   chats: many(chats),
+  kbSources: many(appKbSources),
 }));
 
 export const aiIntegrationsRelations = relations(
@@ -122,5 +125,16 @@ export const orgTeamUsersRelations = relations(orgTeamUsers, ({ one }) => ({
   orgUsers: one(orgUsers, {
     fields: [orgTeamUsers.userId],
     references: [orgUsers.userId],
+  }),
+}));
+
+export const appKbSourcesRelations = relations(appKbSources, ({ one }) => ({
+  app: one(apps, {
+    fields: [appKbSources.appId],
+    references: [apps.id],
+  }),
+  sourceData: one(kbSources, {
+    fields: [appKbSources.kbSourceId],
+    references: [kbSources.id],
   }),
 }));

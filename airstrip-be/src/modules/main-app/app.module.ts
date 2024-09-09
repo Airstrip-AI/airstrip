@@ -1,21 +1,22 @@
-import * as fs from 'fs';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
-import { AllExceptionsFilter } from '../../utils/exceptions-filter';
-import { BearerAuthGuard } from '../auth/bearer-auth.guard';
-import { AuthModule } from '../auth/auth.module';
-import { OrgsModule } from '../orgs/orgs.module';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import * as fs from 'fs';
 import { LoggerOptions } from 'typeorm';
 import { EnvVariables } from '../../utils/constants/env';
-import { OrgInvitesModule } from '../org-invites/org-invites.module';
-import { UserOrgInvitesModule } from '../user-org-invites/user-org-invites.module';
-import { OrgTeamsModule } from '../org-teams/org-teams.module';
+import { AllExceptionsFilter } from '../../utils/exceptions-filter';
 import { AiIntegrationsModule } from '../ai-integrations/ai-integrations.module';
-import { AppsModule } from '../apps/apps.module';
 import { AppChatsModule } from '../app-chats/app-chats.module';
+import { AppsModule } from '../apps/apps.module';
+import { AuthModule } from '../auth/auth.module';
+import { BearerAuthGuard } from '../auth/bearer-auth.guard';
 import { ChatMessagesModule } from '../chat-messages/chat-messages.module';
+import { KbEmbeddingsModule } from '../kb-embeddings/kb-embeddings.module';
+import { OrgInvitesModule } from '../org-invites/org-invites.module';
+import { OrgTeamsModule } from '../org-teams/org-teams.module';
+import { OrgsModule } from '../orgs/orgs.module';
+import { UserOrgInvitesModule } from '../user-org-invites/user-org-invites.module';
 
 function getPostgresDbConfig(
   configService: ConfigService,
@@ -65,6 +66,7 @@ function getPostgresDbConfig(
     AppsModule,
     AppChatsModule,
     ChatMessagesModule,
+    KbEmbeddingsModule,
   ],
   providers: [
     {

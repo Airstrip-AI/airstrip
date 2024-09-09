@@ -1,11 +1,13 @@
 'use client';
 
 import { loadImage } from '@/components/ai-providers-image/helpers';
+import AttachKnowledgeBaseButton from '@/components/knowledge-base/attach-knowledge-base-button';
 import {
   useGetAllowedAiProvidersForApp,
   useOptionalFeatures,
   useUpdateApp,
 } from '@/hooks/queries/apps';
+import { useAppKbSources } from '@/hooks/queries/kb-sources';
 import type { AppEntity } from '@/services/apps';
 import { UpdateAppReq } from '@/utils/backend/client/apps/types';
 import { AiProvider } from '@/utils/backend/client/common/types';
@@ -18,6 +20,7 @@ import {
   Checkbox,
   CopyButton,
   Group,
+  Pill,
   Select,
   Slider,
   Stack,
@@ -29,6 +32,7 @@ import {
 } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
 import {
+  IconBook2,
   IconCheck,
   IconDeviceSdCard,
   IconExternalLink,
@@ -269,6 +273,10 @@ export default function UpdateAppForm({
           </Table>
         </Card>
 
+        {!!optionalFeatures?.knowledgeBaseAllowed && (
+          <KnowledgeSection appId={app.id} />
+        )}
+
         {!!optionalFeatures?.memoryAllowed && <MemorySection form={form} />}
 
         <Group justify="flex-end">
@@ -344,6 +352,52 @@ function MemorySection({ form }: { form: UseFormReturnType<UpdateAppReq> }) {
                 'Indicate what should be stored in the memory e.g. "user preferences". You can select from the list or type in a new tag.'
               }
             />
+          </Stack>
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
+  );
+}
+
+function KnowledgeSection({ appId }: { appId: string }) {
+  const enabled = true;
+
+  const { data: appKbSources } = useAppKbSources({ appId });
+
+  return (
+    <Accordion defaultValue={enabled ? 'kb' : ''} variant="contained">
+      <Accordion.Item value="kb">
+        <Accordion.Control>
+          <Group>
+            <IconBook2 size="1em" />
+            <Box>Knowledge</Box>
+          </Group>
+        </Accordion.Control>
+
+        <Accordion.Panel>
+          <Stack>
+            <Box c="dimmed" fz="sm">
+              <p>
+                Upload documents for the AI assistant to use as additional
+                knowledge and reference when generating responses.
+              </p>
+            </Box>
+
+            {appKbSources?.length ? (
+              <Group>
+                {appKbSources.map((kbSource) => {
+                  const { appId, kbSourceId, sourceData } = kbSource;
+                  const key = `${appId}-${kbSourceId}`;
+
+                  return <Pill key={key}>{sourceData.name}</Pill>;
+                })}
+              </Group>
+            ) : (
+              <Text c="dimmed" size="sm">
+                No knowledge attached to app.
+              </Text>
+            )}
+            <AttachKnowledgeBaseButton appId={appId} />
           </Stack>
         </Accordion.Panel>
       </Accordion.Item>
