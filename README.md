@@ -9,9 +9,9 @@ Airstrip is an open-source enterprise generative AI platform. Airstrip combines 
 - [x] Teams and RBAC.
 - [x] LLM Integrations.
   - [x] API keys encryption.
+- [x] Memory layer for enhanced context. (Use your mem0 API key or run https://github.com/Airstrip-AI/mem0-rest/ for self-hosting Airstrip)
+- [x] LLM usage analytics.
 - [] ( :construction: ) RAG and Chunking.
-- [] ( :construction: ) Memory layer for enhanced context.
-- [] ( :bulb: ) LLM usage analytics.
 - [] ( :bulb: ) Rate-limits
 - [] ( :bulb: ) REST APIs.
 
@@ -19,8 +19,6 @@ Airstrip is an open-source enterprise generative AI platform. Airstrip combines 
 | -------------- | ------- |
 | :bulb:         | Planned |
 | :construction: | WIP     |
-
-<!-- TODO: add list of open-source tools used -->
 
 ## Getting started
 
@@ -34,6 +32,7 @@ The fastest way to try Airstrip is signing up for free at [Airstrip Cloud](https
 **Prereqs**: Make sure you have Git and Docker installed.
 
 ```
+cp airstrip-fe/sample.env airstrip-fe/.env
 cp airstrip-be/sample.env airstrip-be/.env
 docker compose up
 ```
