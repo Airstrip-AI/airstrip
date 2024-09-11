@@ -133,6 +133,18 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
+"@clickhouse/client-common@1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@clickhouse/client-common/-/client-common-1.5.0.tgz#fa621ee4fbdf8f4b44e5548fd5d9fe1e44b07e88"
+  integrity sha512-U3vDp+PDnNVEv6kia+Mq5ygnlMZzsYU+3TX+0da3XvL926jzYLMBlIvFUxe2+/5k47ySvnINRC/2QxVK7PC2/A==
+
+"@clickhouse/client@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@clickhouse/client/-/client-1.5.0.tgz#ce6110a710396544a2435fe9ed8f61f20bd178b8"
+  integrity sha512-Udwyoec+AHHS1TiLxDiWiJWcm2BvhZEqGjmUnvzL54NyT8D8eh2mxn5RR/W5ie64JDnsKLeZFlPYKRRhZMhkxA==
+  dependencies:
+    "@clickhouse/client-common" "1.5.0"
+
 "@drizzle-team/brocli@^0.10.1":
   version "0.10.1"
   resolved "https://registry.yarnpkg.com/@drizzle-team/brocli/-/brocli-0.10.1.tgz#8b73d65eaf2f6d04f45718ea6f4d789d69526cd3"
@@ -1036,6 +1048,14 @@ chokidar@^3.5.3:
   optionalDependencies:
     fsevents "~2.3.2"
 
+clickhouse-migrations@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/clickhouse-migrations/-/clickhouse-migrations-1.0.1.tgz#10f320f6860451aa4535ddd3585997988a928e01"
+  integrity sha512-P9mwua6a/ql/ZzC3uIF2PMxh2+gFoc4Xk24nN4j1l0eBkT1nUnxDRDf9qmQhIBHgx3fdPoqjfhdnpi0+iwjw/g==
+  dependencies:
+    "@clickhouse/client" "^1.5.0"
+    commander "^12.1.0"
+
 client-only@0.0.1, client-only@^0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/client-only/-/client-only-0.0.1.tgz#38bba5d403c41ab150bff64a95c85013cf73bca1"
@@ -1062,6 +1082,11 @@ comma-separated-tokens@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/comma-separated-tokens/-/comma-separated-tokens-2.0.3.tgz#4e89c9458acb61bc8fef19f4529973b2392839ee"
   integrity sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==
+
+commander@^12.1.0:
+  version "12.1.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-12.1.0.tgz#01423b36f501259fdaac4d0e4d60c96c991585d3"
+  integrity sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==
 
 commander@^4.0.0:
   version "4.1.1"

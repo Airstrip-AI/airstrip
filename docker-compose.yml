@@ -11,17 +11,32 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - '5432:5432'
+  clickhouse-db:
+    image: 'clickhouse/clickhouse-server:latest'
+    container_name: 'airstrip-clickhouse-db'
+    restart: always
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - clickhouse_logs:/var/log/clickhouse-server
+    ports:
+      - '8123:8123'
+      - '9000:9000'
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
   fe:
     container_name: 'airstrip-fe'
     build:
       context: ./airstrip-fe
       dockerfile: Dockerfile
     env_file: ./airstrip-fe/.env
-    # env_file here is used ONLY by drizzle for db migration purposes.
+    # env_file here is used ONLY by drizzle and clickhouse for db migration purposes.
     # This is not available at build time and therefore not available to compiled app - nextjs bakes the env variables into the build.
     # To change the env vars, update ARG in frontend's Dockerfile.
     environment:
       - AIRSTRIP_DB_HOST=db
+      - CLICKHOUSE_HOST=http://clickhouse-db:8123
     ports:
       - '3000:3000'
     depends_on:
@@ -41,4 +56,8 @@ services:
 
 volumes:
   pg_data:
+    driver: local
+  clickhouse_data:
+    driver: local
+  clickhouse_logs:
     driver: local

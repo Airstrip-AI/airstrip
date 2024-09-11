@@ -11,7 +11,24 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
-
+  clickhouse-db:
+    image: 'clickhouse/clickhouse-server:latest'
+    container_name: 'airstrip-clickhouse-db'
+    restart: always
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - clickhouse_logs:/var/log/clickhouse-server
+    ports:
+      - '8123:8123'
+      - '9000:9000'
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
 volumes:
   pg_data:
+    driver: local
+  clickhouse_data:
+    driver: local
+  clickhouse_logs:
     driver: local

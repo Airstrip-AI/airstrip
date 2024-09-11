@@ -7,11 +7,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "docker-start": "drizzle-kit migrate && next start",
+    "docker-start": "echo $CLICKHOUSE_HOST && yarn migrate-clickhouse && drizzle-kit migrate && next start",
     "lint": "next lint",
     "introspect-db-schema": "drizzle-kit introspect",
     "generate-db-schema": "drizzle-kit generate",
-    "migrate-db-schema": "drizzle-kit migrate"
+    "migrate-db-schema": "drizzle-kit migrate",
+    "migrate-clickhouse": "clickhouse-migrations migrate --host=$CLICKHOUSE_HOST --user=$CLICKHOUSE_USER --password=$CLICKHOUSE_PASSWORD --db=$CLICKHOUSE_DB --migrations-home=$CLICKHOUSE_MIGRATIONS_HOME"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^0.0.48",
@@ -19,6 +20,7 @@
     "@ai-sdk/google": "^0.0.46",
     "@ai-sdk/mistral": "^0.0.38",
     "@ai-sdk/openai": "^0.0.55",
+    "@clickhouse/client": "^1.5.0",
     "@mantine/charts": "^7.12.0",
     "@mantine/code-highlight": "^7.12.0",
     "@mantine/core": "^7.11.2",
@@ -33,6 +35,7 @@
     "@types/pg": "^8.11.8",
     "@types/uuid": "^10.0.0",
     "ai": "^3.3.2",
+    "clickhouse-migrations": "^1.0.1",
     "clsx": "^2.1.1",
     "cookies-next": "^4.2.1",
     "dayjs": "^1.11.12",

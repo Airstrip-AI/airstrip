@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY public public
 COPY src src
+COPY clickhouse clickhouse
 COPY next.config.mjs package.json postcss.config.cjs tailwind.config.ts tsconfig.json drizzle.config.ts yarn.lock ./
 
 # Section for env vars that will be built into the image
@@ -17,6 +18,10 @@ ARG AIRSTRIP_DB_PORT=5432
 ARG AIRSTRIP_DB_USER=airstrip
 ARG AIRSTRIP_DB_PASSWORD=airstrip
 ARG AIRSTRIP_DB_NAME=airstrip
+ARG CLICKHOUSE_HOST=http://clickhouse-db:8123
+ARG CLICKHOUSE_USER=default
+ARG CLICKHOUSE_PASSWORD=
+ARG CLICKHOUSE_DB=default
 
 # End of section for env vars that will be built into the image
 

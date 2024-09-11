@@ -8,15 +8,15 @@ import {
   useCreateNewChatWithFirstMessage,
   useSaveChatMessage,
 } from '@/hooks/queries/chat-messages';
-import { useSaveUsageDataByClientGeneratedId } from '@/hooks/queries/message-token-usage-data';
 import type { AppEntity } from '@/services/apps';
-import { UsageData } from '@/utils/backend/client/message-token-usage-data/types';
 import { showErrorNotification } from '@/utils/misc';
 import { Alert, Card, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { Message } from 'ai';
+import { CompletionTokenUsage, Message } from 'ai';
 import { useChat } from 'ai/react';
 import { useEffect, useState } from 'react';
+import { saveMessageUsageData } from '../../actions/usage-data';
+import { useCurrentUser } from '../../hooks/queries/user-auth';
 
 export default function Chat({
   app,
@@ -28,16 +28,9 @@ export default function Chat({
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [chatId, setChatId] = useState<string | null>(null);
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
-  const [usageData, setUsageData] = useState<Map<string, UsageData>>(new Map());
+  const [usageData, setUsageData] = useState<Map<string, { finishReason: string; usage: CompletionTokenUsage; }>>(new Map());
 
-  const { mutate: saveUsageDataMutation } = useSaveUsageDataByClientGeneratedId(
-    {
-      onSuccess: (resp) => {},
-      onError: (error) => {
-        console.error('Failed to save usage data', error);
-      },
-    },
-  );
+  const { currentUser } = useCurrentUser();
 
   const {
     messages,
@@ -74,22 +67,33 @@ export default function Chat({
   });
   const { mutate: saveChatMessageMutation } = useSaveChatMessage({
     onSuccess: (savedChatMessageResp) => {
-      const { clientGeneratedId } = savedChatMessageResp;
+      const { clientGeneratedId, id } = savedChatMessageResp;
       const messageUsageData = usageData.get(clientGeneratedId);
       if (!messageUsageData) {
         return;
       }
-      saveUsageDataMutation({
-        clientGeneratedId,
-        body: {
-          usage: messageUsageData,
-        },
-      });
-      setUsageData((prev) => {
-        const newUsageData = new Map(prev);
-        newUsageData.delete(clientGeneratedId);
-        return newUsageData;
-      });
+
+      saveMessageUsageData({
+        chatMessageId: id,
+        createdAt: new Date(),
+        orgId: app.orgId,
+        appId: app.id,
+        userId: currentUser!.id,
+        chatId: chatId!,
+        aiProvider: app.aiProvider!.aiProvider,
+        aiModel: app.aiProvider!.aiModel,
+        completionTokens: messageUsageData.usage.completionTokens,
+        promptTokens: messageUsageData.usage.promptTokens,
+        totalTokens: messageUsageData.usage.totalTokens,
+        status: messageUsageData.finishReason,
+      }).then(() => {
+        setUsageData((prev) => {
+          const newUsageData = new Map(prev);
+          newUsageData.delete(clientGeneratedId);
+          return newUsageData;
+        });
+      }).catch((error) => console.error('Failed to save message usage data', error));
+
     },
     onError: (error) =>
       showErrorNotification(`Failed to save message. Error: ${error.message}`),

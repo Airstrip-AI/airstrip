@@ -28,3 +28,8 @@ export const MEM0_API_KEY = process.env.MEM0_API_KEY || '';
 
 export const currentUserJwtKey = 'currentUserJwt';
 export const activeOrgIdKey = 'active-org-id';
+
+export const CLICKHOUSE_HOST = process.env.CLICKHOUSE_HOST || '';
+export const CLICKHOUSE_USER = process.env.CLICKHOUSE_USER || '';
+export const CLICKHOUSE_PASSWORD = process.env.CLICKHOUSE_PASSWORD || '';
+export const CLICKHOUSE_DB = process.env.CLICKHOUSE_DB || '';

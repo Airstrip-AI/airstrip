@@ -22,6 +22,7 @@ import {
 } from '@mantine/core';
 import { useLocalStorage, useDisclosure, useMediaQuery } from '@mantine/hooks';
 import {
+  IconLayoutDashboard,
   IconLogout,
   IconMail,
   IconPlugConnected,
@@ -38,6 +39,26 @@ const sideNav: {
   label: React.ReactNode;
   requiresOrgAdmin: boolean;
 }[] = [
+  {
+    href: Links.apps(),
+    label: (
+      <Group>
+        <IconTerminal2 />
+        Apps
+      </Group>
+    ),
+    requiresOrgAdmin: false,
+  },
+  {
+    href: Links.dashboard(),
+    label: (
+      <Group>
+        <IconLayoutDashboard />
+        Dashboard
+      </Group>
+    ),
+    requiresOrgAdmin: true,
+  },
   {
     href: Links.users(),
     label: (
@@ -57,16 +78,6 @@ const sideNav: {
       </Group>
     ),
     requiresOrgAdmin: true,
-  },
-  {
-    href: Links.apps(),
-    label: (
-      <Group>
-        <IconTerminal2 />
-        Apps
-      </Group>
-    ),
-    requiresOrgAdmin: false,
   },
 ];
 

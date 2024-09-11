@@ -5,8 +5,8 @@ export const Links = {
   login: () => '/login',
   register: () => '/register',
   requestResetPassword: () => '/request-reset-password',
-  appHome: () => `${appPrefix}/apps`, // Make this the default page for authenticated users since we don't have a dashboard now.
-
+  appHome: () => `${appPrefix}/apps`, // Make this the default page for authenticated users until we find a better home page.
+  dashboard: () => `${appPrefix}/dashboard`,
   users: (tab?: 'members' | 'teams') =>
     `${appPrefix}/users${tab ? `?tab=${tab}` : ''}`,
   aiIntegrations: () => `${appPrefix}/ai-integrations`,
