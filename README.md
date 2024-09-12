@@ -11,7 +11,7 @@ Airstrip is an open-source enterprise generative AI platform. Airstrip combines 
   - [x] API keys encryption.
 - [x] Memory layer for enhanced context. (Use your mem0 API key or run https://github.com/Airstrip-AI/mem0-rest/ for self-hosting Airstrip)
 - [x] LLM usage analytics.
-- [] ( :construction: ) RAG and Chunking.
+- [x] RAG and Chunking.
 - [] ( :bulb: ) Rate-limits
 - [] ( :bulb: ) REST APIs.
 
