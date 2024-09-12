@@ -26,6 +26,20 @@ export const AIRSTRIP_DB_SSL_CERT = process.env.AIRSTRIP_DB_SSL_CERT || '';
 export const MEM0_API_HOST = process.env.MEM0_API_HOST;
 export const MEM0_API_KEY = process.env.MEM0_API_KEY || '';
 
+export const BLOB_STORAGE_BUCKET =
+  process.env.BLOB_STORAGE_BUCKET || 'airstrip';
+export const BLOB_STORAGE_URL = process.env.NEXT_PUBLIC_BLOB_STORAGE_URL || '';
+export const BLOB_STORAGE_REGION = 'us-east-1';
+export const BLOB_STORAGE_ACCESS_ID = process.env.BLOB_STORAGE_ACCESS_ID || '';
+export const BLOB_STORAGE_ACCESS_KEY =
+  process.env.BLOB_STORAGE_ACCESS_KEY || '';
+
+export const OPENAI_EMBEDDING_API_KEY =
+  process.env.OPENAI_EMBEDDING_API_KEY || '';
+
+export const kbDocumentMaxSize = 40 * 1024 ** 2; // 80 MB
+export const kbDocumentMaxSizeLabel = '80mb';
+
 export const currentUserJwtKey = 'currentUserJwt';
 export const activeOrgIdKey = 'active-org-id';
 

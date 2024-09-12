@@ -1,0 +1,4 @@
+.saveButton {
+  position: sticky;
+  bottom: var(--mantine-spacing-md);
+}

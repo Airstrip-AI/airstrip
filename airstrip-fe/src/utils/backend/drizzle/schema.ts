@@ -18,7 +18,7 @@ import {
   unique,
   uniqueIndex,
   uuid,
-  varchar,
+  vector,
 } from 'drizzle-orm/pg-core';
 
 export const airstrip = pgSchema('airstrip');
@@ -409,4 +409,92 @@ export const orgTeamUsers = airstrip.table(
       }),
     };
   },
+);
+
+export const kbSources = airstrip.table(
+  'knowledge_base_sources',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
+    blobKey: text('blob_key').notNull(), // Key that represents blob in bucket e.g. `foo/bar/baz.pdf`
+    name: text('name').notNull(),
+    contentType: text('content_type').notNull(),
+    size: integer('size').notNull(), // size in bytes
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    orgId: uuid('org_id').notNull(),
+    processedAt: timestamp('processed_at', { withTimezone: true }),
+  },
+  (table) => {
+    return {
+      kbSourcesOrgIdFkey: foreignKey({
+        columns: [table.orgId],
+        foreignColumns: [organizations.id],
+        name: 'knowledge_base_sources_org_id_fkey',
+      }).onDelete('cascade'),
+    };
+  },
+);
+
+export const kbEmbeddings = airstrip.table(
+  'knowledge_base_embeddings',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
+    sourceId: uuid('source_id').notNull(),
+    content: text('content').notNull(),
+    embedding: vector('embedding', { dimensions: 1536 }), // ada-small
+    metadata: jsonb('metadata'),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  (table) => {
+    return {
+      embeddingsSourceIdKbSourcesIdFkey: foreignKey({
+        columns: [table.sourceId],
+        foreignColumns: [kbSources.id],
+        name: 'kb_embeddings_source_id_kb_sources_id_fkey',
+      }).onDelete('cascade'),
+      embeddingIndex: index('kbEmbeddingsIndex').using(
+        'hnsw',
+        table.embedding.op('vector_cosine_ops'),
+      ),
+    };
+  },
+);
+
+export const appKbSources = airstrip.table(
+  'app_knowledge_base_sources',
+  {
+    appId: uuid('app_id')
+      .references(() => apps.id)
+      .notNull(),
+    kbSourceId: uuid('kb_source_id')
+      .references(() => kbSources.id)
+      .notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  (table) => ({
+    appKbSourcesAppIdFkey: foreignKey({
+      columns: [table.appId],
+      foreignColumns: [apps.id],
+      name: 'app_kb_sources_app_id_fkey',
+    }).onDelete('cascade'),
+    appKbSourcesKbSourceIdFkey: foreignKey({
+      columns: [table.kbSourceId],
+      foreignColumns: [kbSources.id],
+      name: 'app_kb_sources_kb_source_id_fkey',
+    }).onDelete('cascade'),
+    appKbSourcesPkey: primaryKey({
+      columns: [table.appId, table.kbSourceId],
+      name: 'app_knowledge_base_sources_pkey',
+    }),
+  }),
 );

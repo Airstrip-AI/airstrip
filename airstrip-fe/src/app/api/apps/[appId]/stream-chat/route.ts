@@ -13,6 +13,7 @@ import { UserProfileResp } from '@/utils/backend/client/auth/types';
 import { AiProvider } from '@/utils/backend/client/common/types';
 import { mem0Client } from '@/utils/backend/mem0';
 import { NextRequest } from 'next/server';
+import { getRagContextPrompt } from './rag';
 
 export async function POST(
   request: NextRequest,
@@ -61,14 +62,23 @@ export async function POST(
       },
     );
 
-    const userPreferencesPromptApppend = await getMemoryForPrompt({
+    const userMessage = messages.slice().pop();
+
+    const userPreferencesPromptAppend = await getMemoryForPrompt({
       user,
       app,
     });
 
+    const ragPromptAppend = await getRagContextPrompt(
+      appId,
+      userMessage?.content || '',
+    );
+
     const updatedSystemPrompt = `
 ${systemPrompt || ''}
-${userPreferencesPromptApppend || ''}
+${userPreferencesPromptAppend || ''}
+
+${ragPromptAppend}
 `.trim();
 
     const streamTextResp = await streamText({
@@ -78,8 +88,6 @@ ${userPreferencesPromptApppend || ''}
       messages: convertToCoreMessages(messages as any),
 
       onFinish: (event) => {
-        const userMessage = messages.slice().pop();
-
         if (!userMessage) {
           return;
         }
