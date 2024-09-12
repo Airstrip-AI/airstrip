@@ -37,8 +37,8 @@ export const BLOB_STORAGE_ACCESS_KEY =
 export const OPENAI_EMBEDDING_API_KEY =
   process.env.OPENAI_EMBEDDING_API_KEY || '';
 
-export const kbDocumentMaxSize = 40 * 1024 ** 2; // 80 MB
-export const kbDocumentMaxSizeLabel = '80mb';
+export const kbDocumentMaxSize = 50 * 1024 ** 2;
+export const kbDocumentMaxSizeLabel = '50mb';
 
 export const currentUserJwtKey = 'currentUserJwt';
 export const activeOrgIdKey = 'active-org-id';

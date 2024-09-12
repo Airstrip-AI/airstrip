@@ -20,8 +20,16 @@ import { useForm } from '@mantine/form';
 import { modals } from '@mantine/modals';
 import {
   IconCloudUpload,
+  IconCsv,
   IconDownload,
-  IconPdf,
+  IconFileTypeDoc,
+  IconFileTypeDocx,
+  IconFileTypeHtml,
+  IconFileTypePdf,
+  IconFileTypePpt,
+  IconFileTypeTxt,
+  IconFileTypeXls,
+  IconJson,
   IconTrash,
   IconX,
 } from '@tabler/icons-react';
@@ -31,6 +39,39 @@ import classes from './new-knowledge-base-modal.module.css';
 interface Props {
   orgId: string;
 }
+
+const allowedTypes = [
+  'text/plain',
+  'text/html',
+  'application/json',
+  MIME_TYPES.pdf,
+  MIME_TYPES.doc,
+  MIME_TYPES.docx,
+  MIME_TYPES.ppt,
+  MIME_TYPES.pptx,
+  MIME_TYPES.csv,
+  MIME_TYPES.xlsx,
+] as const;
+
+type AllowedType = (typeof allowedTypes)[number];
+
+const typeIcon: Record<AllowedType, any> = {
+  'text/plain': IconFileTypeTxt,
+  'text/html': IconFileTypeHtml,
+  'application/json': IconJson,
+  'application/pdf': IconFileTypePdf,
+  'application/msword': IconFileTypeDoc,
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    IconFileTypeDocx,
+  'application/vnd.ms-powerpoint': IconFileTypePpt,
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+    IconFileTypePpt,
+  'text/csv': IconCsv,
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+    IconFileTypeXls,
+};
+
+const allTypeIcons = Array.from(new Set(Object.values(typeIcon)));
 
 export default function NewKnowledgeBaseModal({ orgId }: Props) {
   const theme = useMantineTheme();
@@ -80,6 +121,7 @@ export default function NewKnowledgeBaseModal({ orgId }: Props) {
   }
 
   const { file } = form.values;
+  const IconComp = file?.type && typeIcon[file.type as AllowedType];
 
   return (
     <form onSubmit={form.onSubmit(onSubmit)}>
@@ -98,7 +140,7 @@ export default function NewKnowledgeBaseModal({ orgId }: Props) {
               </ActionIcon>
             </Group>
             <Stack align="center" gap="xs">
-              <IconPdf />
+              <IconComp />
               <Box ta="center" fz="sm">
                 <Box fw="500">{file.name}</Box>
                 <Box c="dimmed">{file.type.split('/')[1].toUpperCase()}</Box>
@@ -149,15 +191,21 @@ export default function NewKnowledgeBaseModal({ orgId }: Props) {
               <Text ta="center" fw={700} fz="lg" mt="xl">
                 <Dropzone.Accept>Drop files here</Dropzone.Accept>
                 <Dropzone.Reject>
-                  Pdf file less than {kbDocumentMaxSizeLabel}
+                  File less than {kbDocumentMaxSizeLabel}
                 </Dropzone.Reject>
-                <Dropzone.Idle>Add document</Dropzone.Idle>
+                <Dropzone.Idle>
+                  <Group justify="center">
+                    {allTypeIcons.map((Icon) => (
+                      <Icon key={Icon.name} size="2rem" />
+                    ))}
+                  </Group>
+                </Dropzone.Idle>
               </Text>
               <Text ta="center" fz="sm" mt="xs" c="dimmed">
-                Click to select or drag&apos;n&apos;drop PDF file here.
+                Click to select or drag&apos;n&apos;drop file here.
               </Text>
               <Text ta="center" fz="sm" c="dimmed">
-                (Supports <i>PDF</i>. Limit {kbDocumentMaxSizeLabel}.)
+                (Limit {kbDocumentMaxSizeLabel})
               </Text>
             </div>
           </Dropzone>
