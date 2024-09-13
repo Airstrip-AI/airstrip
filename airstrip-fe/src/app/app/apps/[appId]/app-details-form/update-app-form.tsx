@@ -1,74 +1,46 @@
 'use client';
 
 import { loadImage } from '@/components/ai-providers-image/helpers';
-import AttachKnowledgeBaseButton from '@/components/knowledge-base/attach-knowledge-base-button';
+import AppEditor from '@/components/app-editor';
 import {
   useGetAllowedAiProvidersForApp,
-  useOptionalFeatures,
   useUpdateApp,
 } from '@/hooks/queries/apps';
-import { useAppKbSources } from '@/hooks/queries/kb-sources';
 import type { AppEntity } from '@/services/apps';
 import { UpdateAppReq } from '@/utils/backend/client/apps/types';
 import { AiProvider } from '@/utils/backend/client/common/types';
 import { showErrorNotification, showSuccessNotification } from '@/utils/misc';
 import {
-  Accordion,
+  ActionIcon,
   Box,
   Button,
   Card,
-  Checkbox,
   CopyButton,
+  Divider,
+  Fieldset,
   Group,
   Pill,
   Select,
-  Slider,
   Stack,
-  Table,
-  TagsInput,
   Text,
   Textarea,
   TextInput,
+  Tooltip,
 } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
-import {
-  IconBook2,
-  IconCheck,
-  IconDeviceSdCard,
-  IconExternalLink,
-} from '@tabler/icons-react';
+import { IconCheck, IconExternalLink, IconLink } from '@tabler/icons-react';
 
 export default function UpdateAppForm({
   app,
   form,
   appUserModeLink,
+  disabled,
 }: {
   app: AppEntity;
   form: UseFormReturnType<UpdateAppReq>;
   appUserModeLink: string;
+  disabled?: boolean;
 }) {
-  const { data: optionalFeatures } = useOptionalFeatures();
-
-  const { data: allowedAiProvidersForApp } = useGetAllowedAiProvidersForApp({
-    appId: app.id,
-    onError: (error) =>
-      showErrorNotification(
-        error.message || 'Unable to fetch allowed AI providers for app.',
-      ),
-  });
-  const aiProviderBoxData = [
-    {
-      label: '(unset)',
-      value: '',
-      provider: null,
-    },
-    ...(allowedAiProvidersForApp?.data.map((provider) => ({
-      label: provider.name,
-      value: provider.id,
-      provider,
-    })) || []),
-  ];
-
   const { mutate: updateAppMutation } = useUpdateApp({
     onSuccess: (app) => {
       showSuccessNotification(`App ${app.name} updated.`);
@@ -89,6 +61,7 @@ export default function UpdateAppForm({
             type: values.type,
             aiProviderId: values.aiProviderId || null,
             systemPrompt: values.systemPrompt || null,
+            systemPromptJson: values.systemPromptJson || null,
             introductionMessage: values.introductionMessage || null,
             outputJsonSchema: values.outputJsonSchema || null,
             temperature: values.temperature,
@@ -99,187 +72,76 @@ export default function UpdateAppForm({
       })}
     >
       <Stack>
-        <Card withBorder padding="0">
-          <Table withColumnBorders={false}>
-            <Table.Tbody>
-              <Table.Tr>
-                <Table.Td width="20%">
-                  {formFieldLabel('User mode link')}
-                </Table.Td>
-                <Table.Td>
-                  <Group>
-                    <Button
-                      size="xs"
-                      component="a"
-                      target="_blank"
-                      href={appUserModeLink}
-                      variant="outline"
-                    >
-                      <IconExternalLink />
-                    </Button>
-                    <CopyButton value={appUserModeLink}>
-                      {({ copied, copy }) => (
-                        <Button
-                          variant="outline"
-                          onClick={copy}
-                          size="xs"
-                          color={copied ? 'teal' : undefined}
-                        >
-                          {copied ? <IconCheck /> : 'Copy url'}
-                        </Button>
-                      )}
-                    </CopyButton>
-                  </Group>
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>{formFieldLabel('Team')}</Table.Td>
-                <Table.Td>
-                  <TextInput
-                    value={app.team?.name || 'Org-wide app'}
-                    disabled
-                  />
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>{formFieldLabel('Name')}</Table.Td>
-                <Table.Td>
-                  <TextInput {...form.getInputProps('name')} />
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>{formFieldLabel('Description')}</Table.Td>
-                <Table.Td>
-                  <TextInput {...form.getInputProps('description')} />
-                </Table.Td>
-              </Table.Tr>
-              {/* Only Chat is supported now */}
-              {/* <Table.Tr>
-              <Table.Td>{formFieldLabel('Type')}</Table.Td>
-              <Table.Td>
-                <Select
-                  mb="md"
-                  {...form.getInputProps('type')}
-                  data={Object.values(AppType).map((provider) => ({
-                    label: provider,
-                    value: provider,
-                  }))}
-                  placeholder="Select app type"
-                />
-              </Table.Td>
-            </Table.Tr> */}
-              <Table.Tr>
-                <Table.Td>{formFieldLabel('AI Provider')}</Table.Td>
-                <Table.Td>
-                  <Select
-                    {...form.getInputProps('aiProviderId')}
-                    data={aiProviderBoxData}
-                    renderOption={({ option, checked }) => {
-                      const provider = (option as any).provider as {
-                        id: string;
-                        name: string;
-                        description: string;
-                        aiProvider: AiProvider;
-                      } | null;
-                      const label = provider ? (
-                        <Group>
-                          <Text size="sm" fw="bold">
-                            {provider.name}
-                          </Text>{' '}
-                          <Text size="sm" c="dimmed">
-                            {provider.description.substring(0, 100) + '...'}
-                          </Text>
-                        </Group>
-                      ) : (
-                        <Text size="sm">{option.label}</Text>
-                      );
+        <Card withBorder p="xl" styles={{ root: { overflow: 'visible' } }}>
+          <Stack gap="lg">
+            <div>
+              <Group
+                wrap="nowrap"
+                justify="space-between"
+                // row-reverse to make tabbing from Name input go to next input instead of user mode buttons
+                style={{ flexDirection: 'row-reverse' }}
+              >
+                <UserModeButtons appUserModeLink={appUserModeLink} />
 
-                      return (
-                        <Group flex="1" gap="xs">
-                          {provider ? loadImage(provider.aiProvider) : null}
-                          {label}
-                          {checked && (
-                            <IconCheck
-                              style={{ marginInlineStart: 'auto' }}
-                              {...{
-                                stroke: 1.5,
-                                color: 'currentColor',
-                                opacity: 0.6,
-                                size: 18,
-                              }}
-                            />
-                          )}
-                        </Group>
-                      );
-                    }}
-                  />
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>{formFieldLabel('Creativity')}</Table.Td>
-                <Table.Td>
-                  <Text size="xs" c="dimmed">
-                    The creativity of the AI. 0 is very predictable, 1 is very
-                    creative.
-                  </Text>
-                  <Slider
-                    {...form.getInputProps('temperature')}
-                    min={0}
-                    max={1}
-                    marks={[
-                      { value: 0, label: '0' },
-                      { value: 1, label: '1' },
-                    ]}
-                    step={0.1}
-                    mb="lg"
-                  />
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>{formFieldLabel('Role')}</Table.Td>
-                <Table.Td>
-                  <Textarea
-                    minRows={15}
-                    rows={15}
-                    {...form.getInputProps('systemPrompt')}
-                    description="Describe what your AI does and how to do it."
-                  />
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>{formFieldLabel('Introduction')}</Table.Td>
-                <Table.Td>
-                  <Textarea
-                    minRows={7}
-                    rows={7}
-                    {...form.getInputProps('introductionMessage')}
-                    description="A message to introduce the AI to users. Usage examples perhaps?"
-                  />
-                </Table.Td>
-              </Table.Tr>
-              {/* Not supported yet */}
-              {/* <Table.Tr>
-              <Table.Td>{formFieldLabel('Output JSON schema')}</Table.Td>
-              <Table.Td>
-                <Textarea
-                  minRows={15}
-                  rows={15}
-                  {...form.getInputProps('outputJsonSchema')}
-                  description="For Tool only. Describe the JSON schema of the output."
+                <TextInput
+                  size="40"
+                  fw="bold"
+                  aria-label="App name"
+                  {...form.getInputProps('name')}
+                  placeholder="App Name"
+                  variant="unstyled"
+                  readOnly={disabled}
+                  errorProps={{
+                    fz: 'sm',
+                  }}
                 />
-              </Table.Td>
-            </Table.Tr> */}
-            </Table.Tbody>
-          </Table>
+              </Group>
+
+              <Box mt="xs">
+                <AppAccessibility app={app} />
+              </Box>
+            </div>
+
+            <TextInput
+              aria-label="App description"
+              {...form.getInputProps('description')}
+              placeholder="App Description (not part of prompt)"
+              variant="unstyled"
+              size="lg"
+              readOnly={disabled}
+              styles={{
+                input: {
+                  color: 'var(--mantine-color-gray-6)',
+                },
+              }}
+            />
+
+            <Card withBorder mt={20}>
+              <Textarea
+                label="Introduction"
+                aria-label="Introduction"
+                {...form.getInputProps('introductionMessage')}
+                placeholder="Hi there, I'm your trusty AI assistant, how may I help? (not part of prompt)"
+                autosize
+                maxRows={5}
+                variant="unstyled"
+                readOnly={disabled}
+              />
+            </Card>
+
+            <Divider label="What does your AI do, and how?" my={20} />
+          </Stack>
+
+          <Box mx="-xl" mt={20}>
+            <AppEditor appId={app.id} form={form} disabled={disabled} />
+          </Box>
         </Card>
 
-        {!!optionalFeatures?.knowledgeBaseAllowed && (
-          <KnowledgeSection appId={app.id} />
-        )}
+        <Fieldset>
+          <AiProviderSelect form={form} appId={app.id} disabled={disabled} />
+        </Fieldset>
 
-        {!!optionalFeatures?.memoryAllowed && <MemorySection form={form} />}
-
-        <Group justify="flex-end">
+        <Group justify="flex-end" display={disabled ? 'none' : undefined}>
           <Button
             size="xs"
             type="reset"
@@ -303,110 +165,114 @@ export default function UpdateAppForm({
   );
 }
 
-function MemorySection({ form }: { form: UseFormReturnType<UpdateAppReq> }) {
-  const memoryInputProps = form.getInputProps('memory', { type: 'checkbox' });
-  const enabled = memoryInputProps.checked;
-
+function UserModeButtons({ appUserModeLink }: { appUserModeLink: string }) {
   return (
-    <Accordion defaultValue={enabled ? 'memory' : ''} variant="contained">
-      <Accordion.Item value="memory">
-        <Accordion.Control>
-          <Group>
-            <IconDeviceSdCard size="1em" />
-            <Box>Assistant Memory</Box>
-          </Group>
-        </Accordion.Control>
-        <Accordion.Panel>
-          <Stack>
-            <Box c="dimmed" fz="sm">
-              <p>
-                With Assistant memory, user preferences and points of interests
-                can be stored and automatically used to provide context across
-                different conversations with this app.
-              </p>
-              <p>
-                This will provide users with a more personalized experience.
-              </p>
-              <Box component="p" fz="xs">
-                (Note: AI token usage will increase when Assistant memory is
-                enabled.)
-              </Box>
-            </Box>
+    <Group wrap="nowrap" gap={8}>
+      <Button
+        size="xs"
+        component="a"
+        target="_blank"
+        href={appUserModeLink}
+        variant="outline"
+        rightSection={<IconExternalLink size="1em" />}
+      >
+        Live App
+      </Button>
 
-            <Checkbox label="Enable" {...memoryInputProps} />
-
-            <TagsInput
-              label="What would be relevant?"
-              {...form.getInputProps('memoryQuery')}
-              acceptValueOnBlur
-              disabled={!enabled}
-              data={[
-                'User preferences',
-                'User role',
-                'User responsibilities',
-                "User's likes",
-              ]}
-              placeholder="Use comma (,) to separate tags"
-              inputWrapperOrder={['label', 'input', 'description']}
-              description={
-                'Indicate what should be stored in the memory e.g. "user preferences". You can select from the list or type in a new tag.'
-              }
-            />
-          </Stack>
-        </Accordion.Panel>
-      </Accordion.Item>
-    </Accordion>
+      <CopyButton value={appUserModeLink}>
+        {({ copied, copy }) => (
+          <Tooltip label="Copy live app link">
+            <ActionIcon
+              variant="outline"
+              onClick={copy}
+              color={copied ? 'teal' : undefined}
+            >
+              {copied ? <IconCheck size="1em" /> : <IconLink size="1em" />}
+            </ActionIcon>
+          </Tooltip>
+        )}
+      </CopyButton>
+    </Group>
   );
 }
 
-function KnowledgeSection({ appId }: { appId: string }) {
-  const enabled = true;
+function AppAccessibility({ app }: { app: AppEntity }) {
+  return <Pill>{app.team?.name || 'Org-wide app'}</Pill>;
+}
 
-  const { data: appKbSources } = useAppKbSources({ appId });
+function AiProviderSelect({
+  appId,
+  form,
+  disabled,
+}: {
+  appId: string;
+  form: UseFormReturnType<UpdateAppReq>;
+  disabled?: boolean;
+}) {
+  const { data: allowedAiProvidersForApp } = useGetAllowedAiProvidersForApp({
+    appId: appId,
+    onError: (error) =>
+      showErrorNotification(
+        error.message || 'Unable to fetch allowed AI providers for app.',
+      ),
+  });
+  const aiProviderBoxData = [
+    {
+      label: '(unset)',
+      value: '',
+      provider: null,
+    },
+    ...(allowedAiProvidersForApp?.data.map((provider) => ({
+      label: provider.name,
+      value: provider.id,
+      provider,
+    })) || []),
+  ];
 
   return (
-    <Accordion defaultValue={enabled ? 'kb' : ''} variant="contained">
-      <Accordion.Item value="kb">
-        <Accordion.Control>
+    <Select
+      label="AI Provider"
+      {...form.getInputProps('aiProviderId')}
+      data={aiProviderBoxData}
+      readOnly={disabled}
+      renderOption={({ option, checked }) => {
+        const provider = (option as any).provider as {
+          id: string;
+          name: string;
+          description: string;
+          aiProvider: AiProvider;
+        } | null;
+        const label = provider ? (
           <Group>
-            <IconBook2 size="1em" />
-            <Box>Knowledge</Box>
+            <Text size="sm" fw="bold">
+              {provider.name}
+            </Text>{' '}
+            <Text size="sm" c="dimmed">
+              {provider.description.substring(0, 100) + '...'}
+            </Text>
           </Group>
-        </Accordion.Control>
+        ) : (
+          <Text size="sm">{option.label}</Text>
+        );
 
-        <Accordion.Panel>
-          <Stack>
-            <Box c="dimmed" fz="sm">
-              <p>
-                Upload documents for the AI assistant to use as additional
-                knowledge and reference when generating responses.
-              </p>
-            </Box>
-
-            {appKbSources?.length ? (
-              <Group>
-                {appKbSources.map((kbSource) => {
-                  const { appId, kbSourceId, sourceData } = kbSource;
-                  const key = `${appId}-${kbSourceId}`;
-
-                  return <Pill key={key}>{sourceData.name}</Pill>;
-                })}
-              </Group>
-            ) : (
-              <Text c="dimmed" size="sm">
-                No knowledge attached to app.
-              </Text>
+        return (
+          <Group flex="1" gap="xs">
+            {provider ? loadImage(provider.aiProvider) : null}
+            {label}
+            {checked && (
+              <IconCheck
+                style={{ marginInlineStart: 'auto' }}
+                {...{
+                  stroke: 1.5,
+                  color: 'currentColor',
+                  opacity: 0.6,
+                  size: 18,
+                }}
+              />
             )}
-            <AttachKnowledgeBaseButton appId={appId} />
-          </Stack>
-        </Accordion.Panel>
-      </Accordion.Item>
-    </Accordion>
+          </Group>
+        );
+      }}
+    />
   );
 }
-
-const formFieldLabel = (label: string) => (
-  <Text fw="bold" size="sm">
-    {label}
-  </Text>
-);

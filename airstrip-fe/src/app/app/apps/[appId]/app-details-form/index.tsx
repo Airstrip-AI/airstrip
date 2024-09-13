@@ -6,17 +6,8 @@ import { UpdateAppReq } from '@/utils/backend/client/apps/types';
 import { AppType } from '@/utils/backend/client/common/types';
 import { isAdminOrAbove } from '@/utils/misc';
 import { Links } from '@/utils/misc/links';
-import {
-  Button,
-  Card,
-  CopyButton,
-  Group,
-  Table,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconCheck, IconExternalLink } from '@tabler/icons-react';
 import UpdateAppForm from './update-app-form';
 
 const formFieldLabel = (label: string) => (
@@ -37,6 +28,7 @@ export default function AppDetailsForm({ app }: { app: AppEntity }) {
       type: app.type,
       aiProviderId: app.aiProvider?.id || '',
       systemPrompt: app.systemPrompt || '',
+      systemPromptJson: app.systemPromptJson,
       introductionMessage: app.introductionMessage || '',
       outputJsonSchema: app.outputJsonSchema || '',
       temperature: app.temperature,
@@ -67,54 +59,12 @@ export default function AppDetailsForm({ app }: { app: AppEntity }) {
     ? isAdminOrAbove(userAppPrivileges?.accessLevel)
     : false;
 
-  return canUpdateApp ? (
-    <UpdateAppForm form={form} app={app} appUserModeLink={appUserModeLink} />
-  ) : (
-    <Card withBorder padding="0">
-      <Table withColumnBorders={false}>
-        <Table.Tbody>
-          <Table.Tr>
-            <Table.Td width="20%">{formFieldLabel('User mode link')}</Table.Td>
-            <Table.Td>
-              <Group>
-                <Button
-                  size="xs"
-                  component="a"
-                  target="_blank"
-                  href={appUserModeLink}
-                  variant="outline"
-                >
-                  <IconExternalLink />
-                </Button>
-                <CopyButton value={appUserModeLink}>
-                  {({ copied, copy }) => (
-                    <Button
-                      variant="outline"
-                      onClick={copy}
-                      size="xs"
-                      color={copied ? 'teal' : undefined}
-                    >
-                      {copied ? <IconCheck /> : 'Copy url'}
-                    </Button>
-                  )}
-                </CopyButton>
-              </Group>
-            </Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Td>{formFieldLabel('Team')}</Table.Td>
-            <Table.Td>
-              <TextInput value={app.team?.name || 'Org-wide app'} disabled />
-            </Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Td>{formFieldLabel('Name')}</Table.Td>
-            <Table.Td>
-              <TextInput {...form.getInputProps('name')} disabled />
-            </Table.Td>
-          </Table.Tr>
-        </Table.Tbody>
-      </Table>
-    </Card>
+  return (
+    <UpdateAppForm
+      form={form}
+      app={app}
+      appUserModeLink={appUserModeLink}
+      disabled={!canUpdateApp}
+    />
   );
 }

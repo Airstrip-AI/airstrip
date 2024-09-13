@@ -1,5 +1,5 @@
 {
-  "id": "f978c2d2-91ec-4634-bedb-9aa9445df535",
+  "id": "436eee70-241b-4248-9fd8-1d00d7e8084d",
   "prevId": "496bfadf-ebd7-4c54-8354-4241477780fe",
   "version": "7",
   "dialect": "postgresql",
@@ -166,34 +166,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "app_knowledge_base_sources_app_id_apps_id_fk": {
-          "name": "app_knowledge_base_sources_app_id_apps_id_fk",
-          "tableFrom": "app_knowledge_base_sources",
-          "tableTo": "apps",
-          "schemaTo": "airstrip",
-          "columnsFrom": [
-            "app_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "app_knowledge_base_sources_kb_source_id_knowledge_base_sources_id_fk": {
-          "name": "app_knowledge_base_sources_kb_source_id_knowledge_base_sources_id_fk",
-          "tableFrom": "app_knowledge_base_sources",
-          "tableTo": "knowledge_base_sources",
-          "schemaTo": "airstrip",
-          "columnsFrom": [
-            "kb_source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "app_kb_sources_app_id_fkey": {
           "name": "app_kb_sources_app_id_fkey",
           "tableFrom": "app_knowledge_base_sources",
@@ -298,6 +270,12 @@
         "system_prompt": {
           "name": "system_prompt",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "system_prompt_json": {
+          "name": "system_prompt_json",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },

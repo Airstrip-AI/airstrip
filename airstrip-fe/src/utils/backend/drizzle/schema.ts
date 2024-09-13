@@ -1,3 +1,4 @@
+import type { GenericBlock } from '@/components/app-editor/blocks/types';
 import {
   AiProvider,
   AppType,
@@ -210,6 +211,7 @@ export const apps = airstrip.table(
     type: text('type').$type<AppType>().notNull(),
     aiProviderId: uuid('ai_provider_id'),
     systemPrompt: text('system_prompt'),
+    systemPromptJson: jsonb('system_prompt_json').$type<GenericBlock[]>(),
     introductionMessage: text('introduction_message'),
     outputJsonSchema: text('output_json_schema'),
     temperature: doublePrecision('temperature').default(1).notNull(),
@@ -473,12 +475,8 @@ export const kbEmbeddings = airstrip.table(
 export const appKbSources = airstrip.table(
   'app_knowledge_base_sources',
   {
-    appId: uuid('app_id')
-      .references(() => apps.id)
-      .notNull(),
-    kbSourceId: uuid('kb_source_id')
-      .references(() => kbSources.id)
-      .notNull(),
+    appId: uuid('app_id').notNull(),
+    kbSourceId: uuid('kb_source_id').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   },
   (table) => ({

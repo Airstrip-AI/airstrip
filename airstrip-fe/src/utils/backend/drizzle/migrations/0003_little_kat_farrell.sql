@@ -26,18 +26,7 @@ CREATE TABLE IF NOT EXISTS "airstrip"."knowledge_base_sources" (
 	"processed_at" timestamp with time zone
 );
 --> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "airstrip"."app_knowledge_base_sources" ADD CONSTRAINT "app_knowledge_base_sources_app_id_apps_id_fk" FOREIGN KEY ("app_id") REFERENCES "airstrip"."apps"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "airstrip"."app_knowledge_base_sources" ADD CONSTRAINT "app_knowledge_base_sources_kb_source_id_knowledge_base_sources_id_fk" FOREIGN KEY ("kb_source_id") REFERENCES "airstrip"."knowledge_base_sources"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
+ALTER TABLE "airstrip"."apps" ADD COLUMN "system_prompt_json" jsonb;--> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "airstrip"."app_knowledge_base_sources" ADD CONSTRAINT "app_kb_sources_app_id_fkey" FOREIGN KEY ("app_id") REFERENCES "airstrip"."apps"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION

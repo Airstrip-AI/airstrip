@@ -7,12 +7,17 @@ import { convertToCoreMessages, LanguageModel, Message, streamText } from 'ai';
 
 import { authGuard } from '@/actions/auth.guard';
 import { makeAppsMemberGuard } from '@/actions/guards/apps.guard';
-import { AppEntity, getAppById } from '@/services/apps';
+import { checkOptionalFeatures } from '@/actions/optional-features';
+import {
+  customBlockTypes,
+  GenericBlock,
+} from '@/components/app-editor/blocks/types';
+import { defaultTemperature } from '@/constants';
+import { getAppById } from '@/services/apps';
 import { getAiIntegration } from '@/utils/backend/client/ai-integrations';
-import { UserProfileResp } from '@/utils/backend/client/auth/types';
 import { AiProvider } from '@/utils/backend/client/common/types';
-import { mem0Client } from '@/utils/backend/mem0';
 import { NextRequest } from 'next/server';
+import { addToMemory, getMemoryForPrompt } from './memory';
 import { getRagContextPrompt } from './rag';
 
 export async function POST(
@@ -62,29 +67,52 @@ export async function POST(
       },
     );
 
+    const promptBlockTypes = extractPromptBlockTypes(
+      app.systemPromptJson || [],
+    );
+
+    const { memoryAllowed, knowledgeBaseAllowed } =
+      await checkOptionalFeatures();
+
     const userMessage = messages.slice().pop();
 
-    const userPreferencesPromptAppend = await getMemoryForPrompt({
-      user,
-      app,
-    });
+    const memoryEnabled =
+      promptBlockTypes.has(customBlockTypes.memory) && memoryAllowed;
+    const memoryPromptAppend = memoryEnabled
+      ? await getMemoryForPrompt({
+          user,
+          app,
+        })
+      : '';
 
-    const ragPromptAppend = await getRagContextPrompt(
-      appId,
-      userMessage?.content || '',
-    );
+    const knowledgeEnabled =
+      promptBlockTypes.has(customBlockTypes.knowledge) && knowledgeBaseAllowed;
+    const ragPromptAppend = knowledgeEnabled
+      ? await getRagContextPrompt(appId, userMessage?.content || '')
+      : '';
 
     const updatedSystemPrompt = `
 ${systemPrompt || ''}
-${userPreferencesPromptAppend || ''}
+${memoryPromptAppend || ''}
 
 ${ragPromptAppend}
 `.trim();
 
+    const useCustomTemperature = promptBlockTypes.has(
+      customBlockTypes.temperature,
+    );
+
+    console.log({
+      customBlockTypes,
+      useCustomTemperature,
+      temp: useCustomTemperature ? app.temperature : defaultTemperature,
+      prompt: updatedSystemPrompt,
+    });
+
     const streamTextResp = await streamText({
       model: languageModel,
       system: updatedSystemPrompt || undefined,
-      temperature: app.temperature,
+      temperature: useCustomTemperature ? app.temperature : defaultTemperature,
       messages: convertToCoreMessages(messages as any),
 
       onFinish: (event) => {
@@ -109,75 +137,6 @@ ${ragPromptAppend}
     console.error(error);
     return new Response(JSON.stringify(error), { status: 500 });
   }
-}
-
-function addToMemory({
-  user,
-  app,
-  messages,
-}: {
-  user: UserProfileResp;
-  app: AppEntity;
-  messages: Message[];
-}) {
-  if (!app.memory) {
-    return;
-  }
-
-  try {
-    const parsedMessages = messages.map(({ role, content }) => ({
-      role: role === 'user' ? 'user' : 'assistant',
-      content,
-    }));
-
-    return mem0Client?.add(parsedMessages, getMemoryOptions({ user, app }));
-  } catch (err) {
-    console.error(err);
-    return;
-  }
-}
-
-async function getMemoryForPrompt({
-  user,
-  app,
-}: {
-  user: UserProfileResp;
-  app: AppEntity;
-}) {
-  if (!app.memory || !app.memoryQuery?.length) {
-    return;
-  }
-
-  try {
-    const queryPrompt = `Get the following data of the user:\n${app.memoryQuery.join('\n')}`;
-    const memory = await mem0Client?.search(
-      queryPrompt,
-      getMemoryOptions({ user, app }),
-    );
-
-    const hasMemory = !!memory?.length;
-
-    if (!hasMemory) {
-      return;
-    }
-
-    return `What we currently know about the user:
-  ${memory.map(({ memory: memContent }) => `- ${memContent}`).join('\n')}
-  `.trim();
-  } catch (err) {
-    console.error(err);
-    return;
-  }
-}
-
-function getMemoryOptions({
-  user,
-  app,
-}: {
-  user: UserProfileResp;
-  app: AppEntity;
-}) {
-  return { user_id: user.id, agent_id: app.id };
 }
 
 function getLanguageModel(
@@ -215,4 +174,8 @@ function getLanguageModel(
   }
 
   return languageModel;
+}
+
+function extractPromptBlockTypes(blocks: GenericBlock[]) {
+  return new Set(blocks.map((block) => block.type));
 }

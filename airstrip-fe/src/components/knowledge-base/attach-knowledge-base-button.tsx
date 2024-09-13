@@ -28,9 +28,10 @@ import NewKnowledgeBaseModal from './new-knowledge-base-modal';
 
 interface Props {
   appId: string;
+  disabled?: boolean;
 }
 
-export default function AttachKnowledgeBaseButton({ appId }: Props) {
+export default function AttachKnowledgeBaseButton({ appId, disabled }: Props) {
   const [opened, { open, close }] = useDisclosure();
   const [orgId] = useLocalStorage({
     key: activeOrgIdKey,
@@ -63,7 +64,7 @@ export default function AttachKnowledgeBaseButton({ appId }: Props) {
         </Stack>
       </Drawer>
 
-      <Button onClick={open} disabled={!orgId}>
+      <Button onClick={open} disabled={!orgId || disabled}>
         Update Knowledge
       </Button>
     </>
