@@ -2,6 +2,7 @@ import '@/app/styles.css';
 import ReactQueryClientProvider from '@/components/react-query-client-provider';
 import { PRODUCT_NAME } from '@/constants';
 import theme from '@/theme';
+import '@blocknote/mantine/style.css';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';

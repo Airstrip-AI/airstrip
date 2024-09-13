@@ -10,7 +10,7 @@ import {
 } from '@/hooks/queries/chat-messages';
 import type { AppEntity } from '@/services/apps';
 import { showErrorNotification } from '@/utils/misc';
-import { Alert, Card, Stack, Text } from '@mantine/core';
+import { Alert, Card, Loader, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { CompletionTokenUsage, Message } from 'ai';
 import { useChat } from 'ai/react';
@@ -28,7 +28,9 @@ export default function Chat({
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [chatId, setChatId] = useState<string | null>(null);
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
-  const [usageData, setUsageData] = useState<Map<string, { finishReason: string; usage: CompletionTokenUsage; }>>(new Map());
+  const [usageData, setUsageData] = useState<
+    Map<string, { finishReason: string; usage: CompletionTokenUsage }>
+  >(new Map());
 
   const { currentUser } = useCurrentUser();
 
@@ -86,14 +88,17 @@ export default function Chat({
         promptTokens: messageUsageData.usage.promptTokens,
         totalTokens: messageUsageData.usage.totalTokens,
         status: messageUsageData.finishReason,
-      }).then(() => {
-        setUsageData((prev) => {
-          const newUsageData = new Map(prev);
-          newUsageData.delete(clientGeneratedId);
-          return newUsageData;
-        });
-      }).catch((error) => console.error('Failed to save message usage data', error));
-
+      })
+        .then(() => {
+          setUsageData((prev) => {
+            const newUsageData = new Map(prev);
+            newUsageData.delete(clientGeneratedId);
+            return newUsageData;
+          });
+        })
+        .catch((error) =>
+          console.error('Failed to save message usage data', error),
+        );
     },
     onError: (error) =>
       showErrorNotification(`Failed to save message. Error: ${error.message}`),
@@ -163,6 +168,7 @@ export default function Chat({
             aiProvider={app.aiProvider?.aiProvider}
             error={error}
           />
+          {isLoading && <Loader type="dots" size="sm" />}
           {/* BUG: doesn't scroll to bottom while text is printing on screen */}
           <ChatScrollAnchor trackVisibility={isLoading} />
         </div>

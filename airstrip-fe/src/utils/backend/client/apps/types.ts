@@ -17,6 +17,7 @@ export class UpdateAppReq {
   type: AppType;
   aiProviderId: string | null;
   systemPrompt: string | null;
+  systemPromptJson: Record<string, any>[] | null;
   introductionMessage: string | null;
   outputJsonSchema: string | null;
   temperature: number;
