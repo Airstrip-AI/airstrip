@@ -3,7 +3,6 @@
 import ChatList from '@/components/chat/ChatList';
 import ChatPanel from '@/components/chat/ChatPanel';
 import { ChatScrollAnchor } from '@/components/chat/ChatScrollAnchor';
-import { getValidToken } from '@/hooks/helpers';
 import {
   useCreateNewChatWithFirstMessage,
   useSaveChatMessage,
@@ -25,7 +24,6 @@ export default function Chat({
   app: AppEntity;
   id: string | null;
 }) {
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const [chatId, setChatId] = useState<string | null>(null);
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
   const [usageData, setUsageData] = useState<
@@ -44,10 +42,6 @@ export default function Chat({
     stop,
   } = useChat({
     api: `/api/apps/${app.id}/stream-chat`,
-    // api: new URL(`/api/v1/apps/${app.id}/stream-chat`, getBackendUrl()).href,
-    // headers: {
-    //   Authorization: `Bearer ${authToken}`,
-    // },
     keepLastMessageOnError: true,
     onFinish: (message, options) =>
       setUsageData((prev) => {
@@ -126,10 +120,6 @@ export default function Chat({
       });
     }
   };
-
-  useEffect(() => {
-    setAuthToken(getValidToken());
-  }, []);
 
   useEffect(() => {
     setChatId(initialChatId);

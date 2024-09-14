@@ -19,6 +19,7 @@ import {
   Divider,
   Fieldset,
   Group,
+  Menu,
   Pill,
   Select,
   Stack,
@@ -28,7 +29,13 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
-import { IconCheck, IconExternalLink, IconLink } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconExternalLink,
+  IconLink,
+  IconShare,
+} from '@tabler/icons-react';
+import PreviewChat from '../preview-chat';
 
 export default function UpdateAppForm({
   app,
@@ -41,7 +48,7 @@ export default function UpdateAppForm({
   appUserModeLink: string;
   disabled?: boolean;
 }) {
-  const { mutate: updateAppMutation } = useUpdateApp({
+  const { mutate: updateAppMutation, isLoading } = useUpdateApp({
     onSuccess: (app) => {
       showSuccessNotification(`App ${app.name} updated.`);
       form.resetDirty();
@@ -50,37 +57,62 @@ export default function UpdateAppForm({
       showErrorNotification(error.message || 'An error occurred.'),
   });
 
+  function beforeOpenChatPreview(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!form.isDirty()) {
+        resolve(undefined);
+        return;
+      }
+
+      save(form.getValues(), () => {
+        resolve(undefined);
+      });
+    });
+  }
+
+  function save(values: UpdateAppReq, onSuccess?: () => void) {
+    updateAppMutation(
+      {
+        appId: app.id,
+        body: {
+          name: values.name.trim(),
+          description: values.description.trim(),
+          type: values.type,
+          aiProviderId: values.aiProviderId || null,
+          systemPrompt: values.systemPrompt || null,
+          systemPromptJson: values.systemPromptJson || null,
+          introductionMessage: values.introductionMessage || null,
+          outputJsonSchema: values.outputJsonSchema || null,
+          temperature: values.temperature,
+          memory: values.memory,
+          memoryQuery: values.memoryQuery,
+        },
+      },
+      {
+        onSuccess,
+      },
+    );
+
+    form.resetDirty();
+  }
+
   return (
-    <form
-      onSubmit={form.onSubmit((values) => {
-        updateAppMutation({
-          appId: app.id,
-          body: {
-            name: values.name.trim(),
-            description: values.description.trim(),
-            type: values.type,
-            aiProviderId: values.aiProviderId || null,
-            systemPrompt: values.systemPrompt || null,
-            systemPromptJson: values.systemPromptJson || null,
-            introductionMessage: values.introductionMessage || null,
-            outputJsonSchema: values.outputJsonSchema || null,
-            temperature: values.temperature,
-            memory: values.memory,
-            memoryQuery: values.memoryQuery,
-          },
-        });
-      })}
-    >
+    <form onSubmit={form.onSubmit((value) => save(value))}>
       <Stack>
         <Card withBorder p="xl" styles={{ root: { overflow: 'visible' } }}>
           <Stack gap="lg">
             <div>
               <Group
                 wrap="nowrap"
-                justify="space-between"
                 // row-reverse to make tabbing from Name input go to next input instead of user mode buttons
                 style={{ flexDirection: 'row-reverse' }}
               >
+                <PreviewChat.Button
+                  app={app}
+                  loading={isLoading}
+                  beforeOpen={beforeOpenChatPreview}
+                />
+
                 <UserModeButtons appUserModeLink={appUserModeLink} />
 
                 <TextInput
@@ -94,6 +126,7 @@ export default function UpdateAppForm({
                   errorProps={{
                     fz: 'sm',
                   }}
+                  flex={1}
                 />
               </Group>
 
@@ -141,25 +174,27 @@ export default function UpdateAppForm({
           <AiProviderSelect form={form} appId={app.id} disabled={disabled} />
         </Fieldset>
 
-        <Group justify="flex-end" display={disabled ? 'none' : undefined}>
-          <Button
-            size="xs"
-            type="reset"
-            onClick={form.reset}
-            disabled={!form.isDirty()}
-          >
-            Reset
-          </Button>
+        {disabled ? null : (
+          <Group justify="flex-end">
+            <Button
+              size="xs"
+              type="reset"
+              onClick={form.reset}
+              disabled={!form.isDirty()}
+            >
+              Reset
+            </Button>
 
-          <Button
-            variant="outline"
-            size="xs"
-            type="submit"
-            disabled={!form.isDirty()}
-          >
-            Update
-          </Button>
-        </Group>
+            <Button
+              variant="outline"
+              size="xs"
+              type="submit"
+              disabled={!form.isDirty()}
+            >
+              Update
+            </Button>
+          </Group>
+        )}
       </Stack>
     </form>
   );
@@ -167,32 +202,44 @@ export default function UpdateAppForm({
 
 function UserModeButtons({ appUserModeLink }: { appUserModeLink: string }) {
   return (
-    <Group wrap="nowrap" gap={8}>
-      <Button
-        size="xs"
-        component="a"
-        target="_blank"
-        href={appUserModeLink}
-        variant="outline"
-        rightSection={<IconExternalLink size="1em" />}
-      >
-        Live App
-      </Button>
+    <Menu>
+      <Menu.Target>
+        <Button variant="outline" rightSection={<IconShare size="1em" />}>
+          Share
+        </Button>
+      </Menu.Target>
+      <Menu.Dropdown>
+        <Menu.Label>
+          Open your app in live mode in a new tab or copy link to share.
+        </Menu.Label>
+        <Group wrap="nowrap" gap={8} mx="xs">
+          <Button
+            size="xs"
+            component="a"
+            target="_blank"
+            href={appUserModeLink}
+            variant="outline"
+            rightSection={<IconExternalLink size="1em" />}
+          >
+            Live App
+          </Button>
 
-      <CopyButton value={appUserModeLink}>
-        {({ copied, copy }) => (
-          <Tooltip label="Copy live app link">
-            <ActionIcon
-              variant="outline"
-              onClick={copy}
-              color={copied ? 'teal' : undefined}
-            >
-              {copied ? <IconCheck size="1em" /> : <IconLink size="1em" />}
-            </ActionIcon>
-          </Tooltip>
-        )}
-      </CopyButton>
-    </Group>
+          <CopyButton value={appUserModeLink}>
+            {({ copied, copy }) => (
+              <Tooltip label="Copy live app link">
+                <ActionIcon
+                  variant="outline"
+                  onClick={copy}
+                  color={copied ? 'teal' : undefined}
+                >
+                  {copied ? <IconCheck size="1em" /> : <IconLink size="1em" />}
+                </ActionIcon>
+              </Tooltip>
+            )}
+          </CopyButton>
+        </Group>
+      </Menu.Dropdown>
+    </Menu>
   );
 }
 

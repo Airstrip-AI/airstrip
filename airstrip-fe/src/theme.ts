@@ -1,11 +1,16 @@
 'use client';
 
-import { Modal, Overlay, createTheme } from '@mantine/core';
+import { Menu, Modal, Overlay, Tooltip, createTheme } from '@mantine/core';
 
 const theme = createTheme({
   primaryColor: 'dark',
   defaultRadius: 'md',
   components: {
+    Menu: Menu.extend({
+      defaultProps: {
+        withArrow: true,
+      },
+    }),
     Modal: Modal.extend({
       defaultProps: {
         transitionProps: {
@@ -18,6 +23,11 @@ const theme = createTheme({
       defaultProps: {
         opacity: 0.8,
         blur: 12,
+      },
+    }),
+    Tooltip: Tooltip.extend({
+      defaultProps: {
+        withArrow: true,
       },
     }),
   },
