@@ -46,18 +46,15 @@ export default function AppEditor({ appId, form, disabled }: Props) {
       return;
     }
 
-    // For migrating from plaintext system prompt made in older editor.
-    if (initialPrompt) {
-      dummyEditor
-        .tryParseMarkdownToBlocks(initialPrompt)
-        .then((initialBlocks) => {
-          setInitialContent(initialBlocks);
-        });
+    // Migrate plaintext system prompt made in older editor if it exists.
+    // Otherwise make an empty paragraph.
+    dummyEditor
+      .tryParseMarkdownToBlocks(initialPrompt || '')
+      .then((initialBlocks) => {
+        setInitialContent(initialBlocks);
+      });
 
-      return;
-    }
-
-    setInitialContent([]);
+    return;
   }, []);
 
   function getCustomSlashMenuItems(

@@ -1,7 +1,8 @@
 'use client';
 
-import { ActionIcon, Menu, Text } from '@mantine/core';
+import { ActionIcon, Box, Menu } from '@mantine/core';
 import { IconDots } from '@tabler/icons-react';
+import { useState } from 'react';
 
 export type ActionMenuItemProps = {
   label: string;
@@ -16,24 +17,37 @@ export default function ActionDropdownButton({
   basicActionMenuItems: ActionMenuItemProps[];
   dangerActionMenuItems: ActionMenuItemProps[];
 }) {
+  const [opened, setOpened] = useState(false);
+
   return (
-    <Menu shadow="md" width={200}>
+    <Menu shadow="md" width={200} opened={opened} onChange={setOpened}>
       <Menu.Target>
-        <ActionIcon size="sm" variant="transparent">
+        <ActionIcon
+          size="sm"
+          variant="transparent"
+          onClick={(ev) => {
+            ev.preventDefault();
+            setOpened((value) => !value);
+          }}
+        >
           <IconDots />
         </ActionIcon>
       </Menu.Target>
 
-      <Menu.Dropdown>
+      <Menu.Dropdown
+        onClick={(ev) => {
+          ev.preventDefault();
+        }}
+      >
         {basicActionMenuItems.map((item, index) => (
           <Menu.Item
             key={index}
             leftSection={item.leftSection}
             onClick={item.onClick}
           >
-            <Text size="sm" fw={600}>
+            <Box fz="sm" fw={600}>
               {item.label}
-            </Text>
+            </Box>
           </Menu.Item>
         ))}
 
@@ -46,10 +60,11 @@ export default function ActionDropdownButton({
             key={index}
             leftSection={item.leftSection}
             onClick={item.onClick}
+            c="red"
           >
-            <Text size="sm" fw={600} c="red">
+            <Box fz="sm" fw={600}>
               {item.label}
-            </Text>
+            </Box>
           </Menu.Item>
         ))}
       </Menu.Dropdown>

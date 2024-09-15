@@ -1,4 +1,4 @@
-import { getApp, updateApp } from '@/actions/apps';
+import { deleteApp, getApp, updateApp } from '@/actions/apps';
 import { checkOptionalFeatures } from '@/actions/optional-features';
 import { getValidToken, QueryKeys } from '@/hooks/helpers';
 import { AppEntity } from '@/services/apps';
@@ -63,6 +63,28 @@ export function useUpdateApp({
     onSuccess: (resp: AppEntity) => {
       queryClient.invalidateQueries([QueryKeys.APPS]);
       onSuccess(resp);
+    },
+    onError,
+  });
+}
+
+export function useDeleteApp({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: () => void;
+  onError: (error: Error) => void;
+}) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ appId }: { appId: string }) => {
+      return deleteApp(appId);
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries([QueryKeys.APPS]);
+      onSuccess();
     },
     onError,
   });

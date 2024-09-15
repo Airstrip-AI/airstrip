@@ -1,21 +1,44 @@
 'use client';
 
-import AbstractDataTable from '@/components/abstract-data-table/AbstractDataTable';
 import ActionDropdownButton from '@/components/action-dropdown-button/ActionDropdownButton';
 import { loadImage } from '@/components/ai-providers-image/helpers';
 import CreateAppForm from '@/components/create-app-form/CreateAppForm';
-import { useListAppsForUser } from '@/hooks/queries/apps';
+import { useDeleteApp, useListAppsForUser } from '@/hooks/queries/apps';
 import { useGetUserOrgTeams } from '@/hooks/queries/org-teams';
 import { useCurrentUser } from '@/hooks/queries/user-auth';
 import { activeOrgIdKey } from '@/hooks/user';
 import { AppResp } from '@/utils/backend/client/apps/types';
 import { fromNow, isAdminOrAbove, isAdminOrAboveInOrg } from '@/utils/misc';
 import { Links } from '@/utils/misc/links';
-import { Modal, Stack, rem, Text, Button, Flex } from '@mantine/core';
+import { notifyError, notifyOk } from '@/utils/notifications';
+import {
+  Box,
+  Button,
+  ButtonProps,
+  Group,
+  LoadingOverlay,
+  Modal,
+  rem,
+  SimpleGrid,
+  Stack,
+  Text,
+} from '@mantine/core';
 import { useDisclosure, useLocalStorage } from '@mantine/hooks';
-import { MRT_ColumnDef } from 'mantine-react-table';
+import { modals } from '@mantine/modals';
+import { IconPlus, IconTrash } from '@tabler/icons-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
+import classes from './page.module.css';
+
+const appButtonProps: ButtonProps = {
+  variant: 'outline',
+  p: 'md',
+  classNames: {
+    root: classes.appButton,
+    label: classes.appButtonLabel,
+  },
+};
 
 export default function AppsPage() {
   const router = useRouter();
@@ -36,7 +59,6 @@ export default function AppsPage() {
   const [hasAnyTeamAdminPrivileges, setHasAnyTeamAdminPrivileges] =
     useState<boolean>(false);
 
-  const [prevPageCursor, setPrevPageCursor] = useState<string | null>(null);
   const [page, setPage] = useState<string>('0');
 
   const { data: apps, isLoading: isLoadingApps } = useListAppsForUser({
@@ -80,103 +102,127 @@ export default function AppsPage() {
     </>
   );
 
-  const columns = useMemo<MRT_ColumnDef<AppResp>[]>(
-    () => [
-      {
-        header: 'Name',
-        accessorKey: 'name',
-      },
-      {
-        header: 'Description',
-        accessorKey: 'description',
-      },
-      {
-        header: 'Type',
-        accessorKey: 'type',
-      },
-      {
-        header: 'Last updated',
-        sortingFn: (a, b) =>
-          new Date(a.original.updatedAt).getTime() -
-          new Date(b.original.updatedAt).getTime(),
-        accessorFn: (data) => fromNow(data.updatedAt),
-      },
-      {
-        header: 'Team',
-        sortingFn: (a, b) => {
-          const teamA = a.original.team?.name || 'Organization';
-          const teamB = b.original.team?.name || 'Organization';
-          return teamA.localeCompare(teamB);
-        },
-        accessorFn: (data) =>
-          data.team?.name || (
-            <Text fs="italic" size="sm" fw="700">
-              Organization
-            </Text>
-          ),
-      },
-      {
-        header: 'Using provider',
-        sortingFn: (a, b) => {
-          const providerA = a.original.aiProvider?.provider || '';
-          const providerB = b.original.aiProvider?.provider || '';
-          return providerA.localeCompare(providerB);
-        },
-        accessorFn: (data) => {
-          const provider = data.aiProvider?.provider || '';
-          if (!provider) {
-            return '';
-          }
-          return loadImage(provider);
-        },
-      },
-      {
-        header: 'Actions',
-        enableSorting: false,
-        enableColumnActions: false,
-        accessorFn: (data) => {
-          return (
-            <ActionDropdownButton
-              basicActionMenuItems={[
-                {
-                  label: 'View/edit details',
-                  onClick: () => router.push(`${Links.apps(data.id)}`),
-                },
-              ]}
-              dangerActionMenuItems={[]}
-            />
-          );
-        },
-      },
-    ],
-    [],
-  );
+  const canCreateApp = hasOrgAdminPrivileges || hasAnyTeamAdminPrivileges;
+  const showEmptyPlaceholder = !canCreateApp && !apps?.data.length;
+  const nextPageCursor = apps?.nextPageCursor;
 
   return (
     <Stack mb={rem(20)}>
       <Text fw="bold">Apps</Text>
-      <AbstractDataTable
-        enableColumnActions={true}
-        columns={columns}
-        data={apps?.data || []}
-        prevPageCursor={prevPageCursor}
-        nextPageCursor={apps?.nextPageCursor}
-        isLoading={isLoadingApps}
-        loadPage={(cursor) => {
-          const prevPage =
-            Number(cursor) - 1 >= 0 ? String(Number(cursor) - 1) : null;
-          setPrevPageCursor(prevPage);
-          setPage(cursor);
-        }}
-      />
-      {createAppModal}
-      {(hasOrgAdminPrivileges || hasAnyTeamAdminPrivileges) && (
-        <Flex>
-          <Button size="xs" variant="outline" onClick={openCreateAppModal}>
-            Create app
-          </Button>
-        </Flex>
+
+      {showEmptyPlaceholder && (
+        <Box w="100%" c="dimmed" ta="center" fz="sm">
+          No apps available.
+        </Box>
       )}
+
+      <SimpleGrid cols={{ base: 2, md: 3, lg: 4 }}>
+        {canCreateApp && (
+          <Button {...appButtonProps} onClick={openCreateAppModal}>
+            <Group gap="xs">
+              <IconPlus size="1em" />
+              <span>New App</span>
+            </Group>
+          </Button>
+        )}
+        {apps?.data.map((app) => {
+          return <AppCard key={app.id} app={app} />;
+        })}
+      </SimpleGrid>
+
+      {!!nextPageCursor && (
+        <Group justify="center">
+          <Button onClick={() => setPage(nextPageCursor)}>Load More</Button>
+        </Group>
+      )}
+      {createAppModal}
     </Stack>
+  );
+}
+
+function AppCard({ app }: { app: AppResp }) {
+  const {
+    mutate: deleteApp,
+    variables,
+    isLoading: isDeletingApp,
+  } = useDeleteApp({
+    onSuccess: () => {
+      notifyOk('App deleted');
+    },
+    onError: () => {
+      notifyError('Failed to delete app. Please try again.');
+    },
+  });
+
+  const router = useRouter();
+
+  const { id, name, aiProvider, updatedAt } = app;
+  const { provider } = aiProvider || {};
+
+  const link = Links.apps(id);
+
+  function onClick() {
+    router.push(`${link}`);
+  }
+
+  function onDelete() {
+    modals.openConfirmModal({
+      title: 'Confirm delete',
+      children: (
+        <>
+          Are you sure you want to delete this app? This action cannot be
+          undone.
+        </>
+      ),
+      labels: { confirm: 'Delete', cancel: 'Back' },
+      confirmProps: { color: 'red' },
+      onConfirm: () => {
+        deleteApp({ appId: id });
+      },
+    });
+  }
+
+  const deletionInProgress = variables?.appId === id && isDeletingApp;
+
+  return (
+    <Button
+      component={Link}
+      key={id}
+      href={link}
+      {...appButtonProps}
+      style={{ pointerEvents: deletionInProgress ? 'none' : undefined }}
+    >
+      <Stack w="100%" h="100%" align="start" justify="space-between">
+        <Group w="100%" wrap="nowrap">
+          <Box mr="auto" fz="md" className={classes.appTitle}>
+            {name}
+          </Box>
+          <ActionDropdownButton
+            basicActionMenuItems={[
+              {
+                label: 'View/edit details',
+                onClick,
+              },
+            ]}
+            dangerActionMenuItems={[
+              {
+                leftSection: <IconTrash size="1em" />,
+                label: 'Delete',
+                onClick: onDelete,
+              },
+            ]}
+          />
+        </Group>
+        {!!provider && <Box>{loadImage(provider)}</Box>}
+        <Box ta="right" c="dimmed" fz="xs" fw="normal">
+          {fromNow(updatedAt)}
+        </Box>
+      </Stack>
+      <LoadingOverlay
+        loaderProps={{ type: 'dots' }}
+        visible={deletionInProgress}
+        overlayProps={{ blur: 18 }}
+      />
+    </Button>
   );
 }

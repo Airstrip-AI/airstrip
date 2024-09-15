@@ -24,3 +24,11 @@ export async function updateApp({
 
   return appsService.getAppById(appId);
 }
+
+export async function deleteApp(appId: string): Promise<void> {
+  await authGuard([makeAppsMemberGuard(appId)]);
+
+  await appsService.deleteApp(appId);
+
+  return;
+}

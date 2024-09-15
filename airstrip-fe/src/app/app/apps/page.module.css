@@ -1,0 +1,12 @@
+.appButton {
+  height: auto;
+}
+
+.appButtonLabel {
+  width: 100%;
+}
+
+.appTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

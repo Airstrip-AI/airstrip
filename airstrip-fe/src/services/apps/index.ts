@@ -35,3 +35,9 @@ export async function updateApp(appId: string, dto: UpdateAppReq) {
 
   return db.update(apps).set(dto).where(eq(apps.id, appId));
 }
+
+export async function deleteApp(appId: string) {
+  const db = await getDb();
+
+  return db.delete(apps).where(eq(apps.id, appId));
+}
