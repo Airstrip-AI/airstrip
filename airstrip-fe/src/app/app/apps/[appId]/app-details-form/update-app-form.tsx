@@ -66,18 +66,19 @@ export default function UpdateAppForm({
 
   function beforeOpenChatPreview(): Promise<void> {
     return new Promise((resolve) => {
-      if (!form.isDirty()) {
-        resolve(undefined);
-        return;
-      }
-
       save(form.getValues(), () => {
         resolve(undefined);
       });
     });
   }
 
+  const hasChanges = form.isDirty();
+
   function save(values: UpdateAppReq, onSuccess?: () => void) {
+    if (!hasChanges) {
+      return;
+    }
+
     updateAppMutation(
       {
         appId: app.id,
@@ -142,13 +143,14 @@ export default function UpdateAppForm({
               </Box>
             </div>
 
-            <TextInput
+            <Textarea
               aria-label="App description"
               {...form.getInputProps('description')}
               placeholder="App Description (not part of prompt)"
               variant="unstyled"
               size="lg"
               readOnly={disabled}
+              autosize
               styles={{
                 input: {
                   color: 'var(--mantine-color-gray-6)',
@@ -195,7 +197,7 @@ export default function UpdateAppForm({
                 appEditorKeyHandlers.increment();
                 form.reset();
               }}
-              disabled={!form.isDirty()}
+              disabled={!hasChanges}
             >
               Reset
             </Button>
@@ -204,7 +206,7 @@ export default function UpdateAppForm({
               variant="outline"
               size="xs"
               type="submit"
-              disabled={!form.isDirty()}
+              disabled={!hasChanges}
             >
               Update
             </Button>

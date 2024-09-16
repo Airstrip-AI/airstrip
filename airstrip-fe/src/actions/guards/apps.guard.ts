@@ -62,3 +62,39 @@ export function makeAppsAdminGuard(appId: string): InjectableGuard {
     }
   };
 }
+
+export function makeAppsAdminCreationGuard(
+  orgId: string,
+  teamId?: string | null,
+): InjectableGuard {
+  return async function (user) {
+    if (!uuidValidate(orgId)) {
+      return false;
+    }
+
+    if (!user) {
+      throw new UnauthorizedException('Not authorized');
+    }
+
+    const userOrg = user.orgs.find((org) => org.id === orgId);
+    const isOrgAdmin = !!userOrg && isAdminOrAbove(userOrg.role);
+
+    let isTeamAdmin = false;
+    if (teamId) {
+      const orgTeamEntity = await orgTeamsService.getOrgTeamById(teamId);
+
+      if (orgTeamEntity.orgId !== orgId) {
+        throw new UnauthorizedException('Team does not belong to the org');
+      }
+
+      const orgTeamUser = await orgTeamsService.getOrgTeamUser(
+        orgTeamEntity.id,
+        user.id,
+      );
+
+      isTeamAdmin = !!orgTeamUser && isAdminOrAbove(orgTeamUser.role);
+    }
+
+    return isOrgAdmin || isTeamAdmin;
+  };
+}
