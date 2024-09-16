@@ -1,7 +1,7 @@
 'use client';
 
 import { loadImage } from '@/components/ai-providers-image/helpers';
-import AppEditor from '@/components/app-editor';
+// import AppEditor from '@/components/app-editor';
 import {
   useGetAllowedAiProvidersForApp,
   useUpdateApp,
@@ -35,7 +35,12 @@ import {
   IconLink,
   IconShare,
 } from '@tabler/icons-react';
+import dynamic from 'next/dynamic';
 import PreviewChat from '../preview-chat';
+
+const AppEditor = dynamic(() => import('@/components/app-editor'), {
+  ssr: false,
+});
 
 export default function UpdateAppForm({
   app,
