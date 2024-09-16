@@ -160,7 +160,7 @@ export default function NewKnowledgeBaseModal({ orgId }: Props) {
             className={classes.dropzone}
             radius="lg"
             maxFiles={1}
-            accept={[MIME_TYPES.pdf]}
+            accept={[...allowedTypes]}
             maxSize={kbDocumentMaxSize}
             p="lg"
           >
