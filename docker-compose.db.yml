@@ -26,10 +26,32 @@ services:
       nofile:
         soft: 262144
         hard: 262144
+  # Local AWS services
+  localstack:
+    container_name: 'airstrip-localstack'
+    image: localstack/localstack
+    ports:
+      - '4566:4566' # LocalStack Gateway
+      # - '127.0.0.1:4510-4559:4510-4559' # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
+      - SERVICES=s3
+    volumes:
+      - 'localstack_data:/var/lib/localstack'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - './.localstack:/etc/localstack/init/ready.d' # ready hook
+  unstructured:
+    container_name: 'airstrip-unstructured'
+    image: downloads.unstructured.io/unstructured-io/unstructured-api:latest
+    ports:
+      - '4322:8000'
 volumes:
   pg_data:
     driver: local
   clickhouse_data:
     driver: local
   clickhouse_logs:
+    driver: local
+  localstack_data:
     driver: local
