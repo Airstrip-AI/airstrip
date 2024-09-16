@@ -20,15 +20,19 @@ import { useCurrentUser } from '../../hooks/queries/user-auth';
 export default function Chat({
   app,
   id: initialChatId,
+  forceSmallScreen,
 }: {
   app: AppEntity;
   id: string | null;
+  forceSmallScreen?: boolean;
 }) {
   const [chatId, setChatId] = useState<string | null>(null);
-  const isSmallScreen = useMediaQuery('(max-width: 768px)');
+  const mqSmallScreen = useMediaQuery('(max-width: 768px)');
   const [usageData, setUsageData] = useState<
     Map<string, { finishReason: string; usage: CompletionTokenUsage }>
   >(new Map());
+
+  const isSmallScreen = forceSmallScreen || mqSmallScreen;
 
   const { currentUser } = useCurrentUser();
 

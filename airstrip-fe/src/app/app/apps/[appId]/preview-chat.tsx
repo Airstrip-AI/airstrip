@@ -13,7 +13,7 @@ interface Props {
 export default function PreviewChat({ app, onClose, show }: Props) {
   return (
     <Drawer onClose={onClose} opened={show} position="right" size="xl">
-      <Chat app={app} id={null} />
+      <Chat app={app} id={null} forceSmallScreen />
     </Drawer>
   );
 }
