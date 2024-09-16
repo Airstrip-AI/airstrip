@@ -62,7 +62,7 @@ export default function AppEditor({ appId, form, disabled }: Props) {
   ): DefaultReactSuggestionItem[] {
     const defaultItems = getDefaultReactSlashMenuItems(editor);
 
-    const addedBlockTypes = editor.document.map((block) => block.type);
+    const addedBlockTypes = editor?.document?.map((block) => block.type) || [];
 
     const filteredDefaultItems = [
       ...defaultItems,
@@ -83,6 +83,11 @@ export default function AppEditor({ appId, form, disabled }: Props) {
       editable={!disabled}
       onChange={() => {
         form.setFieldValue('systemPromptJson', editor.document);
+
+        if (!editor.document) {
+          form.setFieldValue('systemPrompt', '');
+          return;
+        }
 
         const filteredDoc = editor.document.filter((block) => {
           return !customBlockTypeSet.has(block.type);
