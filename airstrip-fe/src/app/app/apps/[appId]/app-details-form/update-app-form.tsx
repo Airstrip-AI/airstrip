@@ -29,6 +29,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
+import { useCounter } from '@mantine/hooks';
 import {
   IconCheck,
   IconExternalLink,
@@ -53,6 +54,8 @@ export default function UpdateAppForm({
   appUserModeLink: string;
   disabled?: boolean;
 }) {
+  const [appEditorKey, appEditorKeyHandlers] = useCounter(0);
+
   const { mutate: updateAppMutation, isLoading } = useUpdateApp({
     onSuccess: (app) => {
       showSuccessNotification(`App ${app.name} updated.`);
@@ -171,7 +174,12 @@ export default function UpdateAppForm({
           </Stack>
 
           <Box mx="-xl" mt={20}>
-            <AppEditor appId={app.id} form={form} disabled={disabled} />
+            <AppEditor
+              key={appEditorKey}
+              appId={app.id}
+              form={form}
+              disabled={disabled}
+            />
           </Box>
         </Card>
 
@@ -184,7 +192,10 @@ export default function UpdateAppForm({
             <Button
               size="xs"
               type="reset"
-              onClick={form.reset}
+              onClick={() => {
+                appEditorKeyHandlers.increment();
+                form.reset();
+              }}
               disabled={!form.isDirty()}
             >
               Reset
