@@ -27,7 +27,6 @@ export function createMemoryBlock(form: UseFormReturnType<UpdateAppReq>) {
         } = form.getInputProps('memoryQuery') || {};
 
         const { data: optionalFeatures } = useOptionalFeatures();
-        console.log({ optionalFeatures });
 
         // Used to trigger re-render. Form's value change cannot trigger re-render here.
         const [value, setValue] = useState<string[]>(inputPropValue);
