@@ -12,6 +12,7 @@ Airstrip is an open-source enterprise generative AI platform. Airstrip combines 
 - [x] Memory layer for enhanced context. (Use your mem0 API key or run https://github.com/Airstrip-AI/mem0-rest/ for self-hosting Airstrip)
 - [x] LLM usage analytics.
 - [x] RAG and Chunking.
+- [x] Notion-style editing. 
 - [] ( :bulb: ) Rate-limits
 - [] ( :bulb: ) REST APIs.
 
@@ -47,7 +48,7 @@ For details on the default values and how to change them, refer to [this (option
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <h3>Manage AI integrations</h3> Bring your own API keys and connect to different LLM providers. We currently support **OpenAI**, **Mistral**, **Google**, **Cohere**, **Anthropic**, and **self-hosted LLMs** with an OpenAI-compatible interface. |                                                       <img width="1512" alt="ai-integrations" src="https://github.com/user-attachments/assets/ee742fc0-0790-44ff-a2ae-55d47ecd5493">                                                        |
 | <h3>Teams and role-based access control</h3> Manage teams and control access to different AI integrations.                                                                                                                                         |                                                            <img width="1512" alt="teams" src="https://github.com/user-attachments/assets/c3623b8e-a7c2-4af4-92dd-d06c21b47056">                                                             |
-| <h3>Build and use internal AI apps</h3> Build internal AI apps by adding prompts and specifying which LLM provider to connect to.                                                                                                                  | <img width="1512" alt="edit-app" src="https://github.com/user-attachments/assets/9511ee23-e42e-4d63-8dad-9f2762ca0af8"> <img width="1512" alt="chat" src="https://github.com/user-attachments/assets/891079db-5c8d-47f4-8c84-18a5fcc38b38"> |
+| <h3>Build and use internal AI apps</h3> Build internal AI apps by adding prompts and specifying which LLM provider to connect to.                                                                                                                  | <img width="1511" alt="Screenshot 2024-09-16 at 16 45 36" src="https://github.com/user-attachments/assets/eb737c4f-355d-4664-92ca-89adfa392b74"> <img width="1512" alt="Screenshot 2024-09-16 at 16 46 40" src="https://github.com/user-attachments/assets/22c1965f-a42b-490f-a5f3-ee7d14bdee57"> |
 | <h3>Usage analytics</h3> View LLM token usages and requests. | <img width="1512" alt="Screenshot 2024-09-11 at 12 32 26" src="https://github.com/user-attachments/assets/9a728ca2-ef49-4915-91eb-c4c941436ccd">|
 
 ## How to use
