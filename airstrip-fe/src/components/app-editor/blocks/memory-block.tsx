@@ -12,8 +12,6 @@ export const MemoryIcon = IconDeviceSdCard;
 export const memoryType = customBlockTypes.memory;
 
 export function createMemoryBlock(form: UseFormReturnType<UpdateAppReq>) {
-  const { data: optionalFeatures } = useOptionalFeatures();
-
   const Memory = createReactBlockSpec(
     {
       type: memoryType,
@@ -27,6 +25,9 @@ export function createMemoryBlock(form: UseFormReturnType<UpdateAppReq>) {
           onChange,
           ...restInputProps
         } = form.getInputProps('memoryQuery') || {};
+
+        const { data: optionalFeatures } = useOptionalFeatures();
+        console.log({ optionalFeatures });
 
         // Used to trigger re-render. Form's value change cannot trigger re-render here.
         const [value, setValue] = useState<string[]>(inputPropValue);
