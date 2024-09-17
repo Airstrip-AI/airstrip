@@ -48,4 +48,6 @@ export const CLICKHOUSE_USER = process.env.CLICKHOUSE_USER || '';
 export const CLICKHOUSE_PASSWORD = process.env.CLICKHOUSE_PASSWORD || '';
 export const CLICKHOUSE_DB = process.env.CLICKHOUSE_DB || '';
 
+export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+
 export const defaultTemperature = 0.5;
