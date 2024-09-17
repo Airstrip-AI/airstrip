@@ -5,3 +5,7 @@ export class UnauthorizedException extends Error {
 export class NotFoundException extends Error {
   name = 'NotFoundException';
 }
+
+export class BadRequestException extends Error {
+  name = 'BadRequestException';
+}

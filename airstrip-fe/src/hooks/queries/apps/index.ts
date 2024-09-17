@@ -1,17 +1,15 @@
-import { deleteApp, getApp, updateApp } from '@/actions/apps';
+import { createApp, deleteApp, getApp, updateApp } from '@/actions/apps';
 import { checkOptionalFeatures } from '@/actions/optional-features';
 import { getValidToken, QueryKeys } from '@/hooks/helpers';
 import { AppEntity } from '@/services/apps';
+import { CreateAppReq } from '@/services/apps/types';
 import {
   checkUserPrivilegesForApp,
-  createApp,
   getAllowedAiProvidersForApp,
   listAppsForUser,
 } from '@/utils/backend/client/apps';
 import {
-  AppResp,
   CheckUserPrivilegesForAppResp,
-  CreateAppReq,
   GetAllowedAiProvidersForAppResp,
   ListAppsResp,
   UpdateAppReq,
@@ -22,21 +20,19 @@ export function useCreateApp({
   onSuccess,
   onError,
 }: {
-  onSuccess: (resp: AppResp) => void;
+  onSuccess: (resp: AppEntity) => void;
   onError: (error: Error) => void;
 }) {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ orgId, body }: { orgId: string; body: CreateAppReq }) => {
-      const authToken = getValidToken();
       return createApp({
         orgId,
-        authToken,
-        body,
+        dto: body,
       });
     },
-    onSuccess: (resp: AppResp) => {
+    onSuccess: (resp: AppEntity) => {
       queryClient.invalidateQueries([QueryKeys.APPS]);
       onSuccess(resp);
     },

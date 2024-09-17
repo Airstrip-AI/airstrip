@@ -1,0 +1,9 @@
+.templateButton {
+  height: auto;
+}
+
+.templateButtonLabel {
+  width: 100%;
+  white-space: normal;
+  text-align: left;
+}
