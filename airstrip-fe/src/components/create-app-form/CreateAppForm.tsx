@@ -9,7 +9,7 @@ import {
   Button,
   ButtonProps,
   Collapse,
-  Flex,
+  Group,
   Select,
   SimpleGrid,
   Stack,
@@ -17,7 +17,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconFile } from '@tabler/icons-react';
+import { IconArrowNarrowLeft, IconFile } from '@tabler/icons-react';
 import { useState } from 'react';
 import classes from './create-app-form.module.css';
 import { useAppTemplates } from './use-app-templates';
@@ -140,6 +140,21 @@ export default function CreateAppForm({
           }))}
           placeholder="Select app type"
         /> */}
+
+        <Group justify="space-between" mt="md">
+          <Button
+            variant="outline"
+            size="xs"
+            leftSection={<IconArrowNarrowLeft size="1em" />}
+            onClick={() => setShowBlankForm(false)}
+          >
+            Back
+          </Button>
+
+          <Button type="submit" size="xs" loading={isCreating}>
+            Create
+          </Button>
+        </Group>
       </Collapse>
 
       {/* App templates */}
@@ -192,12 +207,6 @@ export default function CreateAppForm({
           ))}
         </SimpleGrid>
       </Collapse>
-
-      <Flex justify="end">
-        <Button type="submit" size="xs" loading={isCreating}>
-          Create
-        </Button>
-      </Flex>
     </form>
   );
 }
