@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <head></head>
       <body className={font.className} style={{ backgroundColor: '#ffffff' }}>
-        {GTM_ID && <GoogleTagManager gtmId="GTM-XYZ" />}
+        {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
         <MantineProvider theme={theme}>
           <Notifications />
           <ReactQueryClientProvider>
